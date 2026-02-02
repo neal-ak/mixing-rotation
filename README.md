@@ -11,3 +11,5 @@ To run the rotation solver you'll need
 Optionally to run the notebook also install
 
 - Jupyter
+- Matplotlib
+
