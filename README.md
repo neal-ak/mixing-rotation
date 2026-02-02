@@ -2,6 +2,8 @@
 
 ## Requirements
 
+This was tested on Python versions 3.12.3, 3.13.11, and 3.14.2.
+
 To run the rotation solver you'll need
 
 - Numpy
@@ -12,6 +14,15 @@ Optionally to run the notebook also install
 
 - Jupyter
 - Matplotlib
+
+Both lists with the tested package versions are found in the `requirements.txt` and `requirements-optional.txt` files, which can be used with
+
+```shell
+pip install -r requirements.txt
+pip install -r requirements-optional.txt
+```
+
+to install the packages either in your global Python environment or a virtual Python environment.
 
 ## Usage
 
