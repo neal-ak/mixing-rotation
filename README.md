@@ -64,3 +64,7 @@ solved = solve_mixing(system_of_equations, argument_order, unknown, known, toler
 
 The result is a dictionary of the unknowns you gave it mapped to the solutions the solver found.
 The `example.ipynb` shows how to iterate this process multiple times and plot the result.
+
+## Citation
+
+This was used in [arxiv:2602.xxxxx](https://arxiv.org/abs/2602.xxxxx).
