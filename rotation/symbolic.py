@@ -55,7 +55,7 @@ def create_3d_rotation() -> (
             ),
         )
     )
-    return rotate_gamma * rotate_beta * rotate_gamma, (rotate_alpha, rotate_beta, rotate_gamma), basic_2d
+    return rotate_gamma * rotate_beta * rotate_alpha, (rotate_alpha, rotate_beta, rotate_gamma), basic_2d
 
 
 # %%
