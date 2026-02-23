@@ -46,30 +46,46 @@ def solve_mixing(
     arguments: list[sym.Symbol],
     unknowns: dict[sym.Symbol, float],
     knowns: dict[sym.Symbol, float],
-    tolerance: float = 1e-8,
+    tolerance: float | None = None,
+    bounds: None|dict[sym.Symbol, tuple[float, float]] = None,
+    info: bool = False,
+    **kwargs
 ) -> dict[sym.Symbol, float]:
     """
     Performs the Scipy optimization routine, and packages the output into a
     dictionary of Symbols (from the input unknowns) mapped to their solved
-    values. Also performs a check to make sure that the solution is close
-    enough (within float tolerances) of zero when subbed back into the system
-    of equations. If it fails this check, it will raise a ValueError. The
-    absolute tolerance of this check can be configured.
+    values, also optionally returning the raw OptimizeResult from the
+    least squares with extra information. Also can perform a check to make sure
+    that the solution is close enough (within float tolerances) of zero when
+    subbed back into the system of equations. If it fails this check, it will
+    raise a ValueError. The absolute tolerance of this check can be configured.
+    The bounds can be defined by passing a dictionary of the Symbols with their
+    lower and upper bound pairs. Keyword arguments (except for 'fun', 'x0', and
+    'jac') are passed along to scipy.optimize.least_squares.
     """
 
-    def func(x, knowns):
+    def func(x):
         return optimize_system(system, arguments, x, knowns)
 
-    solution = optimize.fsolve(
-        func, [unknowns[k] for k in arguments if k in unknowns], knowns
+    unknown_args = [k for k in arguments if k in unknowns]
+    if bounds is not None:
+        kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [bounds[k][1] for k in unknown_args]
+    solution = optimize.least_squares(
+        func,
+        [unknowns[k] for k in unknown_args],
+        # jac = ,
+        **{k:v for k,v in kwargs.items() if k not in ["fun", "x0", "jac"]}
     )
-    solve = dict(zip([k for k in arguments if k in unknowns], solution))
-    correct = np.isclose(
-        func([solve[k] for k in arguments if k in solve], knowns), [0] * len(solution),
-        atol=tolerance,
-    )
-    if not np.all(correct):
-        raise ValueError(f"Solutions not close enough to zero: {correct}")
+    solve = dict(zip(unknown_args, solution.x))
+    if tolerance is not None:
+        correct = np.isclose(
+            func([solve[k] for k in arguments if k in solve]), [0] * len(solution.x),
+            atol=tolerance,
+        )
+        if not np.all(correct):
+            raise ValueError(f"Solutions not close enough to zero: {correct}")
+    if info:
+        return solve, solution
     return solve
 
 
