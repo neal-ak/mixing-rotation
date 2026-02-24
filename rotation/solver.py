@@ -9,36 +9,31 @@ import sympy as sym
 from .symbolic import MASS, MIX, ANGLE, create_mix_equation, create_3d_rotation
 
 # %%
-def optimize_system(
-    system: list,
+def build_call(
     arg_order: list[sym.Symbol],
     unknowns: list[float],
     knowns: dict[sym.Symbol, float],
 ):
     """
-    Evaluate the system of equations with a fixed argument ordering. The
-    unknowns are a list of numbers passed to the functions in the system. Their
-    ordering matches the argument ordering. The knowns are pairs of Sympy
-    Symbols and their fixed values. There should be 6 unknown parameters, and
-    as a result there should be len(arg_order)-6 knowns.
+    Takes the arguments split between unknowns and knowns and creates a
+    complete call signature for the lambdified Sympy functions. There should
+    be 6 unknown parameters, and as a result there should be len(arg_order)-6
+    knowns.
     """
     if len(unknowns) != 6:
         raise ValueError("The system can only accommodate 6 unknowns")
 
-    # Create a call signature to the lambdified Sympy functions:
-    # A. Pull from the knowns
-    # B. If that fails, get the next unknown that was passed in
     unknowns = iter(unknowns)
     call = {}
+    # A. Pull from the knowns
+    # B. If that fails, get the next unknown that was passed in
     for argument in arg_order:
         if argument in knowns:
             call[argument] = knowns[argument]
         else:
             call[argument] = next(unknowns)
 
-    arguments = [call[argument] for argument in arg_order]
-    return [f(*arguments) for f in system]
-
+    return [call[argument] for argument in arg_order]
 
 # %%
 def solve_mixing(
@@ -65,7 +60,8 @@ def solve_mixing(
     """
 
     def func(x):
-        return optimize_system(system, arguments, x, knowns)
+        calling = build_call(arguments, x, knowns)
+        return [f(*calling) for f in system]
 
     unknown_args = [k for k in arguments if k in unknowns]
     if bounds is not None:
