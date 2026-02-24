@@ -42,8 +42,8 @@ def solve_mixing(
     unknowns: dict[sym.Symbol, float],
     knowns: dict[sym.Symbol, float],
     partials: list[dict[sym.Symbol, any]] = None,
-    tolerance: float | None = None,
-    bounds: None|dict[sym.Symbol, tuple[float, float]] = None,
+    tolerance: float | None = 1e-8,
+    bounds: None | dict[sym.Symbol, tuple[float, float]] = None,
     info: bool = False,
     **kwargs
 ) -> dict[sym.Symbol, float]:
@@ -77,8 +77,25 @@ def solve_mixing(
     elif "jac" in kwargs:
         del kwargs["jac"]
 
-    if bounds is not None:
-        kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [bounds[k][1] for k in unknown_args]
+    if bounds is None:
+        bounds = {
+            MASS["pi"]: [0, np.inf],
+            MASS["eta"]: [0, np.inf],
+            MASS["phi"]: [0, np.inf],
+            MIX["pi"]: [0, np.inf],
+            MIX["eta"]: [0, np.inf],
+            MIX["phi"]: [0, np.inf],
+            MIX["1x1"]: [0, np.inf],
+            MIX["1x2"]: [0, np.inf],
+            ANGLE["alpha"]: [-np.pi/2, np.pi/2],
+            ANGLE["gamma"]: [-np.pi/2, np.pi/2],
+            ANGLE["beta"]: [-np.pi/2, np.pi/2],
+        }
+    kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [bounds[k][1] for k in unknown_args]
+    # default tolerances for least_squares if they weren't set by user
+    for k in ["ftol", "gtol", "xtol"]:
+        if k not in kwargs:
+            kwargs[k] = 1e-15
     solution = optimize.least_squares(
         func,
         [unknowns[k] for k in unknown_args],
