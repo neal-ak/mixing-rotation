@@ -90,17 +90,18 @@ def solve_mixing(
 
 
 # %%
-def initialize() -> tuple[sym.Matrix, list[sym.Symbol], list]:
+def initialize() -> tuple[list[sym.Symbol], list, list, sym.Matrix]:
     """
     Initializes the system of equations, and the argument order to the
     equations in the system. Returns the argument order, the system of
-    equations, and the matrix equation as a tuple.
+    equations, all the partial derivatives and the matrix equation as a tuple.
     """
     equation, _ = create_mix_equation(create_3d_rotation()[0])
     arguments = list(MASS.values()) + list(MIX.values()) + list(ANGLE.values())
-    system = []
+    system,partials = [], []
     for eq in [
         eq for i, eq in enumerate(equation.lhs - equation.rhs) if i not in [3, 6, 7]
     ]:
         system.append(sym.lambdify(arguments, eq))
-    return arguments, system, equation
+        partials.append({arg: sym.lambdify(arguments, sym.diff(eq, arg)) for arg in arguments})
+    return arguments, system, partials, equation
