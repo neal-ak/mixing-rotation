@@ -60,7 +60,7 @@ def solve_mixing(
     If it fails this check, it will raise a ValueError. The absolute tolerance
     of this check can be configured. The bounds can be defined by passing a
     dictionary of the Symbols with their lower and upper bound pairs. Keyword
-    arguments (except for 'fun', 'x0', and 'jac') are passed along to
+    arguments (except for 'fun' and 'x0') are passed along to
     scipy.optimize.least_squares.
     """
 
@@ -74,8 +74,6 @@ def solve_mixing(
             calling = build_call(arguments, x, knowns)
             return [[part[k](*calling) for k in unknown_args] for part in partials]
         kwargs["jac"] = jacobian
-    elif "jac" in kwargs:
-        del kwargs["jac"]
 
     if bounds is None:
         bounds = {
