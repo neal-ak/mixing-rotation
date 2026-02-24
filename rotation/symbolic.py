@@ -4,17 +4,25 @@
 import sympy as sym
 
 # %%
+def _preprocess_symbol(s):
+    s = str(s).replace("\\", "")
+    s = s.replace("^0", "").replace("^prime", "")
+    s = s.removesuffix(" b")
+    s = s.replace(" tilde{", "-").removesuffix("}")
+    return s
+
+# %%
 ANGLE = {
-    str(k).removeprefix("\\"): sym.Symbol(k, real=True)
+    _preprocess_symbol(k): sym.Symbol(k, real=True)
     for k in [r"\alpha", r"\beta", r"\gamma"]
 }
 MASS = {
-    str(k).removeprefix("\\"): sym.Symbol(f"M_{{{k}}}", nonnegative=True)
-    for k in [r"\pi", r"\phi", r"\eta"]
+    _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
+    for k in [r"\pi^0", r"\phi^\prime", r"\eta"]
 }
 MIX = {
-    str(k).removeprefix("\\"): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-    for k in [r"\pi", r"\phi", r"\eta", "1x1", "1x2"]
+    _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
+    for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}"]
 }
 
 
@@ -70,9 +78,9 @@ def create_mix_equation(
     rotation_inverse = rotation.transpose()
     mixing_matrix = sym.Matrix(
         [
-            [MIX["pi"] ** 2, MIX["1x1"], 0],
-            [MIX["1x1"], MIX["phi"] ** 2, MIX["1x2"]],
-            [0, MIX["1x2"], MIX["eta"] ** 2],
+            [MIX["pi"] ** 2, MIX["pi-phi"]/2, 0],
+            [MIX["pi-phi"]/2, MIX["phi"] ** 2, MIX["eta-phi"]/2],
+            [0, MIX["eta-phi"]/2, MIX["eta"] ** 2],
         ]
     )
     mass_matrix = sym.Matrix(
