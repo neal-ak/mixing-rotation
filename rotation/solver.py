@@ -41,6 +41,7 @@ def solve_mixing(
     arguments: list[sym.Symbol],
     unknowns: dict[sym.Symbol, float],
     knowns: dict[sym.Symbol, float],
+    partials: list[dict[sym.Symbol, any]] = None,
     tolerance: float | None = None,
     bounds: None|dict[sym.Symbol, tuple[float, float]] = None,
     info: bool = False,
@@ -50,13 +51,17 @@ def solve_mixing(
     Performs the Scipy optimization routine, and packages the output into a
     dictionary of Symbols (from the input unknowns) mapped to their solved
     values, also optionally returning the raw OptimizeResult from the
-    least squares with extra information. Also can perform a check to make sure
-    that the solution is close enough (within float tolerances) of zero when
-    subbed back into the system of equations. If it fails this check, it will
-    raise a ValueError. The absolute tolerance of this check can be configured.
-    The bounds can be defined by passing a dictionary of the Symbols with their
-    lower and upper bound pairs. Keyword arguments (except for 'fun', 'x0', and
-    'jac') are passed along to scipy.optimize.least_squares.
+    least squares with extra information. Optionally can use an analytic
+    Jacobian by passing the list of all partial derivatives in a list of
+    dictionaries sorted in the same order as the system's equation list. If
+    this is not done, least_squares makes a numerical approximation. Also can
+    perform a check to make sure that the solution is close enough (within
+    float tolerances) of zero when subbed back into the system of equations.
+    If it fails this check, it will raise a ValueError. The absolute tolerance
+    of this check can be configured. The bounds can be defined by passing a
+    dictionary of the Symbols with their lower and upper bound pairs. Keyword
+    arguments (except for 'fun', 'x0', and 'jac') are passed along to
+    scipy.optimize.least_squares.
     """
 
     def func(x):
@@ -64,13 +69,20 @@ def solve_mixing(
         return [f(*calling) for f in system]
 
     unknown_args = [k for k in arguments if k in unknowns]
+    if partials is not None:
+        def jacobian(x):
+            calling = build_call(arguments, x, knowns)
+            return [[part[k](*calling) for k in unknown_args] for part in partials]
+        kwargs["jac"] = jacobian
+    elif "jac" in kwargs:
+        del kwargs["jac"]
+
     if bounds is not None:
         kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [bounds[k][1] for k in unknown_args]
     solution = optimize.least_squares(
         func,
         [unknowns[k] for k in unknown_args],
-        # jac = ,
-        **{k:v for k,v in kwargs.items() if k not in ["fun", "x0", "jac"]}
+        **{k:v for k,v in kwargs.items() if k not in ["fun", "x0"]}
     )
     solve = dict(zip(unknown_args, solution.x))
     if tolerance is not None:
