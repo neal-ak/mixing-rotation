@@ -16,11 +16,11 @@ ANGLE = {
     _preprocess_symbol(k): sym.Symbol(k, real=True)
     for k in [r"\alpha", r"\beta", r"\gamma"]
 }
-MASS = {
+PROP = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [r"\pi^0", r"\phi^\prime", r"\eta"]
 }
-MIX = {
+BARE = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}"]
 }
@@ -78,13 +78,13 @@ def create_mix_equation(
     rotation_inverse = rotation.transpose()
     mixing_matrix = sym.Matrix(
         [
-            [MIX["pi"] ** 2, MIX["pi-phi"]/2, 0],
-            [MIX["pi-phi"]/2, MIX["phi"] ** 2, MIX["eta-phi"]/2],
-            [0, MIX["eta-phi"]/2, MIX["eta"] ** 2],
+            [BARE["pi"] ** 2, BARE["pi-phi"]/2, 0],
+            [BARE["pi-phi"]/2, BARE["phi"] ** 2, BARE["eta-phi"]/2],
+            [0, BARE["eta-phi"]/2, BARE["eta"] ** 2],
         ]
     )
     mass_matrix = sym.Matrix(
-        [[MASS["pi"] ** 2, 0, 0], [0, MASS["phi"] ** 2, 0], [0, 0, MASS["eta"] ** 2]]
+        [[PROP["pi"] ** 2, 0, 0], [0, PROP["phi"] ** 2, 0], [0, 0, PROP["eta"] ** 2]]
     )
     mixing_equation = sym.Eq(
         mass_matrix,

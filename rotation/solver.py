@@ -9,18 +9,18 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import MASS, MIX, ANGLE, create_mix_equation, create_3d_rotation
+from .symbolic import PROP, BARE, ANGLE, create_mix_equation, create_3d_rotation
 
 # %%
 _DEFAULT_BOUNDS = {
-    MASS["pi"]: [0, np.inf],
-    MASS["eta"]: [0, np.inf],
-    MASS["phi"]: [0, np.inf],
-    MIX["pi"]: [0, np.inf],
-    MIX["eta"]: [0, np.inf],
-    MIX["phi"]: [0, np.inf],
-    MIX["pi-phi"]: [0, np.inf],
-    MIX["eta-phi"]: [0, np.inf],
+    PROP["pi"]: [0, np.inf],
+    PROP["eta"]: [0, np.inf],
+    PROP["phi"]: [0, np.inf],
+    BARE["pi"]: [0, np.inf],
+    BARE["eta"]: [0, np.inf],
+    BARE["phi"]: [0, np.inf],
+    BARE["pi-phi"]: [0, np.inf],
+    BARE["eta-phi"]: [0, np.inf],
     ANGLE["alpha"]: [-np.pi/2, np.pi/2],
     ANGLE["gamma"]: [-np.pi/2, np.pi/2],
     ANGLE["beta"]: [-np.pi/2, np.pi/2],
@@ -113,7 +113,7 @@ def initialize() -> tuple[list[sym.Symbol], list[Callable], list[dict[sym.Symbol
     :rtype: tuple[list[sympy.Symbol], list[Callable], list[dict[sympy.Symbol,Callable]], sympy.Matrix]
     """
     equation, _ = create_mix_equation(create_3d_rotation()[0])
-    arg_ordering = list(MASS.values()) + list(MIX.values()) + list(ANGLE.values())
+    arg_ordering = list(PROP.values()) + list(BARE.values()) + list(ANGLE.values())
     system, partials = [], []
     for eq in [
         eq for i, eq in enumerate(equation.lhs - equation.rhs) if i not in [3, 6, 7]
