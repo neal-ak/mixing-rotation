@@ -6,10 +6,10 @@ import sympy as sym
 # %%
 def _preprocess_symbol(s):
     s = str(s).replace("\\", "")
-    s = s.replace("^0", "").replace("^prime", "")
-    s = s.removesuffix(" b")
-    s = s.replace(" tilde{", "-").removesuffix("}")
-    return s
+    s = s.replace("^0", "").replace("_0", "").replace("^prime", "")
+    s = s.removesuffix("b")
+    s = s.replace("tilde{", "").replace("}", "")
+    return s.strip().replace(" ", "-")
 
 # %%
 ANGLE = {
