@@ -18,7 +18,7 @@ ANGLE = {
 }
 PROP = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-    for k in [r"\pi^0", r"\phi^\prime", r"\eta"]
+    for k in [r"\pi^0", r"\tilde{\phi}^\prime", r"\eta"]
 }
 BARE = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
