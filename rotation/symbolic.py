@@ -77,7 +77,8 @@ def create_mix_equation(
     return mixing_equation, (rotation_transpose, bare_matrix, prop_matrix)
 
 # %%
-def create_kinetic(angles: tuple[sym.Symbol, sym.Symbol, sym.Symbol]):
+def create_kinetic():
+    angles = [ANGLE[k] for k in ["u", "v", "w"]]
     d = sym.sqrt(1 - sym.sin(angles[0])**2 - sym.sin(angles[1])**2 - sym.sin(angles[2])**2 + 2*sym.sin(angles[0])*sym.sin(angles[1])*sym.sin(angles[2]))
     return sym.Matrix([
         [1, -sym.tan(angles[0]), (sym.tan(angles[0])*sym.sin(angles[2])-sym.sin(angles[1])/sym.cos(angles[0]))/d],
