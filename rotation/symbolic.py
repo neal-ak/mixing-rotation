@@ -6,7 +6,7 @@ import sympy as sym
 # %%
 def _preprocess_symbol(s):
     s = str(s).replace("\\", "")
-    s = s.replace("^0", "").replace("_0", "").replace("^prime", "")
+    s = s.replace("^prime", "").replace("^", "").replace("_", "")
     s = s.removesuffix("b")
     s = s.replace("tilde{", "").replace("}", "")
     return s.strip().replace(" ", "-")
@@ -78,13 +78,13 @@ def create_mix_equation(
     rotation_inverse = rotation.transpose()
     mixing_matrix = sym.Matrix(
         [
-            [BARE["pi"] ** 2, BARE["pi-phi"]/2, 0],
-            [BARE["pi-phi"]/2, BARE["phi"] ** 2, BARE["eta-phi"]/2],
+            [BARE["pi0"] ** 2, BARE["pi0-phi"]/2, 0],
+            [BARE["pi0-phi"]/2, BARE["phi"] ** 2, BARE["eta-phi"]/2],
             [0, BARE["eta-phi"]/2, BARE["eta"] ** 2],
         ]
     )
     mass_matrix = sym.Matrix(
-        [[PROP["pi"] ** 2, 0, 0], [0, PROP["phi"] ** 2, 0], [0, 0, PROP["eta"] ** 2]]
+        [[PROP["pi0"] ** 2, 0, 0], [0, PROP["phi"] ** 2, 0], [0, 0, PROP["eta"] ** 2]]
     )
     mixing_equation = sym.Eq(
         mass_matrix,

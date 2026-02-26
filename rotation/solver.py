@@ -12,19 +12,7 @@ import sympy as sym
 from .symbolic import PROP, BARE, ANGLE, create_mix_equation, create_3d_rotation
 
 # %%
-_DEFAULT_BOUNDS = {
-    PROP["pi"]: [0, np.inf],
-    PROP["eta"]: [0, np.inf],
-    PROP["phi"]: [0, np.inf],
-    BARE["pi"]: [0, np.inf],
-    BARE["eta"]: [0, np.inf],
-    BARE["phi"]: [0, np.inf],
-    BARE["pi-phi"]: [0, np.inf],
-    BARE["eta-phi"]: [0, np.inf],
-    ANGLE["alpha"]: [-np.pi/2, np.pi/2],
-    ANGLE["gamma"]: [-np.pi/2, np.pi/2],
-    ANGLE["beta"]: [-np.pi/2, np.pi/2],
-}
+_DEFAULT_BOUNDS = {v: [0, np.inf] for v in list(PROP.values()) + list(BARE.values())} | {v: [-np.pi/2, np.pi/2] for v in ANGLE.values()}
 
 # %%
 def _build_call(
