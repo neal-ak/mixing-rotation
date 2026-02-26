@@ -9,7 +9,7 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import PROP, BARE, ANGLE, create_mix_equation, create_3d_rotation
+from .symbolic import PROP, BARE, ANGLE
 
 # %%
 _DEFAULT_BOUNDS = {v: [0, np.inf] for v in list(PROP.values()) + list(BARE.values())} | {v: [-np.pi/2, np.pi/2] for v in ANGLE.values()}
@@ -87,28 +87,28 @@ def _least_sqr_tolerance(
     return solve, solution
 
 
-
 # %%
-def initialize_pseudo() -> tuple[list[sym.Symbol], list[Callable], list[dict[sym.Symbol,Callable]], sym.Matrix]:
-    """Initializes the system of equations for the pseudoscalar solver.
+def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Callable], list[dict[sym.Symbol,Callable]]]:
+    """Initializes a system of equations for the solver.
 
     Sets up the argument call order for the lambdified sympy equations, the
-    equations themselves and their partials. Also returns a matrix representing
-    the system. Due to redundancy the callable system drops the lower diagonal
-    component of the matrix (6 equations in the system).
+    equations themselves and their partials. Due to redundancy the callable
+    system drops the lower diagonal component of the matrix (6 equations in the
+    system).
 
-    :return: Argument call order, system of equations, all partials for each equation, system as a matrix
-    :rtype: tuple[list[sympy.Symbol], list[Callable], list[dict[sympy.Symbol,Callable]], sympy.Matrix]
+    :param equation: Matrix representing the system of equations
+    :type equation: sym.Matrix
+    :return: Argument call order, system of equations, and all partials for each equation
+    :rtype: tuple[list[sympy.Symbol], list[Callable], list[dict[sympy.Symbol,Callable]]]
     """
-    equation, _ = create_mix_equation(create_3d_rotation()[0])
-    arg_ordering = [PROP[k] for k in ["pi0", "phi", "eta"]] + [BARE[k] for k in ["pi0", "phi", "eta", "pi0-phi", "eta-phi"]] + [ANGLE[k] for k in ["alpha", "beta", "gamma"]]
+    arg_ordering = [v for v in list(PROP.values())+list(BARE.values())+list(ANGLE.values()) if v in equation.free_symbols]
     system, partials = [], []
     for eqn in [
-        e for i, e in enumerate(equation.lhs - equation.rhs) if i not in [3, 6, 7]
+        e for i, e in enumerate(equation) if i not in [3, 6, 7]
     ]:
         system.append(sym.lambdify(arg_ordering, eqn))
         partials.append({arg: sym.lambdify(arg_ordering, sym.diff(eqn, arg)) for arg in arg_ordering})
-    return arg_ordering, system, partials, equation
+    return arg_ordering, system, partials
 
 
 # %%
