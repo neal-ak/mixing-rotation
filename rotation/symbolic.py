@@ -34,8 +34,8 @@ def create_3d_rotation() -> (
     theta = sym.Symbol(r"\theta", real=True)
     basic_2d = sym.Matrix(
         [
-            [sym.cos(theta), sym.sin(theta)],
-            [-sym.sin(theta), sym.cos(theta)],
+            [sym.cos(theta), -sym.sin(theta)],
+            [sym.sin(theta), sym.cos(theta)],
         ]
     )
     rotate = [
@@ -45,7 +45,7 @@ def create_3d_rotation() -> (
     ]
     for i, (m,s) in enumerate(zip(rotate, [ANGLE[k] for k in ["alpha", "beta", "gamma"]])):
         rotate[i] = m.subs(theta, s)
-    return rotate[2] * rotate[1] * rotate[0], tuple(rotate), basic_2d
+    return rotate[0] * rotate[1] * rotate[2], tuple(rotate), basic_2d
 
 
 # %%
@@ -53,24 +53,24 @@ def create_mix_equation(
     rotation: sym.Matrix,
 ) -> tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]:
     """
-    Creates the mixing equation from the rotation, mass, and mixing matrices.
+    Creates the mixing equation from the rotation, propagating, and bare matrices.
     Returns the equation, and a tuple of the matrices: (rotation_inverse,
-    mixing, mass).
+    bare, propagating).
     """
     rotation_inverse = rotation.transpose()
-    mixing_matrix = sym.Matrix(
+    bare_matrix = sym.Matrix(
         [
             [BARE["pi0"] ** 2, BARE["pi0-phi"]/2, 0],
             [BARE["pi0-phi"]/2, BARE["phi"] ** 2, BARE["eta-phi"]/2],
             [0, BARE["eta-phi"]/2, BARE["eta"] ** 2],
         ]
     )
-    mass_matrix = sym.Matrix(
+    prop_matrix = sym.Matrix(
         [[PROP["pi0"] ** 2, 0, 0], [0, PROP["phi"] ** 2, 0], [0, 0, PROP["eta"] ** 2]]
     )
     mixing_equation = sym.Eq(
-        mass_matrix,
-        sym.MatMul(rotation_inverse, mixing_matrix, rotation),
+        prop_matrix,
+        sym.MatMul(rotation, bare_matrix, rotation_inverse),
         evaluate=False,
     )
-    return mixing_equation, (rotation_inverse, mixing_matrix, mass_matrix)
+    return mixing_equation, (rotation_inverse, bare_matrix, prop_matrix)
