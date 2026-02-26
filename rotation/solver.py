@@ -89,8 +89,8 @@ def _least_sqr_tolerance(
 
 
 # %%
-def initialize() -> tuple[list[sym.Symbol], list[Callable], list[dict[sym.Symbol,Callable]], sym.Matrix]:
-    """Initializes the system of equations for solver.
+def initialize_pseudo() -> tuple[list[sym.Symbol], list[Callable], list[dict[sym.Symbol,Callable]], sym.Matrix]:
+    """Initializes the system of equations for the pseudoscalar solver.
 
     Sets up the argument call order for the lambdified sympy equations, the
     equations themselves and their partials. Also returns a matrix representing
@@ -101,13 +101,13 @@ def initialize() -> tuple[list[sym.Symbol], list[Callable], list[dict[sym.Symbol
     :rtype: tuple[list[sympy.Symbol], list[Callable], list[dict[sympy.Symbol,Callable]], sympy.Matrix]
     """
     equation, _ = create_mix_equation(create_3d_rotation()[0])
-    arg_ordering = list(PROP.values()) + list(BARE.values()) + list(ANGLE.values())
+    arg_ordering = [PROP[k] for k in ["pi0", "phi", "eta"]] + [BARE[k] for k in ["pi0", "phi", "eta", "pi0-phi", "eta-phi"]] + [ANGLE[k] for k in ["alpha", "beta", "gamma"]]
     system, partials = [], []
-    for eq in [
-        eq for i, eq in enumerate(equation.lhs - equation.rhs) if i not in [3, 6, 7]
+    for eqn in [
+        e for i, e in enumerate(equation.lhs - equation.rhs) if i not in [3, 6, 7]
     ]:
-        system.append(sym.lambdify(arg_ordering, eq))
-        partials.append({arg: sym.lambdify(arg_ordering, sym.diff(eq, arg)) for arg in arg_ordering})
+        system.append(sym.lambdify(arg_ordering, eqn))
+        partials.append({arg: sym.lambdify(arg_ordering, sym.diff(eqn, arg)) for arg in arg_ordering})
     return arg_ordering, system, partials, equation
 
 

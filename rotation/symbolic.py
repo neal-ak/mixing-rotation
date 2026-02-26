@@ -14,15 +14,16 @@ def _preprocess_symbol(s):
 # %%
 ANGLE = {
     _preprocess_symbol(k): sym.Symbol(k, real=True)
-    for k in [r"\alpha", r"\beta", r"\gamma"]
+    for k in [r"\alpha", r"\beta", r"\gamma", "u", "v", "w"]
 }
+TRIG = {t: {k: sym.Symbol(f"{t}_{v}", real=True) for k,v in ANGLE.items()} for t in ["c", "s", "t"]}
 PROP = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-    for k in [r"\pi^0", r"\tilde{\phi}^\prime", r"\eta"]
+    for k in [r"\pi^0", r"\tilde{\phi}^\prime", r"\eta", r"\eta_0"]
 }
 BARE = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-    for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}"]
+    for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}", r"\eta_0"]
 }
 
 
@@ -54,10 +55,10 @@ def create_mix_equation(
 ) -> tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]:
     """
     Creates the mixing equation from the rotation, propagating, and bare matrices.
-    Returns the equation, and a tuple of the matrices: (rotation_inverse,
+    Returns the equation, and a tuple of the matrices: (rotation_transpose,
     bare, propagating).
     """
-    rotation_inverse = rotation.transpose()
+    rotation_transpose = rotation.transpose()
     bare_matrix = sym.Matrix(
         [
             [BARE["pi0"] ** 2, BARE["pi0-phi"]/2, 0],
@@ -70,7 +71,37 @@ def create_mix_equation(
     )
     mixing_equation = sym.Eq(
         prop_matrix,
-        sym.MatMul(rotation, bare_matrix, rotation_inverse),
+        sym.MatMul(rotation, bare_matrix, rotation_transpose),
         evaluate=False,
     )
-    return mixing_equation, (rotation_inverse, bare_matrix, prop_matrix)
+    return mixing_equation, (rotation_transpose, bare_matrix, prop_matrix)
+
+# %%
+def create_kinetic(angles: tuple[sym.Symbol, sym.Symbol, sym.Symbol]):
+    d = sym.sqrt(1 - sym.sin(angles[0])**2 - sym.sin(angles[1])**2 - sym.sin(angles[2])**2 + 2*sym.sin(angles[0])*sym.sin(angles[1])*sym.sin(angles[2]))
+    return sym.Matrix([
+        [1, -sym.tan(angles[0]), (sym.tan(angles[0])*sym.sin(angles[2])-sym.sin(angles[1])/sym.cos(angles[0]))/d],
+        [0, 1/sym.cos(angles[0]), (sym.tan(angles[0])*sym.sin(angles[1])-sym.sin(angles[2])/sym.cos(angles[0]))/d],
+        [0, 0, sym.cos(angles[0])/d]
+    ])
+
+# %%
+def create_axial_mix_equation(rotation, kinetic):
+    rotation_transpose = rotation.transpose()
+    kinetic_transpose = kinetic.transpose()
+    bare_matrix = sym.Matrix(
+        [
+            [BARE["pi0"] ** 2, 0, 0],
+            [0, BARE["eta"] ** 2, 0],
+            [0, 0, BARE["eta0"] ** 2],
+        ]
+    )
+    prop_matrix = sym.Matrix(
+        [[PROP["pi0"] ** 2, 0, 0], [0, PROP["eta"] ** 2, 0], [0, 0, PROP["eta0"] ** 2]]
+    )
+    mixing_equation = sym.Eq(
+        prop_matrix,
+        sym.MatMul(rotation, kinetic, bare_matrix, kinetic_transpose, rotation_transpose),
+        evaluate=False,
+    )
+    return mixing_equation, (kinetic_transpose, rotation_transpose, bare_matrix, prop_matrix)
