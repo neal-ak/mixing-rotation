@@ -38,32 +38,14 @@ def create_3d_rotation() -> (
             [-sym.sin(theta), sym.cos(theta)],
         ]
     )
-    rotate_alpha = sym.Matrix(sym.BlockDiagMatrix(basic_2d, sym.Matrix([1]))).subs(
-        {
-            sym.cos(theta): sym.cos(ANGLE["alpha"]),
-            sym.sin(theta): sym.sin(ANGLE["alpha"]),
-        }
-    )
-    rotate_beta = sym.Matrix(
-        [[basic_2d[0], 0, basic_2d[1]], [0, 1, 0], [basic_2d[2], 0, basic_2d[3]]]
-    ).subs(
-        {
-            sym.cos(theta): sym.cos(ANGLE["beta"]),
-            sym.sin(theta): sym.sin(ANGLE["beta"]),
-        }
-    )
-    rotate_gamma = sym.Matrix(
-        sym.BlockDiagMatrix(
-            sym.Matrix([1]),
-            basic_2d.subs(
-                {
-                    sym.cos(theta): sym.cos(ANGLE["gamma"]),
-                    sym.sin(theta): sym.sin(ANGLE["gamma"]),
-                }
-            ),
-        )
-    )
-    return rotate_gamma * rotate_beta * rotate_alpha, (rotate_alpha, rotate_beta, rotate_gamma), basic_2d
+    rotate = [
+        sym.Matrix(sym.BlockDiagMatrix(basic_2d, sym.Matrix([1]))),
+        sym.Matrix([[basic_2d[0], 0, basic_2d[1]], [0, 1, 0], [basic_2d[2], 0, basic_2d[3]]]),
+        sym.Matrix(sym.BlockDiagMatrix(sym.Matrix([1]), basic_2d)),
+    ]
+    for i, (m,s) in enumerate(zip(rotate, [ANGLE[k] for k in ["alpha", "beta", "gamma"]])):
+        rotate[i] = m.subs(theta, s)
+    return rotate[2] * rotate[1] * rotate[0], tuple(rotate), basic_2d
 
 
 # %%
