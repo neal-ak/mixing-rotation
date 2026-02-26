@@ -23,7 +23,7 @@ PROP = {
 }
 BARE = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-    for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}", r"\eta_0"]
+    for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}", r"\eta_0 b"]
 }
 
 

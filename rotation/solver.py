@@ -79,7 +79,7 @@ def _least_sqr_tolerance(
     if abs_tolerance is not None:
         correct = np.isclose(
             function([solve[k] for k in arg_ordering if k in solve]),
-            [0] * len(solution.x),
+            0,
             atol=abs_tolerance,
         )
         if not np.all(correct):
