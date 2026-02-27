@@ -9,10 +9,22 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import PROP, BARE, ANGLE
+from .symbolic import ALL_SYMBOL
 
 # %%
-_DEFAULT_BOUNDS = {v: [0, np.inf] for v in list(PROP.values()) + list(BARE.values())} | {v: [-np.pi/2, np.pi/2] for v in ANGLE.values()}
+_DEFAULT_BOUNDS = {}
+for section, sub_symbols in ALL_SYMBOL.items():
+    match section:
+        case "prop"|"bare":
+            _DEFAULT_BOUNDS |= {v: tuple([0, np.inf]) for v in sub_symbols.values()}
+        case "angle":
+            _DEFAULT_BOUNDS |= {v: tuple([-np.pi, np.pi]) for v in sub_symbols.values()}
+        case "cos"|"sin":
+            _DEFAULT_BOUNDS |= {v: tuple([-1, 1]) for v in sub_symbols.values()}
+        case "tan":
+            _DEFAULT_BOUNDS |= {v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()}
+        case _:
+            _DEFAULT_BOUNDS |= {v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()}
 
 # %%
 def _build_call(
@@ -101,7 +113,9 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
     :return: Argument call order, system of equations, and all partials for each equation
     :rtype: tuple[list[sympy.Symbol], list[Callable], list[dict[sympy.Symbol,Callable]]]
     """
-    arg_ordering = [v for v in list(PROP.values())+list(BARE.values())+list(ANGLE.values()) if v in equation.free_symbols]
+    arg_ordering = []
+    for s in ALL_SYMBOL.values():
+        arg_ordering += [v for v in s.values() if v in equation.free_symbols]
     system, partials = [], []
     for eqn in [
         e for i, e in enumerate(equation) if i not in [3, 6, 7]
