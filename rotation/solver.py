@@ -100,7 +100,7 @@ def _least_sqr_tolerance(
 
 
 # %%
-def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Callable]]:
+def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Callable], list[dict[sym.Symbol,Callable]]]:
     """Initializes a system of equations for the solver.
 
     Sets up the argument call order for the lambdified sympy equations, the
@@ -110,27 +110,30 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
 
     :param equation: Matrix representing the system of equations
     :type equation: sym.Matrix
-    :return: Argument call order, and the system of equations
-    :rtype: tuple[list[sympy.Symbol], list[Callable]]
+    :return: Argument call order, system of equations, and all partials for each equation
+    :rtype: tuple[list[sympy.Symbol], list[Callable], list[dict[sympy.Symbol,Callable]]]
     """
     arg_ordering = []
     for s in ALL_SYMBOL.values():
         arg_ordering += [v for v in s.values() if v in equation.free_symbols]
-    system = []
+    system, partials = [], []
     for eqn in [
         e for i, e in enumerate(equation) if i not in [3, 6, 7]
     ]:
         system.append(sym.lambdify(arg_ordering, eqn))
-    return arg_ordering, system
+        partials.append({arg: sym.lambdify(arg_ordering, sym.diff(eqn, arg)) for arg in arg_ordering})
+    return arg_ordering, system, partials
 
 
 # %%
-def create_func(
+def create_func_jac(
     system: list[Callable],
     arg_ordering: list[sym.Symbol],
+    arg_unknown: list[sym.Symbol],
     knowns: dict[sym.Symbol, float],
-) -> Callable:
-    """Creates the vector function for the Scipy solver.
+    partials: list[dict[sym.Symbol, Callable]] = None,
+) -> tuple[Callable, Callable | None]:
+    """Creates the vector function and jacobian for the Scipy solver.
 
     :param system: System of equations lambdified from Sympy
     :type system: list[Callable]
@@ -140,19 +143,26 @@ def create_func(
     :type arg_unknown: list[sympy.Symbol]
     :param knowns: Known arguments and their values in the system
     :type knowns: dict[sympy.Symbol, float]
-    :return: The function Scipy can use to optimize
-    :rtype: Callable
+    :param partials: Partials of the system sorted the same as the system of equations, defaults to None
+    :type partials: list[dict[sympy.Symbol, Callable]], optional
+    :return: The function and jacobian Scipy can use to optimize
+    :rtype: tuple[Callable, Callable | None]
     """
     def function(x):
         calling = _build_call(arg_ordering, x, knowns)
         return [f(*calling) for f in system]
 
-    return function
+    if partials is not None:
+        def jacobian(x):
+            calling = _build_call(arg_ordering, x, knowns)
+            return [[part[k](*calling) for k in arg_unknown] for part in partials]
+        return function, jacobian
+    return function, None
 
 
 # %%
 def debug_solve_mixing(
-    func: Callable,
+    func_jac: tuple[Callable,Callable|None],
     arg_ordering: list[sym.Symbol],
     init_unknowns: dict[sym.Symbol, float],
     abs_tolerance: float | None,
@@ -164,8 +174,8 @@ def debug_solve_mixing(
     This function also returns the raw scipy.optimize.OptimizeResult for
     debugging help.
 
-    :param func: The vector function
-    :type func: Callable,
+    :param func_jac: The vector function and its jacobian
+    :type func_jac: tuple[Callable,Callable | None]
     :param arg_ordering: Call order defined by the Sympy lambdification
     :type arg_ordering: list[sympy.Symbol]
     :param init_unknowns: The unknowns and their initial guesses for the solver
@@ -179,19 +189,21 @@ def debug_solve_mixing(
     """
     unknown_args = [k for k in arg_ordering if k in init_unknowns]
 
+    if func_jac[1] is not None:
+        kwargs["jac"] = func_jac[1]
     bounds = _DEFAULT_BOUNDS if bounds is None else bounds
     kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [bounds[k][1] for k in unknown_args]
     # default tolerances for least_squares if they weren't set by user
     for k in ["ftol", "gtol", "xtol"]:
         if k not in kwargs:
             kwargs[k] = 1e-15
-    solve = _least_sqr_tolerance(func, arg_ordering, init_unknowns, abs_tolerance, **kwargs)
+    solve = _least_sqr_tolerance(func_jac[0], arg_ordering, init_unknowns, abs_tolerance, **kwargs)
     return solve
 
 
 # %%
 def solve_mixing(
-    func: Callable,
+    func_jac: tuple[Callable,Callable|None],
     arg_ordering: list[sym.Symbol],
     init_unknowns: dict[sym.Symbol, float],
     abs_tolerance: float | None = 1e-8,
@@ -205,8 +217,8 @@ def solve_mixing(
     More options can be passed along to `scipy.optimize.least_squares` using
     keyword arguments.
 
-    :param func: The vector function
-    :type func: Callable
+    :param func_jac: The vector function and its jacobian
+    :type func_jac: tuple[Callable,Callable | None]
     :param arg_ordering: Call order defined by the Sympy lambdification
     :type arg_ordering: list[sympy.Symbol]
     :param init_unknowns: The unknowns and their initial guesses for the solver
@@ -218,4 +230,4 @@ def solve_mixing(
     :return: Dictionary of solved values
     :rtype: dict[sympy.Symbol, float]
     """
-    return debug_solve_mixing(func, arg_ordering, init_unknowns, abs_tolerance, bounds, **kwargs)[0]
+    return debug_solve_mixing(func_jac, arg_ordering, init_unknowns, abs_tolerance, bounds, **kwargs)[0]
