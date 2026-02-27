@@ -9,7 +9,7 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import ALL_SYMBOL
+from .symbolic import ALL_SYMBOL, kinetic_sines
 
 # %%
 _DEFAULT_BOUNDS = {}
@@ -219,3 +219,17 @@ def solve_mixing(
     :rtype: dict[sympy.Symbol, float]
     """
     return debug_solve_mixing(func, arg_ordering, init_unknowns, abs_tolerance, bounds, **kwargs)[0]
+
+# %%
+def calculate_uvw(m_axial, m_pi0_axial, m_eta_axial, m_eta0_axial):
+    parameter = {
+        ALL_SYMBOL["prop"]["A"]: m_axial,
+        ALL_SYMBOL["bare"]["pi0-A"]: m_pi0_axial,
+        ALL_SYMBOL["bare"]["eta-A"]: m_eta_axial,
+        ALL_SYMBOL["bare"]["eta0-A"]: m_eta0_axial,
+    }
+    uvw = []
+    for s in kinetic_sines():
+        call = list(s.free_symbols)
+        uvw.append(sym.lambdify(call, sym.asin(s))(*[parameter[k] for k in call]))
+    return tuple(uvw)

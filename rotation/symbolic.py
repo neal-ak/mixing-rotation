@@ -19,11 +19,11 @@ ALL_SYMBOL = {
     },
     "prop": {
         _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-        for k in [r"\pi^0", r"\tilde{\phi}^\prime", r"\eta", r"\eta_0"]
+        for k in [r"\pi^0", r"\tilde{\phi}^\prime", r"\eta", r"\eta_0", r"A^\prime"]
     },
     "bare": {
         _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-        for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}", r"\eta_0 b"]
+        for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}", r"\eta_0 b", r"\pi^0 A", r"\eta A", r"\eta_0 A"]
     },
 }
 for t in ["cos", "sin", "tan"]:
@@ -108,3 +108,15 @@ def create_axial_mix_equation(rotation, kinetic):
         evaluate=False,
     )
     return mixing_equation, (kinetic_transpose, rotation_transpose, bare_matrix, prop_matrix)
+
+# %%
+def _kinetic_sine(m1, m2):
+    ma = ALL_SYMBOL["prop"]["A"]
+    return -m1*m2/(2*ma**2*sym.sqrt((1-(m1/ma)**2)*(1-(m2/ma)**2)))
+
+# %%
+def kinetic_sines():
+    s_u = _kinetic_sine(ALL_SYMBOL["bare"]["pi0-A"], ALL_SYMBOL["bare"]["eta-A"])
+    s_v = _kinetic_sine(ALL_SYMBOL["bare"]["pi0-A"], ALL_SYMBOL["bare"]["eta0-A"])
+    s_w = _kinetic_sine(ALL_SYMBOL["bare"]["eta0-A"], ALL_SYMBOL["bare"]["eta-A"])
+    return s_u, s_v, s_w
