@@ -9,7 +9,7 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import ALL_SYMBOL, kinetic_sines
+from .symbolic import ALL_SYMBOL, kinetic_sines, rotated_pseudo_meson_couplings, rotated_pseudo_photon_coupling, bare_pseudo_kaon_couplings, rotated_pseudo_kaon_couplings
 
 # %%
 _DEFAULT_BOUNDS = {}
@@ -233,3 +233,145 @@ def calculate_uvw(m_axial, m_pi0_axial, m_eta_axial, m_eta0_axial):
         call = list(s.free_symbols)
         uvw.append(sym.lambdify(call, sym.asin(s))(*[parameter[k] for k in call]))
     return tuple(uvw)
+
+# %%
+def pseudo_calculate_meson_couplings(
+        bare_mediator_dm_coupling: float,
+        alpha: float,
+        beta: float,
+        gamma: float,
+) -> tuple[float, float, float]:
+    """Numerical calculation of the rotated meson to dark matter couplings.
+
+    Specific to the pseudo scalar mediator phi case.
+
+    :param bare_mediator_dm_coupling: un-rotated mediator to dark matter coupling
+    :type bare_mediator_dm_coupling: float
+    :param alpha: mixing angle alpha
+    :type alpha: float
+    :param beta: mixing angle beta
+    :type beta: float
+    :param gamma: mixing angle gamma
+    :type gamma: float
+    :return: pion-chi, phi-chi, eta-chi
+    :rtype: tuple[float, float, float]
+    """
+    parameter = {
+        ALL_SYMBOL["coupling"]["phi-chi"]: bare_mediator_dm_coupling,
+        ALL_SYMBOL["angle"]["alpha"]: alpha,
+        ALL_SYMBOL["angle"]["beta"]: beta,
+        ALL_SYMBOL["angle"]["gamma"]: gamma,
+    }
+    coupling = []
+    for g in rotated_pseudo_meson_couplings():
+        call = list(g.free_symbols)
+        coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
+    return tuple(coupling)
+
+# %%
+def pseudo_calculate_photon_coupling(
+        known_pion_photon_coupling: float,
+        known_eta_photon_coupling: float,
+        alpha: float,
+        beta: float,
+        gamma: float,
+) -> float:
+    """Numerical calculation of the rotated mediator to photon coupling.
+
+    Specific to the pseudo scalar mediator case.
+
+    :param known_pion_photon_coupling: known pion to photon coupling
+    :type known_pion_photon_coupling: float
+    :param known_eta_photon_coupling: known eta to photon coupling
+    :type known_eta_photon_coupling: float
+    :param alpha: alpha mixing angle
+    :type alpha: float
+    :param beta: beta mixing angle
+    :type beta: float
+    :param gamma: gamma mixing angle
+    :type gamma: float
+    :return: rotated mediator to photon coupling
+    :rtype: float
+    """
+    parameter = {
+        ALL_SYMBOL["rotated"]["pi-gamma"]: known_pion_photon_coupling,
+        ALL_SYMBOL["rotated"]["eta-gamma"]: known_eta_photon_coupling,
+        ALL_SYMBOL["angle"]["alpha"]: alpha,
+        ALL_SYMBOL["angle"]["beta"]: beta,
+        ALL_SYMBOL["angle"]["gamma"]: gamma,
+    }
+    g = rotated_pseudo_photon_coupling()
+    call = list(g.free_symbols)
+    return sym.lambdify(call, g)(*[parameter[k] for k in call])
+
+# %%
+def pseudo_calculate_bare_kaon(
+        energy_pion: float,
+        mass_pion: float,
+        mass_kaon: float,
+) -> tuple[float, float, float]:
+    """Numerical calculation of the un-rotated kaon couplings.
+
+    Specific to the pseudo scalar mediator case.
+
+    :param energy_pion: Pion energy
+    :type energy_pion: float
+    :param mass_pion: Pion mass
+    :type mass_pion: float
+    :param mass_kaon: Kaon mass
+    :type mass_kaon: float
+    :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
+    :rtype: tuple[float, float, float]
+    """
+    parameter = {
+        ALL_SYMBOL["parameters"]["Epi"]: energy_pion,
+        ALL_SYMBOL["prop"]["pi0"]: mass_pion,
+        ALL_SYMBOL["prop"]["K0"]: mass_kaon,
+    }
+    coupling = []
+    for g in bare_pseudo_kaon_couplings():
+        call = list(g.free_symbols)
+        coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
+    return tuple([coupling[0], 0, coupling[1]])
+
+# %%
+def pseudo_calculate_kaon_couplings(
+        bare_pi_pi_K_coupling: float,
+        bare_phi_pi_K_coupling: float,
+        bare_eta_pi_K_coupling: float,
+        alpha: float,
+        beta: float,
+        gamma: float,
+):
+    """Numerical calculation of the rotated kaon couplings.
+
+    Specific to the pseudo scalar mediator case.
+
+    :param bare_pi_pi_K_coupling: Un-rotated pion-pion-kaon coupling
+    :type bare_pi_pi_K_coupling: float
+    :param bare_phi_pi_K_coupling: Un-rotated mediator-pion-kaon coupling
+    :type bare_phi_pi_K_coupling: float
+    :param bare_eta_pi_K_coupling: Un-rotated eta-pion-kaon coupling
+    :type bare_eta_pi_K_coupling: float
+    :param alpha: Alpha mixing angle
+    :type alpha: float
+    :param beta: Beta mixing angle
+    :type beta: float
+    :param gamma: Gamma mixing
+    :type gamma: float
+    :return: rotated pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
+    :rtype: _type_
+    """
+    parameter = {
+        ALL_SYMBOL["coupling"]["pi-pi-K"]: bare_pi_pi_K_coupling,
+        ALL_SYMBOL["coupling"]["phi-pi-K"]: bare_phi_pi_K_coupling,
+        ALL_SYMBOL["coupling"]["eta-pi-K"]: bare_eta_pi_K_coupling,
+        ALL_SYMBOL["angle"]["alpha"]: alpha,
+        ALL_SYMBOL["angle"]["beta"]: beta,
+        ALL_SYMBOL["angle"]["gamma"]: gamma,
+    }
+    coupling = []
+    for g in rotated_pseudo_kaon_couplings():
+        call = list(g.free_symbols)
+        coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
+    return tuple(coupling)

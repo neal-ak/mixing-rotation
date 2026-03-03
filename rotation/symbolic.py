@@ -7,7 +7,7 @@ import sympy as sym
 def _preprocess_symbol(s):
     s = str(s).replace("\\", "")
     s = s.replace("^prime", "").replace("^", "").replace("_", "")
-    s = s.removesuffix("b")
+    s = s.replace(" b", "")
     s = s.replace("tilde{", "").replace("}", "")
     return s.strip().replace(" ", "-")
 
@@ -19,11 +19,23 @@ ALL_SYMBOL = {
     },
     "prop": {
         _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-        for k in [r"\pi^0", r"\tilde{\phi}^\prime", r"\eta", r"\eta_0", r"A^\prime"]
+        for k in [r"\pi^0", r"\tilde{\phi}^\prime", r"\eta", r"\eta_0", r"A^\prime", r"K^0"]
     },
     "bare": {
         _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
         for k in [r"\pi^0 b", r"\phi", r"\eta b", r"\pi^0 \tilde{\phi}", r"\eta \tilde{\phi}", r"\eta_0 b", r"\pi^0 A", r"\eta A", r"\eta_0 A"]
+    },
+    "coupling": {
+        _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
+        for k in ["u", "d", "s", r"\pi b \chi", r"\phi \chi", r"\eta b \chi", r"\pi b \gamma", r"\phi \gamma", r"\eta b \gamma", r"\pi b \pi K", r"\phi \pi K", r"\eta b \pi K"]
+    },
+    "rotated": {
+        _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
+        for k in [r"\pi \chi", r"\phi^\prime \chi", r"\eta \chi", r"\pi \gamma", r"\phi^\prime \gamma", r"\eta \gamma", r"\pi \pi K", r"\phi^\prime \pi K", r"\eta \pi K"]
+    },
+    "parameters": {
+        _preprocess_symbol(k): sym.Symbol(k, real=True)
+        for k in [r"E_\pi"]
     },
 }
 for t in ["cos", "sin", "tan"]:
@@ -120,3 +132,61 @@ def kinetic_sines():
     s_v = _kinetic_sine(ALL_SYMBOL["bare"]["pi0-A"], ALL_SYMBOL["bare"]["eta0-A"])
     s_w = _kinetic_sine(ALL_SYMBOL["bare"]["eta0-A"], ALL_SYMBOL["bare"]["eta-A"])
     return s_u, s_v, s_w
+
+# %%
+def rotated_pseudo_meson_couplings() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
+    """Symbolic expressions for the rotated meson to dark matter couplings.
+    
+    Using the pseudo scalar mediator phi.
+
+    :return: pion-chi, mediator-chi, eta-chi
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    """
+    bare_couplings = sym.Matrix([[0, ALL_SYMBOL["coupling"]["phi-chi"], 0]])
+    rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
+    return tuple(rotated_couplings)
+
+# %%
+def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
+    """Symbolic expression for the rotated mediator to photon coupling.
+
+    Using the pseudo scalar mediator phi.
+
+    Note that the bare un-rotated photon couplings have been eliminated from the
+    final expression in favour of the known photon to pion and eta couplings.
+
+    :return: mediator-photon
+    :rtype: sym.core.mul.Mul
+    """
+    gamma_matrix = sym.Matrix([[ALL_SYMBOL["coupling"]["pi-gamma"], 0, ALL_SYMBOL["coupling"]["eta-gamma"]]]) * create_3d_rotation()[0].transpose()
+    gamma_eqns = [sym.Eq(g, e) for g,e in zip([ALL_SYMBOL["rotated"][k] for k in ["pi-gamma", "phi-gamma", "eta-gamma"]], gamma_matrix)]
+    gamma_solutions = sym.solve(gamma_eqns, [ALL_SYMBOL["rotated"]["phi-gamma"], ALL_SYMBOL["coupling"]["pi-gamma"], ALL_SYMBOL["coupling"]["eta-gamma"]], dict=True)
+    return gamma_solutions[0][ALL_SYMBOL["rotated"]["phi-gamma"]].trigsimp()
+
+# %%
+def bare_pseudo_kaon_couplings() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
+    """Symbolic expressions for the un-rotated kaon couplings.
+
+    Using the pseudo scalar mediator phi.
+
+    :return: pion-pion-kaon, eta-pion-kaon
+    :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul]
+    """
+    pi_pi_kaon = ALL_SYMBOL["prop"]["K0"]**2 - 2 * ALL_SYMBOL["prop"]["K0"] * ALL_SYMBOL["parameters"]["Epi"]
+    eta_pi_kaon = (ALL_SYMBOL["prop"]["K0"]**2 - 2 * ALL_SYMBOL["prop"]["K0"] * ALL_SYMBOL["parameters"]["Epi"] - ALL_SYMBOL["prop"]["pi0"]**2)/sym.sqrt(3)
+    return pi_pi_kaon, eta_pi_kaon
+
+
+# %%
+def rotated_pseudo_kaon_couplings() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
+    """Symbolic expressions for the rotated kaon couplings.
+
+    Using the pseudo scalar mediator phi.
+
+    :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
+    :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+    """
+    bare_couplings = sym.Matrix([[ALL_SYMBOL["coupling"][f"{k}-pi-K"] for k in ["pi", "phi", "eta"]]])
+    rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
+    return tuple(rotated_couplings)
+
