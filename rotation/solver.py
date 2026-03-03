@@ -9,22 +9,34 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import ALL_SYMBOL, kinetic_sines, rotated_pseudo_meson_couplings, rotated_pseudo_photon_coupling, bare_pseudo_kaon_couplings, rotated_pseudo_kaon_couplings
+from .symbolic import (
+    ALL_SYMBOL,
+    kinetic_sines,
+    rotated_pseudo_meson_couplings,
+    rotated_pseudo_photon_coupling,
+    bare_pseudo_kaon_couplings,
+    rotated_pseudo_kaon_couplings,
+)
 
 # %%
 _DEFAULT_BOUNDS = {}
 for section, sub_symbols in ALL_SYMBOL.items():
     match section:
-        case "prop"|"bare":
+        case "prop" | "bare":
             _DEFAULT_BOUNDS |= {v: tuple([0, np.inf]) for v in sub_symbols.values()}
         case "angle":
             _DEFAULT_BOUNDS |= {v: tuple([-np.pi, np.pi]) for v in sub_symbols.values()}
-        case "cos"|"sin":
+        case "cos" | "sin":
             _DEFAULT_BOUNDS |= {v: tuple([-1, 1]) for v in sub_symbols.values()}
         case "tan":
-            _DEFAULT_BOUNDS |= {v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()}
+            _DEFAULT_BOUNDS |= {
+                v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()
+            }
         case _:
-            _DEFAULT_BOUNDS |= {v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()}
+            _DEFAULT_BOUNDS |= {
+                v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()
+            }
+
 
 # %%
 def _build_call(
@@ -58,11 +70,11 @@ def _build_call(
 
 # %%
 def _least_sqr_tolerance(
-        function: Callable,
-        arg_ordering: list[sym.Symbol],
-        init_unknowns: dict[sym.Symbol, float],
-        abs_tolerance: float | None,
-        **kwargs,
+    function: Callable,
+    arg_ordering: list[sym.Symbol],
+    init_unknowns: dict[sym.Symbol, float],
+    abs_tolerance: float | None,
+    **kwargs,
 ) -> tuple[dict[sym.Symbol, float], optimize.OptimizeResult]:
     """Runs least squares optimization and checks solution for validity.
 
@@ -84,7 +96,7 @@ def _least_sqr_tolerance(
     solution = optimize.least_squares(
         function,
         [init_unknowns[k] for k in unknown_args],
-        **{k:v for k,v in kwargs.items() if k not in ["fun", "x0"]},
+        **{k: v for k, v in kwargs.items() if k not in ["fun", "x0"]},
     )
     solve = dict(zip(unknown_args, solution.x))
 
@@ -117,9 +129,7 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
     for s in ALL_SYMBOL.values():
         arg_ordering += [v for v in s.values() if v in equation.free_symbols]
     system = []
-    for eqn in [
-        e for i, e in enumerate(equation) if i not in [3, 6, 7]
-    ]:
+    for eqn in [e for i, e in enumerate(equation) if i not in [3, 6, 7]]:
         system.append(sym.lambdify(arg_ordering, eqn))
     return arg_ordering, system
 
@@ -143,6 +153,7 @@ def create_func(
     :return: The function Scipy can use to optimize
     :rtype: Callable
     """
+
     def function(x):
         calling = _build_call(arg_ordering, x, knowns)
         return [f(*calling) for f in system]
@@ -157,10 +168,10 @@ def debug_solve_mixing(
     init_unknowns: dict[sym.Symbol, float],
     abs_tolerance: float | None,
     bounds: dict[sym.Symbol, tuple[float, float]] | None,
-    **kwargs
+    **kwargs,
 ) -> tuple[dict[sym.Symbol, float], optimize.OptimizeResult]:
     """See `solve_mixing`.
-    
+
     This function also returns the raw scipy.optimize.OptimizeResult for
     debugging help.
 
@@ -180,12 +191,16 @@ def debug_solve_mixing(
     unknown_args = [k for k in arg_ordering if k in init_unknowns]
 
     bounds = _DEFAULT_BOUNDS if bounds is None else bounds
-    kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [bounds[k][1] for k in unknown_args]
+    kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [
+        bounds[k][1] for k in unknown_args
+    ]
     # default tolerances for least_squares if they weren't set by user
     for k in ["ftol", "gtol", "xtol"]:
         if k not in kwargs:
             kwargs[k] = 1e-15
-    solve = _least_sqr_tolerance(func, arg_ordering, init_unknowns, abs_tolerance, **kwargs)
+    solve = _least_sqr_tolerance(
+        func, arg_ordering, init_unknowns, abs_tolerance, **kwargs
+    )
     return solve
 
 
@@ -196,10 +211,10 @@ def solve_mixing(
     init_unknowns: dict[sym.Symbol, float],
     abs_tolerance: float | None = 1e-8,
     bounds: dict[sym.Symbol, tuple[float, float]] | None = None,
-    **kwargs
+    **kwargs,
 ) -> dict[sym.Symbol, float]:
     """Solves the provided vector function for unknowns in the mixing equation.
-    
+
     The absolute tolerance is used to check the accuracy of the solution, which
     will raise a ValueError if any equation in the system is too far from 0.
     More options can be passed along to `scipy.optimize.least_squares` using
@@ -218,7 +233,10 @@ def solve_mixing(
     :return: Dictionary of solved values
     :rtype: dict[sympy.Symbol, float]
     """
-    return debug_solve_mixing(func, arg_ordering, init_unknowns, abs_tolerance, bounds, **kwargs)[0]
+    return debug_solve_mixing(
+        func, arg_ordering, init_unknowns, abs_tolerance, bounds, **kwargs
+    )[0]
+
 
 # %%
 def calculate_uvw(m_axial, m_pi0_axial, m_eta_axial, m_eta0_axial):
@@ -234,12 +252,13 @@ def calculate_uvw(m_axial, m_pi0_axial, m_eta_axial, m_eta0_axial):
         uvw.append(sym.lambdify(call, sym.asin(s))(*[parameter[k] for k in call]))
     return tuple(uvw)
 
+
 # %%
 def pseudo_calculate_meson_couplings(
-        bare_mediator_dm_coupling: float,
-        alpha: float,
-        beta: float,
-        gamma: float,
+    bare_mediator_dm_coupling: float,
+    alpha: float,
+    beta: float,
+    gamma: float,
 ) -> tuple[float, float, float]:
     """Numerical calculation of the rotated meson to dark matter couplings.
 
@@ -268,13 +287,14 @@ def pseudo_calculate_meson_couplings(
         coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
     return tuple(coupling)
 
+
 # %%
 def pseudo_calculate_photon_coupling(
-        known_pion_photon_coupling: float,
-        known_eta_photon_coupling: float,
-        alpha: float,
-        beta: float,
-        gamma: float,
+    known_pion_photon_coupling: float,
+    known_eta_photon_coupling: float,
+    alpha: float,
+    beta: float,
+    gamma: float,
 ) -> float:
     """Numerical calculation of the rotated mediator to photon coupling.
 
@@ -304,11 +324,12 @@ def pseudo_calculate_photon_coupling(
     call = list(g.free_symbols)
     return sym.lambdify(call, g)(*[parameter[k] for k in call])
 
+
 # %%
 def pseudo_calculate_bare_kaon(
-        energy_pion: float,
-        mass_pion: float,
-        mass_kaon: float,
+    energy_pion: float,
+    mass_pion: float,
+    mass_kaon: float,
 ) -> tuple[float, float, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
@@ -334,14 +355,15 @@ def pseudo_calculate_bare_kaon(
         coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
     return tuple([coupling[0], 0, coupling[1]])
 
+
 # %%
 def pseudo_calculate_kaon_couplings(
-        bare_pi_pi_K_coupling: float,
-        bare_phi_pi_K_coupling: float,
-        bare_eta_pi_K_coupling: float,
-        alpha: float,
-        beta: float,
-        gamma: float,
+    bare_pi_pi_K_coupling: float,
+    bare_phi_pi_K_coupling: float,
+    bare_eta_pi_K_coupling: float,
+    alpha: float,
+    beta: float,
+    gamma: float,
 ):
     """Numerical calculation of the rotated kaon couplings.
 
