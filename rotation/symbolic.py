@@ -6,6 +6,7 @@ import sympy as sym
 
 # %%
 def _preprocess_symbol(s):
+    """Helper to automate assigning dict key strings from symbols."""
     s = str(s).replace("\\", "")
     s = s.replace("^prime", "").replace("^", "").replace("_", "")
     s = s.replace(" b", "")
@@ -87,7 +88,11 @@ for t in ["cos", "sin", "tan"]:
 def create_3d_rotation() -> (
     tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
 ):
-    """Creates the 3D rotation matrix from three 2D rotation matrices."""
+    """Creates the 3D rotation matrix from three 2D rotation matrices.
+
+    :return: Rotation matrix, (alpha, beta, gamma) rotations, 2D matrix
+    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+    """
     theta = sym.Symbol(r"\theta", real=True)
     basic_2d = sym.Matrix(
         [
@@ -113,10 +118,12 @@ def create_3d_rotation() -> (
 def create_mix_equation(
     rotation: sym.Matrix,
 ) -> tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]:
-    """
-    Creates the mixing equation from the rotation, propagating, and bare matrices.
-    Returns the equation, and a tuple of the matrices: (rotation_transpose,
-    bare, propagating).
+    """Creates the mixing equation.
+
+    :param rotation: Rotation matrix
+    :type rotation: sym.Matrix
+    :return: Mixing matrix equation, (rotation transpose, bare mass matrix, propagating mass matrix)
+    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]
     """
     rotation_transpose = rotation.transpose()
     bare_matrix = sym.Matrix(
@@ -146,7 +153,12 @@ def create_mix_equation(
 
 
 # %%
-def create_kinetic():
+def create_kinetic() -> sym.Matrix:
+    """Creates the kinetic mixing matrix for the axial vector mediator.
+
+    :return: Kinetic mixing matrix
+    :rtype: sym.Matrix
+    """
     angles = [ALL_SYMBOL["angle"][k] for k in ["u", "v", "w"]]
     d = sym.sqrt(
         1
@@ -181,7 +193,18 @@ def create_kinetic():
 
 
 # %%
-def create_axial_mix_equation(rotation, kinetic):
+def create_axial_mix_equation(
+    rotation: sym.Matrix, kinetic: sym.Matrix
+) -> tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix]]:
+    """Creates the axial vector mixing matrix equation.
+
+    :param rotation: Rotation matrix
+    :type rotation: sym.Matrix
+    :param kinetic: Kinetic rotation matrix
+    :type kinetic: sym.Matrix
+    :return: Mixing matrix equation, (kinetic transpose, rotation transpose, bare mass matrix, propagation mass matrix)
+    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix]]
+    """
     rotation_transpose = rotation.transpose()
     kinetic_transpose = kinetic.transpose()
     bare_matrix = sym.Matrix(
@@ -214,7 +237,8 @@ def create_axial_mix_equation(rotation, kinetic):
 
 
 # %%
-def _kinetic_sine(m1, m2):
+def _kinetic_sine(m1, m2) -> sym.core.mul.Mul:
+    """Helper to automate sine of kinetic mixing angle."""
     ma = ALL_SYMBOL["prop"]["A"]
     return (
         -m1 * m2 / (2 * ma**2 * sym.sqrt((1 - (m1 / ma) ** 2) * (1 - (m2 / ma) ** 2)))
@@ -222,7 +246,12 @@ def _kinetic_sine(m1, m2):
 
 
 # %%
-def kinetic_sines():
+def kinetic_sines() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
+    """Creates the sines of the three kinetic mixing angles.
+
+    :return: sine(u), sine(v), sine(w)
+    :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+    """
     s_u = _kinetic_sine(ALL_SYMBOL["bare"]["pi0-A"], ALL_SYMBOL["bare"]["eta-A"])
     s_v = _kinetic_sine(ALL_SYMBOL["bare"]["pi0-A"], ALL_SYMBOL["bare"]["eta0-A"])
     s_w = _kinetic_sine(ALL_SYMBOL["bare"]["eta0-A"], ALL_SYMBOL["bare"]["eta-A"])
