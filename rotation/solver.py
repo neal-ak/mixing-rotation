@@ -239,7 +239,24 @@ def solve_mixing(
 
 
 # %%
-def calculate_uvw(m_axial, m_pi0_axial, m_eta_axial, m_eta0_axial):
+def calculate_uvw(
+    m_axial: float, m_pi0_axial: float, m_eta_axial: float, m_eta0_axial: float
+) -> tuple[float, float, float]:
+    """Numerically calculates the kinetic mixing angles u, v, and w.
+
+    For the axial vector mediator case.
+
+    :param m_axial: Mass of axial vector mediator
+    :type m_axial: float
+    :param m_pi0_axial: Mass of the pi^0
+    :type m_pi0_axial: float
+    :param m_eta_axial: Mass of the eta
+    :type m_eta_axial: float
+    :param m_eta0_axial: Mass of the eta^0
+    :type m_eta0_axial: float
+    :return: u, v, w
+    :rtype: tuple[float, float, float]
+    """
     parameter = {
         ALL_SYMBOL["prop"]["A"]: m_axial,
         ALL_SYMBOL["bare"]["pi0-A"]: m_pi0_axial,
@@ -358,9 +375,9 @@ def pseudo_calculate_bare_kaon(
 
 # %%
 def pseudo_calculate_kaon_couplings(
-    bare_pi_pi_K_coupling: float,
-    bare_phi_pi_K_coupling: float,
-    bare_eta_pi_K_coupling: float,
+    bare_pion_pion_kaon_coupling: float,
+    bare_mediator_pion_kaon_coupling: float,
+    bare_eta_pion_kaon_coupling: float,
     alpha: float,
     beta: float,
     gamma: float,
@@ -369,12 +386,12 @@ def pseudo_calculate_kaon_couplings(
 
     Specific to the pseudo scalar mediator case.
 
-    :param bare_pi_pi_K_coupling: Un-rotated pion-pion-kaon coupling
-    :type bare_pi_pi_K_coupling: float
-    :param bare_phi_pi_K_coupling: Un-rotated mediator-pion-kaon coupling
-    :type bare_phi_pi_K_coupling: float
-    :param bare_eta_pi_K_coupling: Un-rotated eta-pion-kaon coupling
-    :type bare_eta_pi_K_coupling: float
+    :param bare_pion_pion_kaon_coupling: Un-rotated pion-pion-kaon coupling
+    :type bare_pion_pion_kaon_coupling: float
+    :param bare_mediator_pion_kaon_coupling: Un-rotated mediator-pion-kaon coupling
+    :type bare_mediator_pion_kaon_coupling: float
+    :param bare_eta_pion_kaon_coupling: Un-rotated eta-pion-kaon coupling
+    :type bare_eta_pion_kaon_coupling: float
     :param alpha: Alpha mixing angle
     :type alpha: float
     :param beta: Beta mixing angle
@@ -385,9 +402,9 @@ def pseudo_calculate_kaon_couplings(
     :rtype: _type_
     """
     parameter = {
-        ALL_SYMBOL["coupling"]["pi-pi-K"]: bare_pi_pi_K_coupling,
-        ALL_SYMBOL["coupling"]["phi-pi-K"]: bare_phi_pi_K_coupling,
-        ALL_SYMBOL["coupling"]["eta-pi-K"]: bare_eta_pi_K_coupling,
+        ALL_SYMBOL["coupling"]["pi-pi-K"]: bare_pion_pion_kaon_coupling,
+        ALL_SYMBOL["coupling"]["phi-pi-K"]: bare_mediator_pion_kaon_coupling,
+        ALL_SYMBOL["coupling"]["eta-pi-K"]: bare_eta_pion_kaon_coupling,
         ALL_SYMBOL["angle"]["alpha"]: alpha,
         ALL_SYMBOL["angle"]["beta"]: beta,
         ALL_SYMBOL["angle"]["gamma"]: gamma,
