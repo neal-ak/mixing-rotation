@@ -52,13 +52,13 @@ ALL_SYMBOL = {
             "d",
             "s",
             r"\pi b \chi",
-            r"\phi \chi",
+            r"\tilde{\phi} \chi",
             r"\eta b \chi",
             r"\pi b \gamma",
-            r"\phi \gamma",
+            r"\tilde{\phi} \gamma",
             r"\eta b \gamma",
             r"\pi b \pi K",
-            r"\phi \pi K",
+            r"\tilde{\phi} \pi K",
             r"\eta b \pi K",
         ]
     },
@@ -66,13 +66,13 @@ ALL_SYMBOL = {
         _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
         for k in [
             r"\pi \chi",
-            r"\phi^\prime \chi",
+            r"\tilde{\phi}^\prime \chi",
             r"\eta \chi",
             r"\pi \gamma",
-            r"\phi^\prime \gamma",
+            r"\tilde{\phi}^\prime \gamma",
             r"\eta \gamma",
             r"\pi \pi K",
-            r"\phi^\prime \pi K",
+            r"\tilde{\phi}^\prime \pi K",
             r"\eta \pi K",
         ]
     },
