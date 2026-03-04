@@ -11,12 +11,12 @@ import sympy as sym
 # %%
 from .symbolic import (
     ALL_SYMBOL,
-    kinetic_sines,
     rotated_pseudo_meson_couplings,
     rotated_pseudo_photon_coupling,
     bare_pseudo_kaon_couplings,
     rotated_pseudo_kaon_couplings,
 )
+from .symbolic_axial import kinetic_sines
 
 # %%
 _DEFAULT_BOUNDS = {}
