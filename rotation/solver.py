@@ -9,8 +9,8 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import (
-    ALL_SYMBOL,
+from .symbolic import ALL_SYMBOL
+from .symbolic_pseudo import (
     rotated_pseudo_meson_couplings,
     rotated_pseudo_photon_coupling,
     bare_pseudo_kaon_couplings,
