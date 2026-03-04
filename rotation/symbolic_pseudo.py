@@ -4,7 +4,7 @@
 import sympy as sym
 
 # %%
-from .symbolic import ALL_SYMBOL, create_3d_rotation
+from .symbolic import COUPLING, PARAMETERS, PROPAGATION, ROTATED, create_3d_rotation
 
 
 # %%
@@ -18,7 +18,7 @@ def rotated_pseudo_meson_couplings() -> (
     :return: pion-chi, mediator-chi, eta-chi
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    bare_couplings = sym.Matrix([[0, ALL_SYMBOL["coupling"]["phi-chi"], 0]])
+    bare_couplings = sym.Matrix([[0, COUPLING["phi-chi"], 0]])
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)
 
@@ -39,9 +39,9 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
         sym.Matrix(
             [
                 [
-                    ALL_SYMBOL["coupling"]["pi-gamma"],
+                    COUPLING["pi-gamma"],
                     0,
-                    ALL_SYMBOL["coupling"]["eta-gamma"],
+                    COUPLING["eta-gamma"],
                 ]
             ]
         )
@@ -50,20 +50,20 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
     gamma_eqns = [
         sym.Eq(g, e)
         for g, e in zip(
-            [ALL_SYMBOL["rotated"][k] for k in ["pi-gamma", "phi-gamma", "eta-gamma"]],
+            [ROTATED[k] for k in ["pi-gamma", "phi-gamma", "eta-gamma"]],
             gamma_matrix,
         )
     ]
     gamma_solutions = sym.solve(
         gamma_eqns,
         [
-            ALL_SYMBOL["rotated"]["phi-gamma"],
-            ALL_SYMBOL["coupling"]["pi-gamma"],
-            ALL_SYMBOL["coupling"]["eta-gamma"],
+            ROTATED["phi-gamma"],
+            COUPLING["pi-gamma"],
+            COUPLING["eta-gamma"],
         ],
         dict=True,
     )
-    return gamma_solutions[0][ALL_SYMBOL["rotated"]["phi-gamma"]].trigsimp()
+    return gamma_solutions[0][ROTATED["phi-gamma"]].trigsimp()
 
 
 # %%
@@ -78,13 +78,13 @@ def bare_pseudo_kaon_couplings() -> (
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul]
     """
     pi_pi_kaon = (
-        ALL_SYMBOL["prop"]["K0"] ** 2
-        - 2 * ALL_SYMBOL["prop"]["K0"] * ALL_SYMBOL["parameters"]["Epi"]
+        PROPAGATION["K0"] ** 2
+        - 2 * PROPAGATION["K0"] * PARAMETERS["Epi"]
     )
     eta_pi_kaon = (
-        ALL_SYMBOL["prop"]["K0"] ** 2
-        - 2 * ALL_SYMBOL["prop"]["K0"] * ALL_SYMBOL["parameters"]["Epi"]
-        - ALL_SYMBOL["prop"]["pi0"] ** 2
+        PROPAGATION["K0"] ** 2
+        - 2 * PROPAGATION["K0"] * PARAMETERS["Epi"]
+        - PROPAGATION["pi0"] ** 2
     ) / sym.sqrt(3)
     return pi_pi_kaon, eta_pi_kaon
 
@@ -101,7 +101,7 @@ def rotated_pseudo_kaon_couplings() -> (
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
     bare_couplings = sym.Matrix(
-        [[ALL_SYMBOL["coupling"][f"{k}-pi-K"] for k in ["pi", "phi", "eta"]]]
+        [[COUPLING[f"{k}-pi-K"] for k in ["pi", "phi", "eta"]]]
     )
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)

@@ -9,7 +9,7 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from .symbolic import ALL_SYMBOL
+from .symbolic import ANGLE, BARE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
 from .symbolic_pseudo import (
     rotated_pseudo_meson_couplings,
     rotated_pseudo_photon_coupling,
@@ -17,25 +17,6 @@ from .symbolic_pseudo import (
     rotated_pseudo_kaon_couplings,
 )
 from .symbolic_axial import kinetic_sines
-
-# %%
-_DEFAULT_BOUNDS = {}
-for section, sub_symbols in ALL_SYMBOL.items():
-    match section:
-        case "prop" | "bare":
-            _DEFAULT_BOUNDS |= {v: tuple([0, np.inf]) for v in sub_symbols.values()}
-        case "angle":
-            _DEFAULT_BOUNDS |= {v: tuple([-np.pi, np.pi]) for v in sub_symbols.values()}
-        case "cos" | "sin":
-            _DEFAULT_BOUNDS |= {v: tuple([-1, 1]) for v in sub_symbols.values()}
-        case "tan":
-            _DEFAULT_BOUNDS |= {
-                v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()
-            }
-        case _:
-            _DEFAULT_BOUNDS |= {
-                v: tuple([-np.inf, np.inf]) for v in sub_symbols.values()
-            }
 
 
 # %%
@@ -126,8 +107,8 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
     :rtype: tuple[list[sympy.Symbol], list[Callable]]
     """
     arg_ordering = []
-    for s in ALL_SYMBOL.values():
-        arg_ordering += [v for v in s.values() if v in equation.free_symbols]
+    for d in [ANGLE, BARE, COUPLING, PARAMETERS, PROPAGATION, ROTATED]:
+        arg_ordering += [v for v in d.values() if v in equation.free_symbols]
     system = []
     for eqn in [e for i, e in enumerate(equation) if i not in [3, 6, 7]]:
         system.append(sym.lambdify(arg_ordering, eqn))
@@ -190,10 +171,22 @@ def debug_solve_mixing(
     """
     unknown_args = [k for k in arg_ordering if k in init_unknowns]
 
-    bounds = _DEFAULT_BOUNDS if bounds is None else bounds
-    kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [
-        bounds[k][1] for k in unknown_args
-    ]
+    if bounds is None:
+        kwargs["bounds"] = [], []
+        for arg in unknown_args:
+            if arg in list(BARE.values())+list(PROPAGATION.values()):
+                kwargs["bounds"][0].append(0)
+                kwargs["bounds"][1].append(np.inf)
+            elif arg in ANGLE.values():
+                kwargs["bounds"][0].append(-np.pi)
+                kwargs["bounds"][1].append(np.pi)
+            else:
+                kwargs["bounds"][0].append(-np.inf)
+                kwargs["bounds"][1].append(np.inf)
+    else:
+        kwargs["bounds"] = [bounds[k][0] for k in unknown_args], [
+            bounds[k][1] for k in unknown_args
+        ]
     # default tolerances for least_squares if they weren't set by user
     for k in ["ftol", "gtol", "xtol"]:
         if k not in kwargs:
@@ -258,10 +251,10 @@ def calculate_uvw(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        ALL_SYMBOL["prop"]["A"]: m_axial,
-        ALL_SYMBOL["bare"]["pi0-A"]: m_pi0_axial,
-        ALL_SYMBOL["bare"]["eta-A"]: m_eta_axial,
-        ALL_SYMBOL["bare"]["eta0-A"]: m_eta0_axial,
+        PROPAGATION["A"]: m_axial,
+        BARE["pi0-A"]: m_pi0_axial,
+        BARE["eta-A"]: m_eta_axial,
+        BARE["eta0-A"]: m_eta0_axial,
     }
     uvw = []
     for s in kinetic_sines():
@@ -293,10 +286,10 @@ def pseudo_calculate_meson_couplings(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        ALL_SYMBOL["coupling"]["phi-chi"]: bare_mediator_dm_coupling,
-        ALL_SYMBOL["angle"]["alpha"]: alpha,
-        ALL_SYMBOL["angle"]["beta"]: beta,
-        ALL_SYMBOL["angle"]["gamma"]: gamma,
+        COUPLING["phi-chi"]: bare_mediator_dm_coupling,
+        ANGLE["alpha"]: alpha,
+        ANGLE["beta"]: beta,
+        ANGLE["gamma"]: gamma,
     }
     coupling = []
     for g in rotated_pseudo_meson_couplings():
@@ -331,11 +324,11 @@ def pseudo_calculate_photon_coupling(
     :rtype: float
     """
     parameter = {
-        ALL_SYMBOL["rotated"]["pi-gamma"]: known_pion_photon_coupling,
-        ALL_SYMBOL["rotated"]["eta-gamma"]: known_eta_photon_coupling,
-        ALL_SYMBOL["angle"]["alpha"]: alpha,
-        ALL_SYMBOL["angle"]["beta"]: beta,
-        ALL_SYMBOL["angle"]["gamma"]: gamma,
+        ROTATED["pi-gamma"]: known_pion_photon_coupling,
+        ROTATED["eta-gamma"]: known_eta_photon_coupling,
+        ANGLE["alpha"]: alpha,
+        ANGLE["beta"]: beta,
+        ANGLE["gamma"]: gamma,
     }
     g = rotated_pseudo_photon_coupling()
     call = list(g.free_symbols)
@@ -362,9 +355,9 @@ def pseudo_calculate_bare_kaon(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        ALL_SYMBOL["parameters"]["Epi"]: energy_pion,
-        ALL_SYMBOL["prop"]["pi0"]: mass_pion,
-        ALL_SYMBOL["prop"]["K0"]: mass_kaon,
+        PARAMETERS["Epi"]: energy_pion,
+        PROPAGATION["pi0"]: mass_pion,
+        PROPAGATION["K0"]: mass_kaon,
     }
     coupling = []
     for g in bare_pseudo_kaon_couplings():
@@ -402,12 +395,12 @@ def pseudo_calculate_kaon_couplings(
     :rtype: _type_
     """
     parameter = {
-        ALL_SYMBOL["coupling"]["pi-pi-K"]: bare_pion_pion_kaon_coupling,
-        ALL_SYMBOL["coupling"]["phi-pi-K"]: bare_mediator_pion_kaon_coupling,
-        ALL_SYMBOL["coupling"]["eta-pi-K"]: bare_eta_pion_kaon_coupling,
-        ALL_SYMBOL["angle"]["alpha"]: alpha,
-        ALL_SYMBOL["angle"]["beta"]: beta,
-        ALL_SYMBOL["angle"]["gamma"]: gamma,
+        COUPLING["pi-pi-K"]: bare_pion_pion_kaon_coupling,
+        COUPLING["phi-pi-K"]: bare_mediator_pion_kaon_coupling,
+        COUPLING["eta-pi-K"]: bare_eta_pion_kaon_coupling,
+        ANGLE["alpha"]: alpha,
+        ANGLE["beta"]: beta,
+        ANGLE["gamma"]: gamma,
     }
     coupling = []
     for g in rotated_pseudo_kaon_couplings():

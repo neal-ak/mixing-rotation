@@ -15,73 +15,77 @@ def _preprocess_symbol(s):
 
 
 # %%
-ALL_SYMBOL = {
-    "angle": {
-        _preprocess_symbol(k): sym.Symbol(k, real=True)
-        for k in [r"\alpha", r"\beta", r"\gamma", "u", "v", "w"]
-    },
-    "prop": {
-        _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-        for k in [
-            r"\pi^0",
-            r"\tilde{\phi}^\prime",
-            r"\eta",
-            r"\eta_0",
-            r"A^\prime",
-            r"K^0",
-        ]
-    },
-    "bare": {
-        _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-        for k in [
-            r"\pi^0 b",
-            r"\phi",
-            r"\eta b",
-            r"\pi^0 \tilde{\phi}",
-            r"\eta \tilde{\phi}",
-            r"\eta_0 b",
-            r"\pi^0 A",
-            r"\eta A",
-            r"\eta_0 A",
-        ]
-    },
-    "coupling": {
-        _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
-        for k in [
-            "u",
-            "d",
-            "s",
-            r"\pi b \chi",
-            r"\tilde{\phi} \chi",
-            r"\eta b \chi",
-            r"\pi b \gamma",
-            r"\tilde{\phi} \gamma",
-            r"\eta b \gamma",
-            r"\pi b \pi K",
-            r"\tilde{\phi} \pi K",
-            r"\eta b \pi K",
-        ]
-    },
-    "rotated": {
-        _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
-        for k in [
-            r"\pi \chi",
-            r"\tilde{\phi}^\prime \chi",
-            r"\eta \chi",
-            r"\pi \gamma",
-            r"\tilde{\phi}^\prime \gamma",
-            r"\eta \gamma",
-            r"\pi \pi K",
-            r"\tilde{\phi}^\prime \pi K",
-            r"\eta \pi K",
-        ]
-    },
-    "parameters": {_preprocess_symbol(k): sym.Symbol(k, real=True) for k in [r"E_\pi"]},
+ANGLE = {
+    _preprocess_symbol(k): sym.Symbol(k, real=True)
+    for k in [r"\alpha", r"\beta", r"\gamma", "u", "v", "w"]
 }
-for t in ["cos", "sin", "tan"]:
-    ALL_SYMBOL[t] = {
-        k: sym.Symbol(f"{t[0]}_{v}", real=True) for k, v in ALL_SYMBOL["angle"].items()
-    }
+
+# %%
+PROPAGATION = {
+    _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
+    for k in [
+        r"\pi^0",
+        r"\tilde{\phi}^\prime",
+        r"\eta",
+        r"\eta_0",
+        r"A^\prime",
+        r"K^0",
+    ]
+}
+
+# %%
+BARE = {
+    _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
+    for k in [
+        r"\pi^0 b",
+        r"\phi",
+        r"\eta b",
+        r"\pi^0 \tilde{\phi}",
+        r"\eta \tilde{\phi}",
+        r"\eta_0 b",
+        r"\pi^0 A",
+        r"\eta A",
+        r"\eta_0 A",
+    ]
+}
+
+# %%
+COUPLING = {
+    _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
+    for k in [
+        "u",
+        "d",
+        "s",
+        r"\pi b \chi",
+        r"\tilde{\phi} \chi",
+        r"\eta b \chi",
+        r"\pi b \gamma",
+        r"\tilde{\phi} \gamma",
+        r"\eta b \gamma",
+        r"\pi b \pi K",
+        r"\tilde{\phi} \pi K",
+        r"\eta b \pi K",
+    ]
+}
+
+# %%
+ROTATED = {
+    _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
+    for k in [
+        r"\pi \chi",
+        r"\tilde{\phi}^\prime \chi",
+        r"\eta \chi",
+        r"\pi \gamma",
+        r"\tilde{\phi}^\prime \gamma",
+        r"\eta \gamma",
+        r"\pi \pi K",
+        r"\tilde{\phi}^\prime \pi K",
+        r"\eta \pi K",
+    ]
+}
+
+# %%
+PARAMETERS = {_preprocess_symbol(k): sym.Symbol(k, real=True) for k in [r"E_\pi"]}
 
 
 # %%
@@ -108,7 +112,7 @@ def create_3d_rotation() -> (
         sym.Matrix(sym.BlockDiagMatrix(sym.Matrix([1]), basic_2d)),
     ]
     for i, (m, s) in enumerate(
-        zip(rotate, [ALL_SYMBOL["angle"][k] for k in ["alpha", "beta", "gamma"]])
+        zip(rotate, [ANGLE[k] for k in ["alpha", "beta", "gamma"]])
     ):
         rotate[i] = m.subs(theta, s)
     return rotate[0] * rotate[1] * rotate[2], tuple(rotate), basic_2d
@@ -128,20 +132,20 @@ def create_mix_equation(
     rotation_transpose = rotation.transpose()
     bare_matrix = sym.Matrix(
         [
-            [ALL_SYMBOL["bare"]["pi0"] ** 2, ALL_SYMBOL["bare"]["pi0-phi"] / 2, 0],
+            [BARE["pi0"] ** 2, BARE["pi0-phi"] / 2, 0],
             [
-                ALL_SYMBOL["bare"]["pi0-phi"] / 2,
-                ALL_SYMBOL["bare"]["phi"] ** 2,
-                ALL_SYMBOL["bare"]["eta-phi"] / 2,
+                BARE["pi0-phi"] / 2,
+                BARE["phi"] ** 2,
+                BARE["eta-phi"] / 2,
             ],
-            [0, ALL_SYMBOL["bare"]["eta-phi"] / 2, ALL_SYMBOL["bare"]["eta"] ** 2],
+            [0, BARE["eta-phi"] / 2, BARE["eta"] ** 2],
         ]
     )
     prop_matrix = sym.Matrix(
         [
-            [ALL_SYMBOL["prop"]["pi0"] ** 2, 0, 0],
-            [0, ALL_SYMBOL["prop"]["phi"] ** 2, 0],
-            [0, 0, ALL_SYMBOL["prop"]["eta"] ** 2],
+            [PROPAGATION["pi0"] ** 2, 0, 0],
+            [0, PROPAGATION["phi"] ** 2, 0],
+            [0, 0, PROPAGATION["eta"] ** 2],
         ]
     )
     mixing_equation = sym.Eq(

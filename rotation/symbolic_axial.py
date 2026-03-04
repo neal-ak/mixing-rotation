@@ -4,7 +4,7 @@
 import sympy as sym
 
 # %%
-from .symbolic import ALL_SYMBOL
+from .symbolic import ANGLE, BARE, PROPAGATION
 
 
 # %%
@@ -14,7 +14,7 @@ def create_kinetic() -> sym.Matrix:
     :return: Kinetic mixing matrix
     :rtype: sym.Matrix
     """
-    angles = [ALL_SYMBOL["angle"][k] for k in ["u", "v", "w"]]
+    angles = [ANGLE[k] for k in ["u", "v", "w"]]
     d = sym.sqrt(
         1
         - sym.sin(angles[0]) ** 2
@@ -64,16 +64,16 @@ def create_axial_mix_equation(
     kinetic_transpose = kinetic.transpose()
     bare_matrix = sym.Matrix(
         [
-            [ALL_SYMBOL["bare"]["pi0"] ** 2, 0, 0],
-            [0, ALL_SYMBOL["bare"]["eta"] ** 2, 0],
-            [0, 0, ALL_SYMBOL["bare"]["eta0"] ** 2],
+            [BARE["pi0"] ** 2, 0, 0],
+            [0, BARE["eta"] ** 2, 0],
+            [0, 0, BARE["eta0"] ** 2],
         ]
     )
     prop_matrix = sym.Matrix(
         [
-            [ALL_SYMBOL["prop"]["pi0"] ** 2, 0, 0],
-            [0, ALL_SYMBOL["prop"]["eta"] ** 2, 0],
-            [0, 0, ALL_SYMBOL["prop"]["eta0"] ** 2],
+            [PROPAGATION["pi0"] ** 2, 0, 0],
+            [0, PROPAGATION["eta"] ** 2, 0],
+            [0, 0, PROPAGATION["eta0"] ** 2],
         ]
     )
     mixing_equation = sym.Eq(
@@ -94,7 +94,7 @@ def create_axial_mix_equation(
 # %%
 def _kinetic_sine(m1, m2) -> sym.core.mul.Mul:
     """Helper to automate sine of kinetic mixing angle."""
-    ma = ALL_SYMBOL["prop"]["A"]
+    ma = PROPAGATION["A"]
     return (
         -m1 * m2 / (2 * ma**2 * sym.sqrt((1 - (m1 / ma) ** 2) * (1 - (m2 / ma) ** 2)))
     )
@@ -107,7 +107,7 @@ def kinetic_sines() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mu
     :return: sine(u), sine(v), sine(w)
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    s_u = _kinetic_sine(ALL_SYMBOL["bare"]["pi0-A"], ALL_SYMBOL["bare"]["eta-A"])
-    s_v = _kinetic_sine(ALL_SYMBOL["bare"]["pi0-A"], ALL_SYMBOL["bare"]["eta0-A"])
-    s_w = _kinetic_sine(ALL_SYMBOL["bare"]["eta0-A"], ALL_SYMBOL["bare"]["eta-A"])
+    s_u = _kinetic_sine(BARE["pi0-A"], BARE["eta-A"])
+    s_v = _kinetic_sine(BARE["pi0-A"], BARE["eta0-A"])
+    s_w = _kinetic_sine(BARE["eta0-A"], BARE["eta-A"])
     return s_u, s_v, s_w
