@@ -122,10 +122,7 @@ def bare_pseudo_kaon_couplings() -> (
     :return: pion-pion-kaon, eta-pion-kaon
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    pi_pi_kaon = (
-        PROPAGATION["K0"] ** 2
-        - 2 * PROPAGATION["K0"] * PARAMETERS["Epi"]
-    )
+    pi_pi_kaon = PROPAGATION["K0"] ** 2 - 2 * PROPAGATION["K0"] * PARAMETERS["Epi"]
     eta_pi_kaon = (
         PROPAGATION["K0"] ** 2
         - 2 * PROPAGATION["K0"] * PARAMETERS["Epi"]
@@ -145,8 +142,6 @@ def rotated_pseudo_kaon_couplings() -> (
     :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    bare_couplings = sym.Matrix(
-        [[COUPLING[f"{k}-pi-K"] for k in ["pi", "phi", "eta"]]]
-    )
+    bare_couplings = sym.Matrix([[COUPLING[f"{k}-pi-K"] for k in ["pi", "phi", "eta"]]])
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)

@@ -174,7 +174,7 @@ def debug_solve_mixing(
     if bounds is None:
         kwargs["bounds"] = [], []
         for arg in unknown_args:
-            if arg in list(BARE.values())+list(PROPAGATION.values()):
+            if arg in list(BARE.values()) + list(PROPAGATION.values()):
                 kwargs["bounds"][0].append(0)
                 kwargs["bounds"][1].append(np.inf)
             elif arg in ANGLE.values():
