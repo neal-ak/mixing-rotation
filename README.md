@@ -1,4 +1,4 @@
-# Pion Rotation Solver
+# Rotation Solver
 
 ## Requirements
 
@@ -27,39 +27,105 @@ to install the packages either in your global Python environment or a virtual Py
 ## Usage
 
 The notebooks contain examples of how to use the rotation solver.
-The basic usage is to first initialize, which gives the argument order for the system of equations:
+The basic usage is to first initialize the symbolic equation as a system of equations and the argument order when calling an equation:
 
 ```python
-argument_order, system_of_equations, _ = initialize()
+# Pseudo scalar mediator case
+import rotation.symbolic
+import rotation.symbolic_pseudo
+import rotation.solver
+
+rotation_matrix = rotation.symbolic.create_3d_rotation()[0]
+pseudo_mixing_equation = rotation.symbolic_pseudo.create_mix_equation(rotation_matrix)[0]
+argument_order, system_of_equations = rotation.solver.initialize_system(pseudo_mixing_equation.lhs - pseudo_mixing_equation.rhs)
+print(argument_order)
+print(system_of_equations)
+
+```
+
+```python
+# Axial vector mediator case
+import rotation.symbolic
+import rotation.symbolic_axial
+import rotation.solver
+
+rotation_matrix = rotation.symbolic.create_3d_rotation()[0]
+kinetic_rotation_matrix = rotation.symbolic_axial.create_kinetic()
+axial_mixing_equation = rotation.symbolic_axial.create_axial_mix_equation(rotation_matrix, kinetic_rotation_matrix)[0]
+argument_order, system_of_equations = rotation.solver.initialize_system(axial_mixing_equation.lhs - axial_mixing_equation.rhs)
 ```
 
 You then need to prepare two dictionaries, one representing fixed known quantities, and the other representing unknown quantities and their initial guesses for the solver to start from:
 
 ```python
-known = {
-    rotation.symbolic.MASS["pi"]: 0.1349768,
-    rotation.symbolic.MASS["eta"]: 0.547862,
-    rotation.symbolic.ANGLE["alpha"]: 0.8,
-    rotation.symbolic.ANGLE["beta"]: 0.7,
-    rotation.symbolic.ANGLE["gamma"]: 2,
-}
+# Pseudo scalar mediator case
+import rotation.symbolic
 
+known = {
+    rotation.symbolic.PROPAGATION["pi0"]: 0.1349768,
+    rotation.symbolic.PROPAGATION["eta"]: 0.547862,
+    rotation.symbolic.BARE["phi"]: 1.0,
+    rotation.symbolic.BARE["pi0-phi"]: 0.1,
+    rotation.symbolic.BARE["eta-phi"]: 0.3,
+}
 unknown = {
-    rotation.symbolic.MASS["phi"]: 1,
-    rotation.symbolic.MIX["phi"]: 1,
-    rotation.symbolic.MIX["pi"]: 0.1349768,
-    rotation.symbolic.MIX["eta"]: 0.547862,
-    rotation.symbolic.MIX["1x2"]: 1,
-    rotation.symbolic.MIX["1x1"]: 1,
+    rotation.symbolic.PROPAGATION["phi"]: 1.0,
+    rotation.symbolic.BARE["pi0"]: 0.1349768,
+    rotation.symbolic.BARE["eta"]: 0.547862,
+    rotation.symbolic.ANGLE["alpha"]: 0.0,
+    rotation.symbolic.ANGLE["beta"]: 0.0,
+    rotation.symbolic.ANGLE["gamma"]: 0.0,
 }
 ```
 
-Note that the system of equations requires there to be exactly 6 unknowns, and 5 unknowns.
-In addition, the dictionary keys must be the symbols defined by `rotation.symbolic`.
-After this, the solver can be called, which will raise a `ValueError` if the solution isn't within tolerance (which defaults to $10^{-8}$):
+Extra note: for the axial vector mediator, the kinetic mixing angles can ether be provided to the solver, or calculated from known particle masses as input.
 
 ```python
-solved = solve_mixing(system_of_equations, argument_order, unknown, known, tolerance=1e-1)
+# Axial vector mediator case
+import rotation.symbolic
+import rotation.symbolic_axial
+
+kin_u, kin_v, kin_w = rotation.symbolic_axial.calculate_uvw(
+    m_axial=5,
+    m_pi0_axial=0.1349768,
+    m_eta_axial=0.547862,
+    m_eta0_axial=0.547862*0.9,
+)
+
+known = {
+    rotation.symbolic.PROPAGATION["pi0"]: 0.1349768,
+    rotation.symbolic.PROPAGATION["eta"]: 0.547862,
+    rotation.symbolic.PROPAGATION["eta0"]: 0.547862*0.9,
+    rotation.symbolic.ANGLE["u"]: kin_u,
+    rotation.symbolic.ANGLE["v"]: kin_v,
+    rotation.symbolic.ANGLE["w"]: kin_w,
+}
+unknown = {
+    rotation.symbolic.BARE["pi0"]: 0.1349768,
+    rotation.symbolic.BARE["eta"]: 0.547862,
+    rotation.symbolic.BARE["eta0"]: 0.547862*0.9,
+    rotation.symbolic.ANGLE["alpha"]: 0.0,
+    rotation.symbolic.ANGLE["beta"]: 0.0,
+    rotation.symbolic.ANGLE["gamma"]: 0.0,
+}
+```
+
+These dictionary keys must be the symbols defined by `rotation.symbolic`.
+After this, the solving function can be created and the solver can be called, which will raise a `ValueError` if the solution isn't within tolerance (which defaults to $10^{-8}$):
+
+```python
+# Create function
+func = create_func(
+    system_of_equations,
+    argument_order,
+    known,
+)
+# Solve system
+solved = solve_mixing(
+    func,
+    argument_order,
+    unknown,
+)
 ```
 
 The result is a dictionary of the unknowns you gave it mapped to the solutions the solver found.
@@ -67,4 +133,4 @@ The `example.ipynb` shows how to iterate this process multiple times and plot th
 
 ## Citation
 
-This was used in [arxiv:2602.xxxxx](https://arxiv.org/abs/2602.xxxxx).
+This was used in [arxiv:2603.xxxxx](https://arxiv.org/abs/2602.xxxxx).
