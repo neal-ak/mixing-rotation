@@ -224,7 +224,7 @@ def create_axial_mix_equation(
     mixing_equation = sym.Eq(
         prop_matrix,
         sym.MatMul(
-            rotation, kinetic, bare_matrix, kinetic_transpose, rotation_transpose
+            rotation, kinetic_transpose, bare_matrix, kinetic, rotation_transpose
         ),
         evaluate=False,
     )
