@@ -4,7 +4,52 @@
 import sympy as sym
 
 # %%
-from .symbolic import COUPLING, PARAMETERS, PROPAGATION, ROTATED, create_3d_rotation
+from .symbolic import (
+    BARE,
+    COUPLING,
+    PARAMETERS,
+    PROPAGATION,
+    ROTATED,
+    create_3d_rotation,
+)
+
+
+# %%
+def create_mix_equation(
+    rotation: sym.Matrix,
+) -> tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]:
+    """Creates the mixing equation.
+
+    :param rotation: Rotation matrix
+    :type rotation: sym.Matrix
+    :return: Mixing matrix equation, (rotation transpose, bare mass matrix, propagating mass matrix)
+    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]
+    """
+    rotation_transpose = rotation.transpose()
+    bare_matrix = sym.Matrix(
+        [
+            [BARE["pi0"] ** 2, BARE["pi0-phi"] / 2, 0],
+            [
+                BARE["pi0-phi"] / 2,
+                BARE["phi"] ** 2,
+                BARE["eta-phi"] / 2,
+            ],
+            [0, BARE["eta-phi"] / 2, BARE["eta"] ** 2],
+        ]
+    )
+    prop_matrix = sym.Matrix(
+        [
+            [PROPAGATION["pi0"] ** 2, 0, 0],
+            [0, PROPAGATION["phi"] ** 2, 0],
+            [0, 0, PROPAGATION["eta"] ** 2],
+        ]
+    )
+    mixing_equation = sym.Eq(
+        prop_matrix,
+        sym.MatMul(rotation, bare_matrix, rotation_transpose),
+        evaluate=False,
+    )
+    return mixing_equation, (rotation_transpose, bare_matrix, prop_matrix)
 
 
 # %%
