@@ -9,7 +9,7 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from ..symbolic import ANGLE, BARE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
+from ..symbolic.symbolic import ANGLE, BARE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
 
 
 # %%
