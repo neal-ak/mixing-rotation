@@ -4,7 +4,7 @@
 import sympy as sym
 
 # %%
-from .symbolic import (
+from .general import (
     BARE,
     COUPLING,
     PARAMETERS,

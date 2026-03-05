@@ -31,24 +31,24 @@ The basic usage is to first initialize the symbolic equation as a system of equa
 
 ```python
 # Pseudo scalar mediator case
-import rotation.symbolic.symbolic
-import rotation.symbolic.symbolic_pseudo
+import rotation.symbolic.general
+import rotation.symbolic.pseudo
 import rotation.numerical.solver
 
-rotation_matrix = rotation.symbolic.symbolic.create_3d_rotation()[0]
-pseudo_mixing_equation = rotation.symbolic.symbolic_pseudo.create_mix_equation(rotation_matrix)[0]
+rotation_matrix = rotation.symbolic.general.create_3d_rotation()[0]
+pseudo_mixing_equation = rotation.symbolic.pseudo.create_mix_equation(rotation_matrix)[0]
 argument_order, system_of_equations = rotation.numerical.solver.initialize_system(pseudo_mixing_equation.lhs - pseudo_mixing_equation.rhs)
 ```
 
 ```python
 # Axial vector mediator case
-import rotation.symbolic.symbolic
-import rotation.symbolic.symbolic_axial
+import rotation.symbolic.general
+import rotation.symbolic.axial
 import rotation.numerical.solver
 
-rotation_matrix = rotation.symbolic.symbolic.create_3d_rotation()[0]
-kinetic_rotation_matrix = rotation.symbolic.symbolic_axial.create_kinetic()
-axial_mixing_equation = rotation.symbolic.symbolic_axial.create_axial_mix_equation(rotation_matrix, kinetic_rotation_matrix)[0]
+rotation_matrix = rotation.symbolic.general.create_3d_rotation()[0]
+kinetic_rotation_matrix = rotation.symbolic.axial.create_kinetic()
+axial_mixing_equation = rotation.symbolic.axial.create_axial_mix_equation(rotation_matrix, kinetic_rotation_matrix)[0]
 argument_order, system_of_equations = rotation.numerical.solver.initialize_system(axial_mixing_equation.lhs - axial_mixing_equation.rhs)
 ```
 
@@ -57,19 +57,19 @@ You then need to prepare two dictionaries, one representing fixed known quantiti
 ```python
 # Pseudo scalar mediator case
 known = {
-    rotation.symbolic.symbolic.PROPAGATION["pi0"]: 0.1349768,
-    rotation.symbolic.symbolic.PROPAGATION["eta"]: 0.547862,
-    rotation.symbolic.symbolic.BARE["phi"]: 1.0,
-    rotation.symbolic.symbolic.BARE["pi0-phi"]: 0.1,
-    rotation.symbolic.symbolic.BARE["eta-phi"]: 0.3,
+    rotation.symbolic.general.PROPAGATION["pi0"]: 0.1349768,
+    rotation.symbolic.general.PROPAGATION["eta"]: 0.547862,
+    rotation.symbolic.general.BARE["phi"]: 1.0,
+    rotation.symbolic.general.BARE["pi0-phi"]: 0.1,
+    rotation.symbolic.general.BARE["eta-phi"]: 0.3,
 }
 unknown = {
-    rotation.symbolic.symbolic.PROPAGATION["phi"]: 1.0,
-    rotation.symbolic.symbolic.BARE["pi0"]: 0.1349768,
-    rotation.symbolic.symbolic.BARE["eta"]: 0.547862,
-    rotation.symbolic.symbolic.ANGLE["alpha"]: 0.0,
-    rotation.symbolic.symbolic.ANGLE["beta"]: 0.0,
-    rotation.symbolic.symbolic.ANGLE["gamma"]: 0.0,
+    rotation.symbolic.general.PROPAGATION["phi"]: 1.0,
+    rotation.symbolic.general.BARE["pi0"]: 0.1349768,
+    rotation.symbolic.general.BARE["eta"]: 0.547862,
+    rotation.symbolic.general.ANGLE["alpha"]: 0.0,
+    rotation.symbolic.general.ANGLE["beta"]: 0.0,
+    rotation.symbolic.general.ANGLE["gamma"]: 0.0,
 }
 ```
 
@@ -85,24 +85,24 @@ kin_u, kin_v, kin_w = rotation.numerical.axial.calculate_uvw(
     m_eta0_axial=0.547862*0.9,
 )
 known = {
-    rotation.symbolic.symbolic.PROPAGATION["pi0"]: 0.1349768,
-    rotation.symbolic.symbolic.PROPAGATION["eta"]: 0.547862,
-    rotation.symbolic.symbolic.PROPAGATION["eta0"]: 0.547862*0.9,
-    rotation.symbolic.symbolic.ANGLE["u"]: kin_u,
-    rotation.symbolic.symbolic.ANGLE["v"]: kin_v,
-    rotation.symbolic.symbolic.ANGLE["w"]: kin_w,
+    rotation.symbolic.general.PROPAGATION["pi0"]: 0.1349768,
+    rotation.symbolic.general.PROPAGATION["eta"]: 0.547862,
+    rotation.symbolic.general.PROPAGATION["eta0"]: 0.547862*0.9,
+    rotation.symbolic.general.ANGLE["u"]: kin_u,
+    rotation.symbolic.general.ANGLE["v"]: kin_v,
+    rotation.symbolic.general.ANGLE["w"]: kin_w,
 }
 unknown = {
-    rotation.symbolic.symbolic.BARE["pi0"]: 0.1349768,
-    rotation.symbolic.symbolic.BARE["eta"]: 0.547862,
-    rotation.symbolic.symbolic.BARE["eta0"]: 0.547862*0.9,
-    rotation.symbolic.symbolic.ANGLE["alpha"]: 0.0,
-    rotation.symbolic.symbolic.ANGLE["beta"]: 0.0,
-    rotation.symbolic.symbolic.ANGLE["gamma"]: 0.0,
+    rotation.symbolic.general.BARE["pi0"]: 0.1349768,
+    rotation.symbolic.general.BARE["eta"]: 0.547862,
+    rotation.symbolic.general.BARE["eta0"]: 0.547862*0.9,
+    rotation.symbolic.general.ANGLE["alpha"]: 0.0,
+    rotation.symbolic.general.ANGLE["beta"]: 0.0,
+    rotation.symbolic.general.ANGLE["gamma"]: 0.0,
 }
 ```
 
-These dictionary keys must be the symbols defined by `rotation.symbolic.symbolic`.
+These dictionary keys must be the symbols defined by `rotation.symbolic.general`.
 After this, the solving function can be created and the solver can be called, which will raise a `ValueError` if the solution isn't within tolerance (which defaults to $10^{-8}$):
 
 ```python

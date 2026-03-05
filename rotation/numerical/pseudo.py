@@ -4,8 +4,8 @@
 import sympy as sym
 
 # %%
-from ..symbolic.symbolic import ANGLE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
-from ..symbolic.symbolic_pseudo import (
+from ..symbolic.general import ANGLE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
+from ..symbolic.pseudo import (
     rotated_pseudo_meson_couplings,
     rotated_pseudo_photon_coupling,
     bare_pseudo_kaon_couplings,

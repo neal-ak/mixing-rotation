@@ -4,7 +4,7 @@
 import sympy as sym
 
 # %%
-from .symbolic import ANGLE, BARE, PROPAGATION
+from .general import ANGLE, BARE, PROPAGATION
 
 
 # %%

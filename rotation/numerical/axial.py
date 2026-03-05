@@ -4,8 +4,8 @@
 import sympy as sym
 
 # %%
-from ..symbolic.symbolic import BARE, PROPAGATION
-from ..symbolic.symbolic_axial import kinetic_sines
+from ..symbolic.general import BARE, PROPAGATION
+from ..symbolic.axial import kinetic_sines
 
 
 # %%
