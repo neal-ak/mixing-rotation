@@ -33,34 +33,29 @@ The basic usage is to first initialize the symbolic equation as a system of equa
 # Pseudo scalar mediator case
 import rotation.symbolic
 import rotation.symbolic_pseudo
-import rotation.solver
+import rotation.numerical.solver
 
 rotation_matrix = rotation.symbolic.create_3d_rotation()[0]
 pseudo_mixing_equation = rotation.symbolic_pseudo.create_mix_equation(rotation_matrix)[0]
-argument_order, system_of_equations = rotation.solver.initialize_system(pseudo_mixing_equation.lhs - pseudo_mixing_equation.rhs)
-print(argument_order)
-print(system_of_equations)
-
+argument_order, system_of_equations = rotation.numerical.solver.initialize_system(pseudo_mixing_equation.lhs - pseudo_mixing_equation.rhs)
 ```
 
 ```python
 # Axial vector mediator case
 import rotation.symbolic
 import rotation.symbolic_axial
-import rotation.solver
+import rotation.numerical.solver
 
 rotation_matrix = rotation.symbolic.create_3d_rotation()[0]
 kinetic_rotation_matrix = rotation.symbolic_axial.create_kinetic()
 axial_mixing_equation = rotation.symbolic_axial.create_axial_mix_equation(rotation_matrix, kinetic_rotation_matrix)[0]
-argument_order, system_of_equations = rotation.solver.initialize_system(axial_mixing_equation.lhs - axial_mixing_equation.rhs)
+argument_order, system_of_equations = rotation.numerical.solver.initialize_system(axial_mixing_equation.lhs - axial_mixing_equation.rhs)
 ```
 
 You then need to prepare two dictionaries, one representing fixed known quantities, and the other representing unknown quantities and their initial guesses for the solver to start from:
 
 ```python
 # Pseudo scalar mediator case
-import rotation.symbolic
-
 known = {
     rotation.symbolic.PROPAGATION["pi0"]: 0.1349768,
     rotation.symbolic.PROPAGATION["eta"]: 0.547862,
@@ -82,16 +77,13 @@ Extra note: for the axial vector mediator, the kinetic mixing angles can ether b
 
 ```python
 # Axial vector mediator case
-import rotation.symbolic
-import rotation.symbolic_axial
-
-kin_u, kin_v, kin_w = rotation.symbolic_axial.calculate_uvw(
+import rotation.numerical.axial
+kin_u, kin_v, kin_w = rotation.numerical.axial.calculate_uvw(
     m_axial=5,
     m_pi0_axial=0.1349768,
     m_eta_axial=0.547862,
     m_eta0_axial=0.547862*0.9,
 )
-
 known = {
     rotation.symbolic.PROPAGATION["pi0"]: 0.1349768,
     rotation.symbolic.PROPAGATION["eta"]: 0.547862,
@@ -115,13 +107,13 @@ After this, the solving function can be created and the solver can be called, wh
 
 ```python
 # Create function
-func = create_func(
+func = rotation.numerical.solver.create_func(
     system_of_equations,
     argument_order,
     known,
 )
 # Solve system
-solved = solve_mixing(
+solved = rotation.numerical.solver.solve_mixing(
     func,
     argument_order,
     unknown,
