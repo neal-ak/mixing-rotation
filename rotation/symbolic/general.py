@@ -8,9 +8,14 @@ import sympy as sym
 def _preprocess_symbol(s):
     """Helper to automate assigning dict key strings from symbols."""
     s = str(s).replace("\\", "")
-    s = s.replace("^prime", "").replace("^", "").replace("_", "")
+    s = (
+        s.replace("eta^prime", "etap")
+        .replace("^prime", "")
+        .replace("^", "")
+        .replace("_", "")
+    )
     s = s.replace(" b", "")
-    s = s.replace("tilde{", "").replace("}", "")
+    s = s.replace("tilde", "").replace("{", "").replace("}", "")
     return s.strip().replace(" ", "-")
 
 
@@ -30,6 +35,8 @@ PROPAGATION = {
         r"\eta_0",
         r"A^\prime",
         r"K^0",
+        r"\pi",
+        "K",
     ]
 }
 
@@ -46,6 +53,8 @@ BARE = {
         r"\pi^0 A",
         r"\eta A",
         r"\eta_0 A",
+        r"A",
+        r"\eta^\prime A",
     ]
 }
 
@@ -85,7 +94,52 @@ ROTATED = {
 }
 
 # %%
-PARAMETERS = {_preprocess_symbol(k): sym.Symbol(k, real=True) for k in [r"E_\pi"]}
+AXIAL_COUPLING = {
+    _preprocess_symbol(k): sym.Symbol(f"\\lambda_{{{k}}}", real=True)
+    for k in [
+        "a",
+        r"\pi b \chi",
+        r"\eta^\prime b \chi",
+        r"\eta b \chi",
+        r"\pi \pi K b",
+        r"\eta \pi K b",
+        r"\eta^\prime \pi K b",
+    ]
+}
+
+# %%
+AXIAL_ROTATED = {
+    _preprocess_symbol(k): sym.Symbol(f"\\lambda_{{{k}}}", real=True)
+    for k in [
+        r"\pi \chi",
+        r"\eta^\prime \chi",
+        r"\eta \chi",
+        r"\pi \pi K",
+        r"\eta \pi K",
+        r"\eta^\prime \pi K",
+    ]
+}
+
+# %%
+PARAMETERS = {
+    _preprocess_symbol(k): sym.Symbol(k, real=True)
+    for k in [
+        r"E_\pi",
+        r"F_0",
+        r"B_0",
+        r"L_4",
+        r"L_5",
+        r"a_u",
+        r"a_d",
+        r"a_s",
+        r"m_u",
+        r"m_d",
+        r"m_s",
+        r"g_8",
+        r"g_{8s}",
+        r"E_\chi",
+    ]
+}
 
 
 # %%

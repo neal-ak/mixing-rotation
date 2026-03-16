@@ -4,7 +4,14 @@
 import sympy as sym
 
 # %%
-from .general import ANGLE, BARE, PROPAGATION
+from .general import (
+    ANGLE,
+    AXIAL_COUPLING,
+    BARE,
+    PARAMETERS,
+    PROPAGATION,
+    create_3d_rotation,
+)
 
 
 # %%
@@ -111,3 +118,288 @@ def kinetic_sines() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mu
     s_v = _kinetic_sine(BARE["pi0-A"], BARE["eta0-A"])
     s_w = _kinetic_sine(BARE["eta0-A"], BARE["eta-A"])
     return s_u, s_v, s_w
+
+
+# %%
+def bare_axial_meson_couplings() -> (
+    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+):
+    """Symbolic expressions for the un-rotated meson to dark matter couplings.
+
+    Using the axial vector mediator A.
+
+    :return: pion-chi, eta-chi, eta^prime-chi
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    """
+    masses = BARE["pi0-A"], BARE["eta-A"], BARE["etap-A"]
+    return tuple(
+        [
+            AXIAL_COUPLING["a"]
+            * m
+            / BARE["A"] ** 2
+            / sym.sqrt(1 - (m / BARE["A"]) ** 2)
+            for m in masses
+        ]
+    )
+
+
+# %%
+def rotated_axial_meson_couplings() -> (
+    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+):
+    """Symbolic expressions for the rotated meson to dark matter couplings.
+
+    Using the axial vector mediator A.
+
+    :return: pion-chi, eta-chi, eta^prime-chi
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    """
+    bare_couplings = sym.Matrix([[*bare_axial_meson_couplings()]])
+    rotated_couplings = (
+        bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()
+    )
+    return tuple(rotated_couplings)
+
+
+# %%
+def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
+    """The bare axial mediator off-diagonal terms.
+
+    :return: pion-mediator, eta-mediator, eta^prime-mediator
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    """
+    terms = [
+        (
+            PARAMETERS["au"] - PARAMETERS["ad"],
+            PARAMETERS["au"] * PARAMETERS["mu"] - PARAMETERS["ad"] * PARAMETERS["md"],
+        ),
+        (
+            1
+            / sym.sqrt(3)
+            * (PARAMETERS["au"] + PARAMETERS["ad"] - 2 * PARAMETERS["as"]),
+            1
+            / sym.sqrt(3)
+            * (
+                PARAMETERS["au"] * PARAMETERS["mu"]
+                + PARAMETERS["ad"] * PARAMETERS["md"]
+                - 2 * PARAMETERS["as"] * PARAMETERS["ms"]
+            ),
+        ),
+        (
+            sym.sqrt(6) / 3 * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]),
+            sym.sqrt(6)
+            / 3
+            * (
+                PARAMETERS["au"] * PARAMETERS["mu"]
+                + PARAMETERS["ad"] * PARAMETERS["md"]
+                + PARAMETERS["as"] * PARAMETERS["ms"]
+            ),
+        ),
+    ]
+    return tuple(
+        [
+            PARAMETERS["F0"]
+            * (
+                a
+                * (
+                    1
+                    + 16
+                    * PARAMETERS["B0"]
+                    * PARAMETERS["L4"]
+                    / PARAMETERS["F0"] ** 2
+                    * (PARAMETERS["mu"] + PARAMETERS["md"] + PARAMETERS["ms"])
+                )
+                + b * 16 * PARAMETERS["B0"] * PARAMETERS["L5"] / PARAMETERS["F0"] ** 2
+            )
+            for a, b in terms
+        ]
+    )
+
+
+# %%
+def bare_axial_kaon_couplings() -> (
+    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+):
+    """Symbolic expressions for the un-rotated kaon couplings.
+
+    Using the axial vector mediator A.
+
+    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    """
+    pi_pi_k = (
+        -(
+            (
+                sym.I
+                * PROPAGATION["K"]
+                * (
+                    PARAMETERS["g8"] * BARE["A"] ** 2
+                    - 2
+                    * PARAMETERS["F0"]
+                    * (
+                        (PARAMETERS["ad"] + PARAMETERS["au"]) * PARAMETERS["g8"]
+                        + (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
+                        * PARAMETERS["g8s"]
+                    )
+                    * BARE["pi0-A"] ** 2
+                )
+                * PARAMETERS["Epi"]
+            )
+            / (PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        )
+        + (
+            sym.I
+            * PARAMETERS["g8"]
+            * PROPAGATION["K"]
+            * (
+                BARE["A"] ** 2
+                + 2
+                * (PARAMETERS["ad"] - PARAMETERS["as"])
+                * PARAMETERS["F0"]
+                * BARE["pi0-A"] ** 2
+            )
+            * PARAMETERS["Echi"]
+        )
+        / (PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        - (
+            sym.I
+            * (
+                (PARAMETERS["ad"] + PARAMETERS["au"]) * PARAMETERS["g8"]
+                + (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
+                * PARAMETERS["g8s"]
+            )
+            * (PROPAGATION["K"] ** 2 + PROPAGATION["pi"] ** 2)
+            * BARE["pi0-A"] ** 2
+        )
+        / (PARAMETERS["F0"] ** 2 * BARE["A"] ** 2)
+    )
+    eta_pi_k = (
+        (
+            sym.I
+            * PROPAGATION["K"]
+            * (
+                -sym.sqrt(3) * PARAMETERS["g8"] * BARE["A"] ** 2
+                + 6
+                * (PARAMETERS["ad"] + PARAMETERS["au"])
+                * PARAMETERS["F0"]
+                * PARAMETERS["g8"]
+                * BARE["eta-A"] ** 2
+                + 6
+                * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
+                * PARAMETERS["F0"]
+                * PARAMETERS["g8s"]
+                * BARE["eta-A"] ** 2
+            )
+            * PARAMETERS["Epi"]
+        )
+        / (3 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        - (
+            sym.I
+            * PARAMETERS["g8"]
+            * PROPAGATION["K"]
+            * (
+                sym.sqrt(3) * BARE["A"] ** 2
+                + 2
+                * (-PARAMETERS["ad"] + PARAMETERS["as"])
+                * PARAMETERS["F0"]
+                * BARE["eta-A"] ** 2
+            )
+            * PARAMETERS["Echi"]
+        )
+        / (PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        + (
+            sym.I
+            * (
+                sym.sqrt(3) * PARAMETERS["g8"] * BARE["A"] ** 2
+                - 3
+                * (PARAMETERS["ad"] + PARAMETERS["au"])
+                * PARAMETERS["F0"]
+                * PARAMETERS["g8"]
+                * BARE["eta-A"] ** 2
+                - 3
+                * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
+                * PARAMETERS["F0"]
+                * PARAMETERS["g8s"]
+                * BARE["eta-A"] ** 2
+            )
+            * (PROPAGATION["K"] ** 2 + PROPAGATION["pi"] ** 2)
+        )
+        / (3 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+    )
+    etap_pi_k = (
+        1
+        / (6 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        * sym.I
+        * (
+            2 * sym.sqrt(6) * PARAMETERS["g8"] * BARE["A"] ** 2
+            + 3 * sym.sqrt(6) * PARAMETERS["g8s"] * BARE["A"] ** 2
+            - 6
+            * (PARAMETERS["ad"] + PARAMETERS["au"])
+            * PARAMETERS["F0"]
+            * PARAMETERS["g8"]
+            * BARE["eta0-A"] ** 2
+            - 6
+            * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
+            * PARAMETERS["F0"]
+            * PARAMETERS["g8s"]
+            * BARE["eta0-A"] ** 2
+        )
+        * (PROPAGATION["K"] ** 2 + PROPAGATION["pi"] ** 2)
+        + (
+            2
+            * sym.I
+            * (PARAMETERS["ad"] - PARAMETERS["as"])
+            * PARAMETERS["g8"]
+            * PROPAGATION["K"]
+            * BARE["eta0-A"] ** 2
+            * PARAMETERS["Echi"]
+        )
+        / (PARAMETERS["F0"] ** 2 * BARE["A"] ** 2)
+        + (
+            sym.I
+            * PROPAGATION["K"]
+            * (
+                -2 * sym.sqrt(6) * PARAMETERS["g8"] * BARE["A"] ** 2
+                - 3 * sym.sqrt(6) * PARAMETERS["g8s"] * BARE["A"] ** 2
+                + 6
+                * (PARAMETERS["ad"] + PARAMETERS["au"])
+                * PARAMETERS["F0"]
+                * PARAMETERS["g8"]
+                * BARE["eta0-A"] ** 2
+                + 6
+                * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
+                * PARAMETERS["F0"]
+                * PARAMETERS["g8s"]
+                * BARE["eta0-A"] ** 2
+            )
+            * PARAMETERS["Epi"]
+        )
+        / (3 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+    )
+    return tuple(
+        [
+            l / sym.sqrt(1 - (m / BARE["A"]) ** 2)
+            for m, l in zip(
+                [BARE["pi0-A"], BARE["eta0-A"], BARE["etap-A"]],
+                [pi_pi_k, eta_pi_k, etap_pi_k],
+            )
+        ]
+    )
+
+
+# %%
+def rotated_axial_kaon_couplings() -> (
+    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+):
+    """Symbolic expressions for the rotated kaon couplings.
+
+    Using the axial vector mediator A.
+
+    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    """
+    bare_couplings = sym.Matrix([[*bare_axial_kaon_couplings()]])
+    rotated_couplings = (
+        bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()
+    )
+    return tuple(rotated_couplings)
