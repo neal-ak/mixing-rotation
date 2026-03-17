@@ -7,6 +7,7 @@ import sympy as sym
 from ..symbolic.general import ANGLE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
 from ..symbolic.pseudo import (
     rotated_pseudo_meson_couplings,
+    bare_pseudo_masses,
     rotated_pseudo_photon_coupling,
     bare_pseudo_kaon_couplings,
     rotated_pseudo_kaon_couplings,
@@ -46,6 +47,40 @@ def pseudo_calculate_meson_couplings(
         call = list(g.free_symbols)
         coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
     return tuple(coupling)
+
+
+def pseudo_calculate_bare_masses(
+    b_0: float, f_0: float, up: float, down: float, strange: float
+) -> tuple[float, float]:
+    """Numerical calculation of the bare off-diagonal meson masses.
+
+    Specific to the pseudo scalar mediator phi case.
+
+    :param b_0: B_{0}
+    :type b_0: float
+    :param f_0: F_{0}
+    :type f_0: float
+    :param up: Up coupling
+    :type up: float
+    :param down: Down coupling
+    :type down: float
+    :param strange: Strange coupling
+    :type strange: float
+    :return: pion-mediator, eta-mediator
+    :rtype: tuple[float, float]
+    """
+    parameter = {
+        PARAMETERS["B0"]: b_0,
+        PARAMETERS["F0"]: f_0,
+        COUPLING["u"]: up,
+        COUPLING["d"]: down,
+        COUPLING["s"]: strange,
+    }
+    masses = []
+    for m in bare_pseudo_masses():
+        call = list(m.free_symbols)
+        masses.append(sym.lambdify(call, m)(*[parameter[k] for k in call]))
+    return tuple(masses)
 
 
 # %%

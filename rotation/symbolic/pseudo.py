@@ -69,6 +69,20 @@ def rotated_pseudo_meson_couplings() -> (
 
 
 # %%
+def bare_pseudo_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul]:
+    """The bare pseudo scalar mediator off-diagonal terms.
+
+    :return: pion-mediator, eta-mediator
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul]
+    """
+    masses = [
+        COUPLING["u"] - COUPLING["d"],
+        COUPLING["u"] + COUPLING["d"] - 2 * COUPLING["s"],
+    ]
+    return tuple([PARAMETERS["B0"] * PARAMETERS["F0"] * m for m in masses])
+
+
+# %%
 def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
     """Symbolic expression for the rotated mediator to photon coupling.
 
