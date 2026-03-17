@@ -97,9 +97,9 @@ def pseudo_calculate_bare_kaon(
 
     :param energy_pion: Pion energy
     :type energy_pion: float
-    :param mass_pion: Pion mass
+    :param mass_pion: Neutral pion mass
     :type mass_pion: float
-    :param mass_kaon: Kaon mass
+    :param mass_kaon: Charged kaon mass
     :type mass_kaon: float
     :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
     :rtype: tuple[float, float, float]
@@ -107,7 +107,7 @@ def pseudo_calculate_bare_kaon(
     parameter = {
         PARAMETERS["Epi"]: energy_pion,
         PROPAGATION["pi0"]: mass_pion,
-        PROPAGATION["K0"]: mass_kaon,
+        PROPAGATION["Kpm"]: mass_kaon,
     }
     coupling = []
     for g in bare_pseudo_kaon_couplings():
