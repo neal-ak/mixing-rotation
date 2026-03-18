@@ -50,7 +50,11 @@ def pseudo_calculate_meson_couplings(
 
 
 def pseudo_calculate_bare_masses(
-    b_0: float, f_0: float, up: float, down: float, strange: float
+    b_0: float,
+    f_0: float,
+    coupling_up: float,
+    coupling_down: float,
+    coupling_strange: float,
 ) -> tuple[float, float]:
     """Numerical calculation of the bare off-diagonal meson masses.
 
@@ -60,21 +64,21 @@ def pseudo_calculate_bare_masses(
     :type b_0: float
     :param f_0: F_{0}
     :type f_0: float
-    :param up: Up coupling
-    :type up: float
-    :param down: Down coupling
-    :type down: float
-    :param strange: Strange coupling
-    :type strange: float
+    :param coupling_up: Up coupling
+    :type coupling_up: float
+    :param coupling_down: Down coupling
+    :type coupling_down: float
+    :param coupling_strange: Strange coupling
+    :type coupling_strange: float
     :return: pion-mediator, eta-mediator
     :rtype: tuple[float, float]
     """
     parameter = {
         PARAMETERS["B0"]: b_0,
         PARAMETERS["F0"]: f_0,
-        COUPLING["u"]: up,
-        COUPLING["d"]: down,
-        COUPLING["s"]: strange,
+        COUPLING["u"]: coupling_up,
+        COUPLING["d"]: coupling_down,
+        COUPLING["s"]: coupling_strange,
     }
     masses = []
     for m in bare_pseudo_masses():
@@ -85,26 +89,26 @@ def pseudo_calculate_bare_masses(
 
 # %%
 def pseudo_calculate_photon_coupling(
-    known_pion_photon_coupling: float,
-    known_eta_photon_coupling: float,
     alpha: float,
     beta: float,
     gamma: float,
+    known_pion_photon_coupling: float,
+    known_eta_photon_coupling: float,
 ) -> float:
     """Numerical calculation of the rotated mediator to photon coupling.
 
     Specific to the pseudo scalar mediator case.
 
-    :param known_pion_photon_coupling: known pion to photon coupling
-    :type known_pion_photon_coupling: float
-    :param known_eta_photon_coupling: known eta to photon coupling
-    :type known_eta_photon_coupling: float
     :param alpha: alpha mixing angle
     :type alpha: float
     :param beta: beta mixing angle
     :type beta: float
     :param gamma: gamma mixing angle
     :type gamma: float
+    :param known_pion_photon_coupling: known pion to photon coupling
+    :type known_pion_photon_coupling: float
+    :param known_eta_photon_coupling: known eta to photon coupling
+    :type known_eta_photon_coupling: float
     :return: rotated mediator to photon coupling
     :rtype: float
     """
@@ -123,18 +127,20 @@ def pseudo_calculate_photon_coupling(
 # %%
 def pseudo_calculate_bare_kaon(
     energy_pion: float,
-    mass_pion: float,
-    mass_kaon: float,
+    mass_pion: float = 0.1349768,
+    mass_kaon: float = 0.493677,
 ) -> tuple[float, float, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
-    Specific to the pseudo scalar mediator case.
+    Specific to the pseudo scalar mediator case. Defaults from the PDG
+    [neutral pion](https://pdglive.lbl.gov/Particle.action?node=S009) and
+    [charged kaon](https://pdglive.lbl.gov/Particle.action?node=S010).
 
     :param energy_pion: Pion energy
     :type energy_pion: float
-    :param mass_pion: Neutral pion mass
+    :param mass_pion: Neutral pion mass, defaults to 0.1349768
     :type mass_pion: float
-    :param mass_kaon: Charged kaon mass
+    :param mass_kaon: Charged kaon mass, defaults to 0.493677
     :type mass_kaon: float
     :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
     :rtype: tuple[float, float, float]
