@@ -398,7 +398,9 @@ def rotated_axial_kaon_couplings() -> (
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    bare_couplings = sym.Matrix([[*bare_axial_kaon_couplings()]])
+    bare_couplings = sym.Matrix(
+        [[AXIAL_COUPLING[f"{k}-pi-K"] for k in ["pi", "eta", "etap"]]]
+    )
     rotated_couplings = (
         bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()
     )
