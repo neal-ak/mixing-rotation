@@ -29,7 +29,7 @@ PROPAGATION = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [
         r"\pi^{0}",
-        r"\tilde{\phi}^{\prime}",
+        r"\tilde{\phi}",
         r"\eta",
         r"\eta^{\prime}",
         r"A^{\prime}",
@@ -43,7 +43,7 @@ BARE = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [
         r"\pi^{0}_{b}",
-        r"\phi",
+        r"\tilde{\phi}_{b}",
         r"\eta_{b}",
         r"\pi^{0} \tilde{\phi}",
         r"\eta \tilde{\phi}",
@@ -66,10 +66,10 @@ COUPLING = {
         r"\chi",
         r"\eta_{b} \chi",
         r"\pi^{0}_{b} \gamma",
-        r"\tilde{\phi} \gamma",
+        r"\tilde{\phi}_{b} \gamma",
         r"\eta_{b} \gamma",
         r"\pi^{0}_{b} \pi K",
-        r"\tilde{\phi} \pi K",
+        r"\tilde{\phi}_{b} \pi K",
         r"\eta_{b} \pi K",
     ]
 }
@@ -79,13 +79,13 @@ ROTATED = {
     _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
     for k in [
         r"\pi^{0} \chi",
-        r"\tilde{\phi}^{\prime} \chi",
+        r"\tilde{\phi} \chi",
         r"\eta \chi",
         r"\pi^{0} \gamma",
-        r"\tilde{\phi}^{\prime} \gamma",
+        r"\tilde{\phi} \gamma",
         r"\eta \gamma",
         r"\pi^{0} \pi K",
-        r"\tilde{\phi}^{\prime} \pi K",
+        r"\tilde{\phi} \pi K",
         r"\eta \pi K",
     ]
 }

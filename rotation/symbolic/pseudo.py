@@ -31,7 +31,7 @@ def create_mix_equation(
             [BARE["pi0Bare"] ** 2, BARE["pi0-phi"] / 2, 0],
             [
                 BARE["pi0-phi"] / 2,
-                BARE["phi"] ** 2,
+                BARE["phiBare"] ** 2,
                 BARE["eta-phi"] / 2,
             ],
             [0, BARE["eta-phi"] / 2, BARE["etaBare"] ** 2],
@@ -40,7 +40,7 @@ def create_mix_equation(
     prop_matrix = sym.Matrix(
         [
             [PROPAGATION["pi0"] ** 2, 0, 0],
-            [0, PROPAGATION["phiP"] ** 2, 0],
+            [0, PROPAGATION["phi"] ** 2, 0],
             [0, 0, PROPAGATION["eta"] ** 2],
         ]
     )
@@ -109,20 +109,20 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
     gamma_eqns = [
         sym.Eq(g, e)
         for g, e in zip(
-            [ROTATED[k] for k in ["pi0-gamma", "phiP-gamma", "eta-gamma"]],
+            [ROTATED[k] for k in ["pi0-gamma", "phi-gamma", "eta-gamma"]],
             gamma_matrix,
         )
     ]
     gamma_solutions = sym.solve(
         gamma_eqns,
         [
-            ROTATED["phiP-gamma"],
+            ROTATED["phi-gamma"],
             COUPLING["pi0Bare-gamma"],
             COUPLING["etaBare-gamma"],
         ],
         dict=True,
     )
-    return gamma_solutions[0][ROTATED["phiP-gamma"]].trigsimp()
+    return gamma_solutions[0][ROTATED["phi-gamma"]].trigsimp()
 
 
 # %%
@@ -157,7 +157,7 @@ def rotated_pseudo_kaon_couplings() -> (
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
     bare_couplings = sym.Matrix(
-        [[COUPLING[f"{k}-pi-K"] for k in ["pi0Bare", "phi", "etaBare"]]]
+        [[COUPLING[f"{k}Bare-pi-K"] for k in ["pi0", "phi", "eta"]]]
     )
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)
