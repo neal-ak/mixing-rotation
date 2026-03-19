@@ -27,6 +27,18 @@ MASS_CHARGED_KAON = 0.493677
 MASS_ETA = 0.547862
 # https://pdglive.lbl.gov/Particle.action?node=M002
 MASS_ETA_PRIME = 0.95778
+# eqn 3 in tex
+B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
+# https://arxiv.org/abs/1405.6488
+L_4 = 1.87e-3
+L_5 = 1.22e-3
+# eqn F3 in tex
+G_8 = 3.62
+# WHAT IS?
+G_8S = 1
+# eqn 34 in tex, CHECK UNITS ON CHARGE
+G_PI_GAMMA = (1) ** 2 / (4 * np.pi**2 * PION_DECAY)
+G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
 
 
 # %%

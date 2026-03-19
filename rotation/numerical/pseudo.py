@@ -18,7 +18,14 @@ from ..symbolic.pseudo import (
     bare_pseudo_kaon_couplings,
     rotated_pseudo_kaon_couplings,
 )
-from .solver import PION_DECAY, MASS_NEUTRAL_PION, MASS_CHARGED_KAON
+from .solver import (
+    PION_DECAY,
+    MASS_NEUTRAL_PION,
+    MASS_CHARGED_KAON,
+    B_0,
+    G_PI_GAMMA,
+    G_ETA_GAMMA,
+)
 
 
 # %%
@@ -57,35 +64,35 @@ def pseudo_calculate_meson_couplings(
 
 
 def pseudo_calculate_bare_masses(
-    b_0: float,
     coupling_up: float,
     coupling_down: float,
     coupling_strange: float,
+    b_0: float = B_0,
     pion_decay: float = PION_DECAY,
 ) -> tuple[float, float]:
     """Numerical calculation of the bare off-diagonal meson masses.
 
     Specific to the pseudo scalar mediator phi case.
 
-    :param b_0: B_{0}
-    :type b_0: float
     :param coupling_up: Up coupling
     :type coupling_up: float
     :param coupling_down: Down coupling
     :type coupling_down: float
     :param coupling_strange: Strange coupling
     :type coupling_strange: float
+    :param b_0: B_{0}, defaults to B_0
+    :type b_0: float
     :param pion_decay: The pion decay constant, defaults to PION_DECAY
     :type pion_decay: float
     :return: pion-mediator, eta-mediator
     :rtype: tuple[float, float]
     """
     parameter = {
-        PARAMETERS["B0"]: b_0,
-        PARAMETERS["F"]: pion_decay,
         COUPLING["u"]: coupling_up,
         COUPLING["d"]: coupling_down,
         COUPLING["s"]: coupling_strange,
+        PARAMETERS["B0"]: b_0,
+        PARAMETERS["F"]: pion_decay,
     }
     masses = []
     for m in bare_pseudo_masses():
@@ -99,8 +106,8 @@ def pseudo_calculate_photon_coupling(
     alpha: float,
     beta: float,
     gamma: float,
-    known_pion_photon_coupling: float,
-    known_eta_photon_coupling: float,
+    known_pion_photon_coupling: float = G_PI_GAMMA,
+    known_eta_photon_coupling: float = G_ETA_GAMMA,
 ) -> float:
     """Numerical calculation of the rotated mediator to photon coupling.
 
@@ -112,19 +119,19 @@ def pseudo_calculate_photon_coupling(
     :type beta: float
     :param gamma: gamma mixing angle
     :type gamma: float
-    :param known_pion_photon_coupling: known pion to photon coupling
+    :param known_pion_photon_coupling: known pion to photon coupling, defaults to G_PI_GAMMA
     :type known_pion_photon_coupling: float
-    :param known_eta_photon_coupling: known eta to photon coupling
+    :param known_eta_photon_coupling: known eta to photon coupling, defaults to G_ETA_GAMMA
     :type known_eta_photon_coupling: float
     :return: rotated mediator to photon coupling
     :rtype: float
     """
     parameter = {
-        ROTATED["pi0-gamma"]: known_pion_photon_coupling,
-        ROTATED["eta-gamma"]: known_eta_photon_coupling,
         ANGLE["alpha"]: alpha,
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,
+        ROTATED["pi0-gamma"]: known_pion_photon_coupling,
+        ROTATED["eta-gamma"]: known_eta_photon_coupling,
     }
     g = rotated_pseudo_photon_coupling()
     call = list(g.free_symbols)

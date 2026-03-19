@@ -133,7 +133,7 @@ PARAMETERS = {
         r"m_{d}",
         r"m_{s}",
         r"g_{8}",
-        r"g_{8s}",
+        r"g_{8}^{s}",
         r"E_{\chi}",
     ]
 }
