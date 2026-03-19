@@ -5,6 +5,11 @@ import sympy as sym
 
 
 # %%
+# https://inspirehep.net/literature/303682
+PION_DECAY = 0.0924
+
+
+# %%
 def _preprocess_symbol(s):
     """Helper to automate assigning dict key strings from symbols."""
     s = str(s).replace("\\", "")
@@ -125,7 +130,7 @@ PARAMETERS = {
     _preprocess_symbol(k): sym.Symbol(k, real=True)
     for k in [
         r"E_{\pi}",
-        r"F_{0}",
+        "F",
         r"B_{0}",
         r"L_{4}",
         r"L_{5}",

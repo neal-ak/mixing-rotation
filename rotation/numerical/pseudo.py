@@ -4,7 +4,7 @@
 import sympy as sym
 
 # %%
-from ..symbolic.general import ANGLE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
+from ..symbolic.general import ANGLE, COUPLING, PARAMETERS, PROPAGATION, ROTATED, PION_DECAY
 from ..symbolic.pseudo import (
     rotated_pseudo_meson_couplings,
     bare_pseudo_masses,
@@ -51,10 +51,10 @@ def pseudo_calculate_meson_couplings(
 
 def pseudo_calculate_bare_masses(
     b_0: float,
-    f_0: float,
     coupling_up: float,
     coupling_down: float,
     coupling_strange: float,
+    pion_decay: float = PION_DECAY,
 ) -> tuple[float, float]:
     """Numerical calculation of the bare off-diagonal meson masses.
 
@@ -62,20 +62,20 @@ def pseudo_calculate_bare_masses(
 
     :param b_0: B_{0}
     :type b_0: float
-    :param f_0: F_{0}
-    :type f_0: float
     :param coupling_up: Up coupling
     :type coupling_up: float
     :param coupling_down: Down coupling
     :type coupling_down: float
     :param coupling_strange: Strange coupling
     :type coupling_strange: float
+    :param pion_decay: The pion decay constant, defaults to PION_DECAY
+    :type pion_decay: float
     :return: pion-mediator, eta-mediator
     :rtype: tuple[float, float]
     """
     parameter = {
         PARAMETERS["B0"]: b_0,
-        PARAMETERS["F0"]: f_0,
+        PARAMETERS["F"]: pion_decay,
         COUPLING["u"]: coupling_up,
         COUPLING["d"]: coupling_down,
         COUPLING["s"]: coupling_strange,

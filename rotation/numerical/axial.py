@@ -4,7 +4,7 @@
 import sympy as sym
 
 # %%
-from ..symbolic.general import BARE, PROPAGATION, ANGLE, AXIAL_COUPLING, PARAMETERS
+from ..symbolic.general import PION_DECAY, BARE, PROPAGATION, ANGLE, AXIAL_COUPLING, PARAMETERS
 from ..symbolic.axial import (
     kinetic_sines,
     rotated_axial_meson_couplings,
@@ -110,12 +110,12 @@ def axial_calculate_meson_couplings(
 
 def axial_calculate_bare_masses(
     b_0: float,
-    f_0: float,
     l_4: float,
     l_5: float,
     coupling_up: float,
     coupling_down: float,
     coupling_strange: float,
+    pion_decay: float = PION_DECAY,
     mass_up: float = 2.16e-3,
     mass_down: float = 4.7e-3,
     mass_strange: float = 93.5e-3,
@@ -127,8 +127,6 @@ def axial_calculate_bare_masses(
 
     :param b_0: B_{0}
     :type b_0: float
-    :param f_0: F_{0}
-    :type f_0: float
     :param l_4: L_{4}
     :type l_4: float
     :param l_5: L_{5}
@@ -139,6 +137,8 @@ def axial_calculate_bare_masses(
     :type coupling_down: float
     :param coupling_strange: Strange coupling
     :type coupling_strange: float
+    :param pion_decay: The pion decay constant, defaults to PION_DECAY
+    :type pion_decay: float
     :param mass_up: Up mass, defaults to 2.16e-3
     :type mass_up: float, optional
     :param mass_down: Down mass, defaults to 4.7e-3
@@ -150,7 +150,7 @@ def axial_calculate_bare_masses(
     """
     parameter = {
         PARAMETERS["B0"]: b_0,
-        PARAMETERS["F0"]: f_0,
+        PARAMETERS["F"]: pion_decay,
         PARAMETERS["L4"]: l_4,
         PARAMETERS["L5"]: l_5,
         PARAMETERS["mu"]: mass_up,
@@ -171,7 +171,6 @@ def axial_calculate_bare_kaon(
     energy_pion: float,
     energy_dm: float,
     mass_axial: float,
-    f_0: float,
     g_8: float,
     g_8s: float,
     coupling_up: float,
@@ -180,6 +179,7 @@ def axial_calculate_bare_kaon(
     mass_pion_axial: float,
     mass_eta_axial: float,
     mass_etap_axial: float,
+    pion_decay: float = PION_DECAY,
     mass_pion: float = 0.13957039,
     mass_kaon: float = 0.493677,
 ) -> tuple[float, float, float]:
@@ -195,8 +195,6 @@ def axial_calculate_bare_kaon(
     :type energy_dm: float
     :param mass_axial: Axial vector mediator mass
     :type mass_axial: float
-    :param f_0: F_{0}
-    :type f_0: float
     :param g_8: g_{8}
     :type g_8: float
     :param g_8s: g_{8s}
@@ -213,6 +211,8 @@ def axial_calculate_bare_kaon(
     :type mass_eta_axial: float
     :param mass_etap_axial: Eta prime - mediator mass
     :type mass_etap_axial: float
+    :param pion_decay: The pion decay constant, defaults to PION_DECAY
+    :type pion_decay: float
     :param mass_pion: Chared pion mass, defaults to 0.13957039
     :type mass_pion: float, optional
     :param mass_kaon: Charged kaon mass, defaults to 0.493677
@@ -224,7 +224,7 @@ def axial_calculate_bare_kaon(
         PARAMETERS["Epi"]: energy_pion,
         PARAMETERS["Echi"]: energy_dm,
         BARE["A"]: mass_axial,
-        PARAMETERS["F0"]: f_0,
+        PARAMETERS["F"]: pion_decay,
         PARAMETERS["g8"]: g_8,
         PARAMETERS["g8s"]: g_8s,
         PARAMETERS["au"]: coupling_up,

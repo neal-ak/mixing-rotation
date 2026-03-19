@@ -198,7 +198,7 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
     ]
     return tuple(
         [
-            PARAMETERS["F0"]
+            PARAMETERS["F"]
             * (
                 a
                 * (
@@ -206,10 +206,10 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
                     + 16
                     * PARAMETERS["B0"]
                     * PARAMETERS["L4"]
-                    / PARAMETERS["F0"] ** 2
+                    / PARAMETERS["F"] ** 2
                     * (PARAMETERS["mu"] + PARAMETERS["md"] + PARAMETERS["ms"])
                 )
-                + b * 16 * PARAMETERS["B0"] * PARAMETERS["L5"] / PARAMETERS["F0"] ** 2
+                + b * 16 * PARAMETERS["B0"] * PARAMETERS["L5"] / PARAMETERS["F"] ** 2
             )
             for a, b in terms
         ]
@@ -235,7 +235,7 @@ def bare_axial_kaon_couplings() -> (
                 * (
                     PARAMETERS["g8"] * BARE["A"] ** 2
                     - 2
-                    * PARAMETERS["F0"]
+                    * PARAMETERS["F"]
                     * (
                         (PARAMETERS["ad"] + PARAMETERS["au"]) * PARAMETERS["g8"]
                         + (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
@@ -245,7 +245,7 @@ def bare_axial_kaon_couplings() -> (
                 )
                 * PARAMETERS["Epi"]
             )
-            / (PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+            / (PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         )
         + (
             sym.I
@@ -255,12 +255,12 @@ def bare_axial_kaon_couplings() -> (
                 BARE["A"] ** 2
                 + 2
                 * (PARAMETERS["ad"] - PARAMETERS["as"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * BARE["pi0-A"] ** 2
             )
             * PARAMETERS["Echi"]
         )
-        / (PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        / (PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         - (
             sym.I
             * (
@@ -271,7 +271,7 @@ def bare_axial_kaon_couplings() -> (
             * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
             * BARE["pi0-A"] ** 2
         )
-        / (PARAMETERS["F0"] ** 2 * BARE["A"] ** 2)
+        / (PARAMETERS["F"] ** 2 * BARE["A"] ** 2)
     )
     eta_pi_k = (
         (
@@ -281,18 +281,18 @@ def bare_axial_kaon_couplings() -> (
                 -sym.sqrt(3) * PARAMETERS["g8"] * BARE["A"] ** 2
                 + 6
                 * (PARAMETERS["ad"] + PARAMETERS["au"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * PARAMETERS["g8"]
                 * BARE["eta-A"] ** 2
                 + 6
                 * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * PARAMETERS["g8s"]
                 * BARE["eta-A"] ** 2
             )
             * PARAMETERS["Epi"]
         )
-        / (3 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        / (3 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         - (
             sym.I
             * PARAMETERS["g8"]
@@ -301,46 +301,46 @@ def bare_axial_kaon_couplings() -> (
                 sym.sqrt(3) * BARE["A"] ** 2
                 + 2
                 * (-PARAMETERS["ad"] + PARAMETERS["as"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * BARE["eta-A"] ** 2
             )
             * PARAMETERS["Echi"]
         )
-        / (PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        / (PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         + (
             sym.I
             * (
                 sym.sqrt(3) * PARAMETERS["g8"] * BARE["A"] ** 2
                 - 3
                 * (PARAMETERS["ad"] + PARAMETERS["au"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * PARAMETERS["g8"]
                 * BARE["eta-A"] ** 2
                 - 3
                 * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * PARAMETERS["g8s"]
                 * BARE["eta-A"] ** 2
             )
             * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
         )
-        / (3 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        / (3 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
     )
     etap_pi_k = (
         1
-        / (6 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        / (6 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         * sym.I
         * (
             2 * sym.sqrt(6) * PARAMETERS["g8"] * BARE["A"] ** 2
             + 3 * sym.sqrt(6) * PARAMETERS["g8s"] * BARE["A"] ** 2
             - 6
             * (PARAMETERS["ad"] + PARAMETERS["au"])
-            * PARAMETERS["F0"]
+            * PARAMETERS["F"]
             * PARAMETERS["g8"]
             * BARE["etap-A"] ** 2
             - 6
             * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-            * PARAMETERS["F0"]
+            * PARAMETERS["F"]
             * PARAMETERS["g8s"]
             * BARE["etap-A"] ** 2
         )
@@ -354,7 +354,7 @@ def bare_axial_kaon_couplings() -> (
             * BARE["etap-A"] ** 2
             * PARAMETERS["Echi"]
         )
-        / (PARAMETERS["F0"] ** 2 * BARE["A"] ** 2)
+        / (PARAMETERS["F"] ** 2 * BARE["A"] ** 2)
         + (
             sym.I
             * PROPAGATION["Kpm"]
@@ -363,18 +363,18 @@ def bare_axial_kaon_couplings() -> (
                 - 3 * sym.sqrt(6) * PARAMETERS["g8s"] * BARE["A"] ** 2
                 + 6
                 * (PARAMETERS["ad"] + PARAMETERS["au"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * PARAMETERS["g8"]
                 * BARE["etap-A"] ** 2
                 + 6
                 * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                * PARAMETERS["F0"]
+                * PARAMETERS["F"]
                 * PARAMETERS["g8s"]
                 * BARE["etap-A"] ** 2
             )
             * PARAMETERS["Epi"]
         )
-        / (3 * PARAMETERS["F0"] ** 3 * BARE["A"] ** 2)
+        / (3 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
     )
     return tuple(
         [
