@@ -34,8 +34,8 @@ L_4 = 1.87e-3
 L_5 = 1.22e-3
 # eqn F3 in tex
 G_8 = 3.62
-# WHAT IS?
-G_8S = 1
+# From Melissa
+G_8S = -0.38 * G_8
 # eqn 34 in tex, CHECK UNITS ON CHARGE
 G_PI_GAMMA = (1) ** 2 / (4 * np.pi**2 * PION_DECAY)
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
