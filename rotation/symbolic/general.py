@@ -70,13 +70,13 @@ COUPLING = {
         "u",
         "d",
         "s",
-        r"\pi b \chi",
-        r"\tilde{\phi} \chi",
+        r"\pi^{0} b \chi",
+        r"\chi",
         r"\eta b \chi",
-        r"\pi b \gamma",
+        r"\pi^{0} b \gamma",
         r"\tilde{\phi} \gamma",
         r"\eta b \gamma",
-        r"\pi b \pi K",
+        r"\pi^{0} b \pi K",
         r"\tilde{\phi} \pi K",
         r"\eta b \pi K",
     ]
@@ -86,13 +86,13 @@ COUPLING = {
 ROTATED = {
     _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
     for k in [
-        r"\pi \chi",
+        r"\pi^{0} \chi",
         r"\tilde{\phi}^{\prime} \chi",
         r"\eta \chi",
-        r"\pi \gamma",
+        r"\pi^{0} \gamma",
         r"\tilde{\phi}^{\prime} \gamma",
         r"\eta \gamma",
-        r"\pi \pi K",
+        r"\pi^{0} \pi K",
         r"\tilde{\phi}^{\prime} \pi K",
         r"\eta \pi K",
     ]
@@ -103,10 +103,10 @@ AXIAL_COUPLING = {
     _preprocess_symbol(k): sym.Symbol(f"\\lambda_{{{k}}}", real=True)
     for k in [
         "a",
-        r"\pi b \chi",
+        r"\pi^{0} b \chi",
         r"\eta^{\prime} b \chi",
         r"\eta b \chi",
-        r"\pi b \pi K",
+        r"\pi^{0} b \pi K",
         r"\eta b \pi K",
         r"\eta^{\prime} b \pi K",
     ]
@@ -116,10 +116,10 @@ AXIAL_COUPLING = {
 AXIAL_ROTATED = {
     _preprocess_symbol(k): sym.Symbol(f"\\lambda_{{{k}}}", real=True)
     for k in [
-        r"\pi \chi",
+        r"\pi^{0} \chi",
         r"\eta^{\prime} \chi",
         r"\eta \chi",
-        r"\pi \pi K",
+        r"\pi^{0} \pi K",
         r"\eta \pi K",
         r"\eta^{\prime} \pi K",
     ]
@@ -129,7 +129,7 @@ AXIAL_ROTATED = {
 PARAMETERS = {
     _preprocess_symbol(k): sym.Symbol(k, real=True)
     for k in [
-        r"E_{\pi}",
+        r"E_{\pi^\pm}",
         "F",
         r"B_{0}",
         r"L_{4}",

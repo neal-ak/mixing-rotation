@@ -4,7 +4,14 @@
 import sympy as sym
 
 # %%
-from ..symbolic.general import PION_DECAY, BARE, PROPAGATION, ANGLE, AXIAL_COUPLING, PARAMETERS
+from ..symbolic.general import (
+    PION_DECAY,
+    BARE,
+    PROPAGATION,
+    ANGLE,
+    AXIAL_COUPLING,
+    PARAMETERS,
+)
 from ..symbolic.axial import (
     kinetic_sines,
     rotated_axial_meson_couplings,
@@ -122,8 +129,7 @@ def axial_calculate_bare_masses(
 ) -> tuple[float, float, float]:
     """Numerical calculation of the bare off-diagonal meson masses.
 
-    Specific to the axial vector mediator case. The default quark masses come
-    from the [PDG](https://pdglive.lbl.gov/Particle.action?node=Q123).
+    Specific to the axial vector mediator case.
 
     :param b_0: B_{0}
     :type b_0: float
@@ -221,7 +227,7 @@ def axial_calculate_bare_kaon(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        PARAMETERS["Epi"]: energy_pion,
+        PARAMETERS["Epipm"]: energy_pion,
         PARAMETERS["Echi"]: energy_dm,
         BARE["A"]: mass_axial,
         PARAMETERS["F"]: pion_decay,
@@ -280,7 +286,7 @@ def axial_calculate_kaon_couplings(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        AXIAL_COUPLING["pi-pi-K"]: bare_pion_pion_kaon,
+        AXIAL_COUPLING["pi0-pi-K"]: bare_pion_pion_kaon,
         AXIAL_COUPLING["eta-pi-K"]: bare_eta_pion_kaon,
         AXIAL_COUPLING["etap-pi-K"]: bare_etap_pion_kaon,
         ANGLE["u"]: u,

@@ -63,7 +63,7 @@ def rotated_pseudo_meson_couplings() -> (
     :return: pion-chi, mediator-chi, eta-chi
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    bare_couplings = sym.Matrix([[0, COUPLING["phi-chi"], 0]])
+    bare_couplings = sym.Matrix([[0, COUPLING["chi"], 0]])
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)
 
@@ -98,7 +98,7 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
         sym.Matrix(
             [
                 [
-                    COUPLING["pi-gamma"],
+                    COUPLING["pi0-gamma"],
                     0,
                     COUPLING["eta-gamma"],
                 ]
@@ -109,7 +109,7 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
     gamma_eqns = [
         sym.Eq(g, e)
         for g, e in zip(
-            [ROTATED[k] for k in ["pi-gamma", "phi-gamma", "eta-gamma"]],
+            [ROTATED[k] for k in ["pi0-gamma", "phi-gamma", "eta-gamma"]],
             gamma_matrix,
         )
     ]
@@ -117,7 +117,7 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
         gamma_eqns,
         [
             ROTATED["phi-gamma"],
-            COUPLING["pi-gamma"],
+            COUPLING["pi0-gamma"],
             COUPLING["eta-gamma"],
         ],
         dict=True,
@@ -136,10 +136,10 @@ def bare_pseudo_kaon_couplings() -> (
     :return: pion-pion-kaon, eta-pion-kaon
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    pi_pi_kaon = PROPAGATION["Kpm"] ** 2 - 2 * PROPAGATION["Kpm"] * PARAMETERS["Epi"]
+    pi_pi_kaon = PROPAGATION["Kpm"] ** 2 - 2 * PROPAGATION["Kpm"] * PARAMETERS["Epipm"]
     eta_pi_kaon = (
         PROPAGATION["Kpm"] ** 2
-        - 2 * PROPAGATION["Kpm"] * PARAMETERS["Epi"]
+        - 2 * PROPAGATION["Kpm"] * PARAMETERS["Epipm"]
         - PROPAGATION["pi0"] ** 2
     ) / sym.sqrt(3)
     return pi_pi_kaon, eta_pi_kaon
@@ -156,6 +156,8 @@ def rotated_pseudo_kaon_couplings() -> (
     :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    bare_couplings = sym.Matrix([[COUPLING[f"{k}-pi-K"] for k in ["pi", "phi", "eta"]]])
+    bare_couplings = sym.Matrix(
+        [[COUPLING[f"{k}-pi-K"] for k in ["pi0", "phi", "eta"]]]
+    )
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)

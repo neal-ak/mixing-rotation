@@ -243,7 +243,7 @@ def bare_axial_kaon_couplings() -> (
                     )
                     * BARE["pi0-A"] ** 2
                 )
-                * PARAMETERS["Epi"]
+                * PARAMETERS["Epipm"]
             )
             / (PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         )
@@ -290,7 +290,7 @@ def bare_axial_kaon_couplings() -> (
                 * PARAMETERS["g8s"]
                 * BARE["eta-A"] ** 2
             )
-            * PARAMETERS["Epi"]
+            * PARAMETERS["Epipm"]
         )
         / (3 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         - (
@@ -372,7 +372,7 @@ def bare_axial_kaon_couplings() -> (
                 * PARAMETERS["g8s"]
                 * BARE["etap-A"] ** 2
             )
-            * PARAMETERS["Epi"]
+            * PARAMETERS["Epipm"]
         )
         / (3 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
     )
@@ -399,7 +399,7 @@ def rotated_axial_kaon_couplings() -> (
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     bare_couplings = sym.Matrix(
-        [[AXIAL_COUPLING[f"{k}-pi-K"] for k in ["pi", "eta", "etap"]]]
+        [[AXIAL_COUPLING[f"{k}-pi-K"] for k in ["pi0", "eta", "etap"]]]
     )
     rotated_couplings = (
         bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()

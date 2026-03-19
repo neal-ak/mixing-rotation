@@ -4,7 +4,14 @@
 import sympy as sym
 
 # %%
-from ..symbolic.general import ANGLE, COUPLING, PARAMETERS, PROPAGATION, ROTATED, PION_DECAY
+from ..symbolic.general import (
+    ANGLE,
+    COUPLING,
+    PARAMETERS,
+    PROPAGATION,
+    ROTATED,
+    PION_DECAY,
+)
 from ..symbolic.pseudo import (
     rotated_pseudo_meson_couplings,
     bare_pseudo_masses,
@@ -37,7 +44,7 @@ def pseudo_calculate_meson_couplings(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        COUPLING["phi-chi"]: bare_mediator_dm_coupling,
+        COUPLING["chi"]: bare_mediator_dm_coupling,
         ANGLE["alpha"]: alpha,
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,
@@ -113,7 +120,7 @@ def pseudo_calculate_photon_coupling(
     :rtype: float
     """
     parameter = {
-        ROTATED["pi-gamma"]: known_pion_photon_coupling,
+        ROTATED["pi0-gamma"]: known_pion_photon_coupling,
         ROTATED["eta-gamma"]: known_eta_photon_coupling,
         ANGLE["alpha"]: alpha,
         ANGLE["beta"]: beta,
@@ -146,7 +153,7 @@ def pseudo_calculate_bare_kaon(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        PARAMETERS["Epi"]: energy_pion,
+        PARAMETERS["Epipm"]: energy_pion,
         PROPAGATION["pi0"]: mass_pion,
         PROPAGATION["Kpm"]: mass_kaon,
     }
@@ -186,7 +193,7 @@ def pseudo_calculate_kaon_couplings(
     :rtype: _type_
     """
     parameter = {
-        COUPLING["pi-pi-K"]: bare_pion_pion_kaon_coupling,
+        COUPLING["pi0-pi-K"]: bare_pion_pion_kaon_coupling,
         COUPLING["phi-pi-K"]: bare_mediator_pion_kaon_coupling,
         COUPLING["eta-pi-K"]: bare_eta_pion_kaon_coupling,
         ANGLE["alpha"]: alpha,
