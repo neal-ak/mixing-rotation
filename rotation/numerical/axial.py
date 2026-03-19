@@ -52,9 +52,9 @@ def calculate_uvw(
     """
     parameter = {
         PROPAGATION["AP"]: m_axial,
-        BARE["pi0-A"]: m_pi0_axial,
-        BARE["eta-A"]: m_eta_axial,
-        BARE["etaP-A"]: m_etap_axial,
+        BARE["pi0-AP"]: m_pi0_axial,
+        BARE["eta-AP"]: m_eta_axial,
+        BARE["etaP-AP"]: m_etap_axial,
     }
     uvw = []
     for s in kinetic_sines():
@@ -107,10 +107,10 @@ def axial_calculate_meson_couplings(
     """
     parameter = {
         AXIAL_COUPLING["a"]: l_axial,
-        BARE["A"]: m_axial,
-        BARE["pi0-A"]: m_pi0_axial,
-        BARE["eta-A"]: m_eta_axial,
-        BARE["etaP-A"]: m_etap_axial,
+        PROPAGATION["AP"]: m_axial,
+        BARE["pi0-AP"]: m_pi0_axial,
+        BARE["eta-AP"]: m_eta_axial,
+        BARE["etaP-AP"]: m_etap_axial,
         ANGLE["u"]: u,
         ANGLE["v"]: v,
         ANGLE["w"]: w,
@@ -239,13 +239,13 @@ def axial_calculate_bare_kaon(
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,
         PARAMETERS["Echi"]: energy_dm,
-        BARE["A"]: mass_axial,
+        PROPAGATION["AP"]: mass_axial,
         PARAMETERS["au"]: coupling_up,
         PARAMETERS["ad"]: coupling_down,
         PARAMETERS["as"]: coupling_strange,
-        BARE["pi0-A"]: mass_pion_axial,
-        BARE["eta-A"]: mass_eta_axial,
-        BARE["etaP-A"]: mass_etap_axial,
+        BARE["pi0-AP"]: mass_pion_axial,
+        BARE["eta-AP"]: mass_eta_axial,
+        BARE["etaP-AP"]: mass_etap_axial,
         PARAMETERS["F"]: pion_decay,
         PARAMETERS["g8"]: g_8,
         PARAMETERS["g8s"]: g_8s,

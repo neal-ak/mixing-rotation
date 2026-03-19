@@ -48,10 +48,9 @@ BARE = {
         r"\pi^{0} \tilde{\phi}",
         r"\eta \tilde{\phi}",
         r"\eta^{\prime}_{b}",
-        r"\pi^{0} A",
-        r"\eta A",
-        r"\eta^{\prime} A",
-        r"A",
+        r"\pi^{0} A^{\prime}",
+        r"\eta A^{\prime}",
+        r"\eta^{\prime} A^{\prime}",
     ]
 }
 
