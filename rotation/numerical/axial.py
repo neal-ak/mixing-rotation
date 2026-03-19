@@ -5,7 +5,6 @@ import sympy as sym
 
 # %%
 from ..symbolic.general import (
-    PION_DECAY,
     BARE,
     PROPAGATION,
     ANGLE,
@@ -19,6 +18,7 @@ from ..symbolic.axial import (
     bare_axial_kaon_couplings,
     rotated_axial_kaon_couplings,
 )
+from .solver import PION_DECAY, MASS_QUARK, MASS_CHARGED_PION, MASS_CHARGED_KAON
 
 
 # %%
@@ -123,9 +123,9 @@ def axial_calculate_bare_masses(
     coupling_down: float,
     coupling_strange: float,
     pion_decay: float = PION_DECAY,
-    mass_up: float = 2.16e-3,
-    mass_down: float = 4.7e-3,
-    mass_strange: float = 93.5e-3,
+    mass_up: float = MASS_QUARK["up"],
+    mass_down: float = MASS_QUARK["down"],
+    mass_strange: float = MASS_QUARK["strange"],
 ) -> tuple[float, float, float]:
     """Numerical calculation of the bare off-diagonal meson masses.
 
@@ -145,11 +145,11 @@ def axial_calculate_bare_masses(
     :type coupling_strange: float
     :param pion_decay: The pion decay constant, defaults to PION_DECAY
     :type pion_decay: float
-    :param mass_up: Up mass, defaults to 2.16e-3
+    :param mass_up: Up mass, defaults to MASS_QUARK["up"]
     :type mass_up: float, optional
-    :param mass_down: Down mass, defaults to 4.7e-3
+    :param mass_down: Down mass, defaults to MASS_QUARK["down"]
     :type mass_down: float, optional
-    :param mass_strange: Strange mass, defaults to 93.5e-3
+    :param mass_strange: Strange mass, defaults to MASS_QUARK["strange"]
     :type mass_strange: float, optional
     :return: pion-mediator, eta-mediator, eta^prime-mediator
     :rtype: tuple[float, float, float]
@@ -186,8 +186,8 @@ def axial_calculate_bare_kaon(
     mass_eta_axial: float,
     mass_etap_axial: float,
     pion_decay: float = PION_DECAY,
-    mass_pion: float = 0.13957039,
-    mass_kaon: float = 0.493677,
+    mass_pion: float = MASS_CHARGED_PION,
+    mass_kaon: float = MASS_CHARGED_KAON,
 ) -> tuple[float, float, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
@@ -219,9 +219,9 @@ def axial_calculate_bare_kaon(
     :type mass_etap_axial: float
     :param pion_decay: The pion decay constant, defaults to PION_DECAY
     :type pion_decay: float
-    :param mass_pion: Chared pion mass, defaults to 0.13957039
+    :param mass_pion: Chared pion mass, defaults to MASS_CHARGED_PION
     :type mass_pion: float, optional
-    :param mass_kaon: Charged kaon mass, defaults to 0.493677
+    :param mass_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
     :type mass_kaon: float, optional
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
     :rtype: tuple[float, float, float]

@@ -10,7 +10,6 @@ from ..symbolic.general import (
     PARAMETERS,
     PROPAGATION,
     ROTATED,
-    PION_DECAY,
 )
 from ..symbolic.pseudo import (
     rotated_pseudo_meson_couplings,
@@ -19,6 +18,7 @@ from ..symbolic.pseudo import (
     bare_pseudo_kaon_couplings,
     rotated_pseudo_kaon_couplings,
 )
+from .solver import PION_DECAY, MASS_NEUTRAL_PION, MASS_CHARGED_KAON
 
 
 # %%
@@ -134,20 +134,18 @@ def pseudo_calculate_photon_coupling(
 # %%
 def pseudo_calculate_bare_kaon(
     energy_pion: float,
-    mass_pion: float = 0.1349768,
-    mass_kaon: float = 0.493677,
+    mass_pion: float = MASS_NEUTRAL_PION,
+    mass_kaon: float = MASS_CHARGED_KAON,
 ) -> tuple[float, float, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
-    Specific to the pseudo scalar mediator case. Defaults from the PDG
-    [neutral pion](https://pdglive.lbl.gov/Particle.action?node=S009) and
-    [charged kaon](https://pdglive.lbl.gov/Particle.action?node=S010).
+    Specific to the pseudo scalar mediator case.
 
     :param energy_pion: Pion energy
     :type energy_pion: float
-    :param mass_pion: Neutral pion mass, defaults to 0.1349768
+    :param mass_pion: Neutral pion mass, defaults to MASS_NEUTRAL_PION
     :type mass_pion: float
-    :param mass_kaon: Charged kaon mass, defaults to 0.493677
+    :param mass_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
     :type mass_kaon: float
     :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
     :rtype: tuple[float, float, float]

@@ -13,6 +13,23 @@ from ..symbolic.general import ANGLE, BARE, COUPLING, PARAMETERS, PROPAGATION, R
 
 
 # %%
+# https://inspirehep.net/literature/303682
+PION_DECAY = 0.0924
+# https://pdglive.lbl.gov/Particle.action?node=Q123
+MASS_QUARK = {"up": 2.16e-3, "down": 4.7e-3, "strange": 93.5e-3}
+# https://pdglive.lbl.gov/Particle.action?node=S009
+MASS_NEUTRAL_PION = 0.1349768
+# https://pdglive.lbl.gov/Particle.action?node=S008
+MASS_CHARGED_PION = 0.13957039
+# https://pdglive.lbl.gov/Particle.action?node=S010
+MASS_CHARGED_KAON = 0.493677
+# https://pdglive.lbl.gov/Particle.action?node=S014
+MASS_ETA = 0.547862
+# https://pdglive.lbl.gov/Particle.action?node=M002
+MASS_ETA_PRIME = 0.95778
+
+
+# %%
 def _build_call(
     arg_ordering: list[sym.Symbol],
     x0: list[float],
