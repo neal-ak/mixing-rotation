@@ -191,9 +191,9 @@ def pseudo_calculate_kaon_couplings(
     :rtype: _type_
     """
     parameter = {
-        COUPLING["pi0-pi-K"]: bare_pion_pion_kaon_coupling,
+        COUPLING["pi0Bare-pi-K"]: bare_pion_pion_kaon_coupling,
         COUPLING["phi-pi-K"]: bare_mediator_pion_kaon_coupling,
-        COUPLING["eta-pi-K"]: bare_eta_pion_kaon_coupling,
+        COUPLING["etaBare-pi-K"]: bare_eta_pion_kaon_coupling,
         ANGLE["alpha"]: alpha,
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,

@@ -71,16 +71,16 @@ def create_axial_mix_equation(
     kinetic_transpose = kinetic.transpose()
     bare_matrix = sym.Matrix(
         [
-            [BARE["pi0"] ** 2, 0, 0],
-            [0, BARE["eta"] ** 2, 0],
-            [0, 0, BARE["etap"] ** 2],
+            [BARE["pi0Bare"] ** 2, 0, 0],
+            [0, BARE["etaBare"] ** 2, 0],
+            [0, 0, BARE["etaPBare"] ** 2],
         ]
     )
     prop_matrix = sym.Matrix(
         [
             [PROPAGATION["pi0"] ** 2, 0, 0],
             [0, PROPAGATION["eta"] ** 2, 0],
-            [0, 0, PROPAGATION["etap"] ** 2],
+            [0, 0, PROPAGATION["etaP"] ** 2],
         ]
     )
     mixing_equation = sym.Eq(
@@ -101,7 +101,7 @@ def create_axial_mix_equation(
 # %%
 def _kinetic_sine(m1, m2) -> sym.core.mul.Mul:
     """Helper to automate sine of kinetic mixing angle."""
-    ma = PROPAGATION["A"]
+    ma = PROPAGATION["AP"]
     return (
         -m1 * m2 / (2 * ma**2 * sym.sqrt((1 - (m1 / ma) ** 2) * (1 - (m2 / ma) ** 2)))
     )
@@ -115,8 +115,8 @@ def kinetic_sines() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mu
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
     s_u = _kinetic_sine(BARE["pi0-A"], BARE["eta-A"])
-    s_v = _kinetic_sine(BARE["pi0-A"], BARE["etap-A"])
-    s_w = _kinetic_sine(BARE["etap-A"], BARE["eta-A"])
+    s_v = _kinetic_sine(BARE["pi0-A"], BARE["etaP-A"])
+    s_w = _kinetic_sine(BARE["etaP-A"], BARE["eta-A"])
     return s_u, s_v, s_w
 
 
@@ -131,7 +131,7 @@ def bare_axial_meson_couplings() -> (
     :return: pion-chi, eta-chi, eta^prime-chi
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    masses = BARE["pi0-A"], BARE["eta-A"], BARE["etap-A"]
+    masses = BARE["pi0-A"], BARE["eta-A"], BARE["etaP-A"]
     return tuple(
         [
             AXIAL_COUPLING["a"]
@@ -326,7 +326,7 @@ def bare_axial_kaon_couplings() -> (
         )
         / (3 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
     )
-    etap_pi_k = (
+    etaP_pi_k = (
         1
         / (6 * PARAMETERS["F"] ** 3 * BARE["A"] ** 2)
         * sym.I
@@ -337,12 +337,12 @@ def bare_axial_kaon_couplings() -> (
             * (PARAMETERS["ad"] + PARAMETERS["au"])
             * PARAMETERS["F"]
             * PARAMETERS["g8"]
-            * BARE["etap-A"] ** 2
+            * BARE["etaP-A"] ** 2
             - 6
             * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
             * PARAMETERS["F"]
             * PARAMETERS["g8s"]
-            * BARE["etap-A"] ** 2
+            * BARE["etaP-A"] ** 2
         )
         * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
         + (
@@ -351,7 +351,7 @@ def bare_axial_kaon_couplings() -> (
             * (PARAMETERS["ad"] - PARAMETERS["as"])
             * PARAMETERS["g8"]
             * PROPAGATION["Kpm"]
-            * BARE["etap-A"] ** 2
+            * BARE["etaP-A"] ** 2
             * PARAMETERS["Echi"]
         )
         / (PARAMETERS["F"] ** 2 * BARE["A"] ** 2)
@@ -365,12 +365,12 @@ def bare_axial_kaon_couplings() -> (
                 * (PARAMETERS["ad"] + PARAMETERS["au"])
                 * PARAMETERS["F"]
                 * PARAMETERS["g8"]
-                * BARE["etap-A"] ** 2
+                * BARE["etaP-A"] ** 2
                 + 6
                 * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
                 * PARAMETERS["F"]
                 * PARAMETERS["g8s"]
-                * BARE["etap-A"] ** 2
+                * BARE["etaP-A"] ** 2
             )
             * PARAMETERS["Epipm"]
         )
@@ -380,8 +380,8 @@ def bare_axial_kaon_couplings() -> (
         [
             l / sym.sqrt(1 - (m / BARE["A"]) ** 2)
             for m, l in zip(
-                [BARE["pi0-A"], BARE["eta-A"], BARE["etap-A"]],
-                [pi_pi_k, eta_pi_k, etap_pi_k],
+                [BARE["pi0-A"], BARE["eta-A"], BARE["etaP-A"]],
+                [pi_pi_k, eta_pi_k, etaP_pi_k],
             )
         ]
     )
@@ -399,7 +399,7 @@ def rotated_axial_kaon_couplings() -> (
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     bare_couplings = sym.Matrix(
-        [[AXIAL_COUPLING[f"{k}-pi-K"] for k in ["pi0", "eta", "etap"]]]
+        [[AXIAL_COUPLING[f"{k}-pi-K"] for k in ["pi0Bare", "etaBare", "etaPBare"]]]
     )
     rotated_couplings = (
         bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()

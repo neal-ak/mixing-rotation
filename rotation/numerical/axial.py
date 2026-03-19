@@ -41,10 +41,10 @@ def calculate_uvw(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        PROPAGATION["A"]: m_axial,
+        PROPAGATION["AP"]: m_axial,
         BARE["pi0-A"]: m_pi0_axial,
         BARE["eta-A"]: m_eta_axial,
-        BARE["etap-A"]: m_etap_axial,
+        BARE["etaP-A"]: m_etap_axial,
     }
     uvw = []
     for s in kinetic_sines():
@@ -100,7 +100,7 @@ def axial_calculate_meson_couplings(
         BARE["A"]: m_axial,
         BARE["pi0-A"]: m_pi0_axial,
         BARE["eta-A"]: m_eta_axial,
-        BARE["etap-A"]: m_etap_axial,
+        BARE["etaP-A"]: m_etap_axial,
         ANGLE["u"]: u,
         ANGLE["v"]: v,
         ANGLE["w"]: w,
@@ -238,7 +238,7 @@ def axial_calculate_bare_kaon(
         PARAMETERS["as"]: coupling_strange,
         BARE["pi0-A"]: mass_pion_axial,
         BARE["eta-A"]: mass_eta_axial,
-        BARE["etap-A"]: mass_etap_axial,
+        BARE["etaP-A"]: mass_etap_axial,
         PROPAGATION["pipm"]: mass_pion,
         PROPAGATION["Kpm"]: mass_kaon,
     }
@@ -286,9 +286,9 @@ def axial_calculate_kaon_couplings(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        AXIAL_COUPLING["pi0-pi-K"]: bare_pion_pion_kaon,
-        AXIAL_COUPLING["eta-pi-K"]: bare_eta_pion_kaon,
-        AXIAL_COUPLING["etap-pi-K"]: bare_etap_pion_kaon,
+        AXIAL_COUPLING["pi0Bare-pi-K"]: bare_pion_pion_kaon,
+        AXIAL_COUPLING["etaBare-pi-K"]: bare_eta_pion_kaon,
+        AXIAL_COUPLING["etaPBare-pi-K"]: bare_etap_pion_kaon,
         ANGLE["u"]: u,
         ANGLE["v"]: v,
         ANGLE["w"]: w,

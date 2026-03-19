@@ -8,15 +8,13 @@ import sympy as sym
 def _preprocess_symbol(s):
     """Helper to automate assigning dict key strings from symbols."""
     s = str(s).replace("\\", "")
+    s = s.replace(r"_{b}", "Bare")
     s = s.replace("{", "")
     s = s.replace("}", "")
-    s = s.replace("phi^prime", "phi")
-    s = s.replace("A^prime", "A")
     s = s.replace("^", "")
     s = s.replace("_", "")
     s = s.replace("tilde", "")
-    s = s.replace("prime", "p")
-    s = s.replace(" b", "")
+    s = s.replace("prime", "P")
     return s.strip().replace(" ", "-")
 
 
@@ -35,7 +33,6 @@ PROPAGATION = {
         r"\eta",
         r"\eta^{\prime}",
         r"A^{\prime}",
-        r"K^{0}",
         r"\pi^{\pm}",
         r"K^{\pm}",
     ]
@@ -45,12 +42,12 @@ PROPAGATION = {
 BARE = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [
-        r"\pi^{0} b",
+        r"\pi^{0}_{b}",
         r"\phi",
-        r"\eta b",
+        r"\eta_{b}",
         r"\pi^{0} \tilde{\phi}",
         r"\eta \tilde{\phi}",
-        r"\eta^{\prime} b",
+        r"\eta^{\prime}_{b}",
         r"\pi^{0} A",
         r"\eta A",
         r"\eta^{\prime} A",
@@ -65,15 +62,15 @@ COUPLING = {
         "u",
         "d",
         "s",
-        r"\pi^{0} b \chi",
+        r"\pi^{0}_{b} \chi",
         r"\chi",
-        r"\eta b \chi",
-        r"\pi^{0} b \gamma",
+        r"\eta_{b} \chi",
+        r"\pi^{0}_{b} \gamma",
         r"\tilde{\phi} \gamma",
-        r"\eta b \gamma",
-        r"\pi^{0} b \pi K",
+        r"\eta_{b} \gamma",
+        r"\pi^{0}_{b} \pi K",
         r"\tilde{\phi} \pi K",
-        r"\eta b \pi K",
+        r"\eta_{b} \pi K",
     ]
 }
 
@@ -98,12 +95,12 @@ AXIAL_COUPLING = {
     _preprocess_symbol(k): sym.Symbol(f"\\lambda_{{{k}}}", real=True)
     for k in [
         "a",
-        r"\pi^{0} b \chi",
-        r"\eta^{\prime} b \chi",
-        r"\eta b \chi",
-        r"\pi^{0} b \pi K",
-        r"\eta b \pi K",
-        r"\eta^{\prime} b \pi K",
+        r"\pi^{0}_{b} \chi",
+        r"\eta^{\prime}_{b} \chi",
+        r"\eta_{b} \chi",
+        r"\pi^{0}_{b} \pi K",
+        r"\eta_{b} \pi K",
+        r"\eta^{\prime}_{b} \pi K",
     ]
 }
 
