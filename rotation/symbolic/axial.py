@@ -228,153 +228,128 @@ def bare_axial_kaon_couplings() -> (
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     pi_pi_k = (
-        -(
-            (
-                sym.I
-                * PROPAGATION["Kpm"]
-                * (
-                    PARAMETERS["g8"] * PROPAGATION["AP"] ** 2
-                    - 2
-                    * PARAMETERS["F"]
-                    * (
-                        (PARAMETERS["ad"] + PARAMETERS["au"]) * PARAMETERS["g8"]
-                        + (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                        * PARAMETERS["g8s"]
-                    )
-                    * BARE["pi0-AP"] ** 2
-                )
-                * PARAMETERS["Epipm"]
-            )
-            / (PARAMETERS["F"] ** 3 * PROPAGATION["AP"] ** 2)
-        )
-        + (
-            sym.I
-            * PARAMETERS["g8"]
-            * PROPAGATION["Kpm"]
-            * (
-                PROPAGATION["AP"] ** 2
-                + 2
-                * (PARAMETERS["ad"] - PARAMETERS["as"])
-                * PARAMETERS["F"]
-                * BARE["pi0-AP"] ** 2
-            )
-            * PARAMETERS["Echi"]
-        )
-        / (PARAMETERS["F"] ** 3 * PROPAGATION["AP"] ** 2)
-        - (
-            sym.I
-            * (
-                (PARAMETERS["ad"] + PARAMETERS["au"]) * PARAMETERS["g8"]
-                + (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                * PARAMETERS["g8s"]
-            )
-            * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
-            * BARE["pi0-AP"] ** 2
-        )
+        -sym.I
+        * BARE["pi0-AP"] ** 2
+        * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
         / (PARAMETERS["F"] ** 2 * PROPAGATION["AP"] ** 2)
+        * (
+            PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
+            + PARAMETERS["g8s"]
+            * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
+        )
+        + sym.I
+        * PARAMETERS["Echi"]
+        * PARAMETERS["g8"]
+        * PROPAGATION["Kpm"]
+        / PARAMETERS["F"] ** 3
+        * (
+            1
+            + 2
+            * PARAMETERS["F"]
+            * BARE["pi0-AP"] ** 2
+            / PROPAGATION["AP"] ** 2
+            * (PARAMETERS["ad"] - PARAMETERS["as"])
+        )
+        - sym.I
+        * PARAMETERS["Epipm"]
+        * PROPAGATION["Kpm"]
+        / (PARAMETERS["F"] ** 3)
+        * (
+            PARAMETERS["g8"]
+            - PARAMETERS["F"]
+            * 2
+            * BARE["pi0-AP"] ** 2
+            / PROPAGATION["AP"] ** 2
+            * (
+                PARAMETERS["g8"] * (PARAMETERS["ad"] + PARAMETERS["au"])
+                + PARAMETERS["g8s"]
+                * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
+            )
+        )
     )
     eta_pi_k = (
-        (
-            sym.I
-            * PROPAGATION["Kpm"]
+        sym.I
+        * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
+        / PARAMETERS["F"] ** 3
+        * (
+            -2
+            * PARAMETERS["F"]
+            * BARE["eta-AP"] ** 2
+            / PROPAGATION["AP"] ** 2
             * (
-                -sym.sqrt(3) * PARAMETERS["g8"] * PROPAGATION["AP"] ** 2
-                + 6
-                * (PARAMETERS["ad"] + PARAMETERS["au"])
-                * PARAMETERS["F"]
-                * PARAMETERS["g8"]
-                * BARE["eta-AP"] ** 2
-                + 6
-                * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                * PARAMETERS["F"]
-                * PARAMETERS["g8s"]
-                * BARE["eta-AP"] ** 2
+                PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
+                + PARAMETERS["g8s"]
+                * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
             )
-            * PARAMETERS["Epipm"]
+            + sym.sqrt(3) / 3 * PARAMETERS["g8"]
         )
-        / (3 * PARAMETERS["F"] ** 3 * PROPAGATION["AP"] ** 2)
-        - (
-            sym.I
-            * PARAMETERS["g8"]
-            * PROPAGATION["Kpm"]
+        - sym.I
+        * PARAMETERS["Echi"]
+        * PARAMETERS["g8"]
+        * PROPAGATION["Kpm"]
+        / PARAMETERS["F"] ** 3
+        * (
+            2
+            * PARAMETERS["F"]
+            * BARE["eta-AP"] ** 2
+            / PROPAGATION["AP"]
+            * (PARAMETERS["as"] - PARAMETERS["ad"])
+            + sym.sqrt(3)
+        )
+        + sym.I
+        * PARAMETERS["Epipm"]
+        * PROPAGATION["Kpm"]
+        / PARAMETERS["F"] ** 3
+        * (
+            -sym.sqrt(3) / 3 * PARAMETERS["g8"]
+            + (2 * PARAMETERS["F"] * BARE["eta-AP"] ** 2 / PROPAGATION["AP"]) ** 2
             * (
-                sym.sqrt(3) * PROPAGATION["AP"] ** 2
-                + 2
-                * (-PARAMETERS["ad"] + PARAMETERS["as"])
-                * PARAMETERS["F"]
-                * BARE["eta-AP"] ** 2
+                PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
+                + PARAMETERS["g8s"]
+                * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
             )
-            * PARAMETERS["Echi"]
         )
-        / (PARAMETERS["F"] ** 3 * PROPAGATION["AP"] ** 2)
-        + (
-            sym.I
-            * (
-                sym.sqrt(3) * PARAMETERS["g8"] * PROPAGATION["AP"] ** 2
-                - 3
-                * (PARAMETERS["ad"] + PARAMETERS["au"])
-                * PARAMETERS["F"]
-                * PARAMETERS["g8"]
-                * BARE["eta-AP"] ** 2
-                - 3
-                * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                * PARAMETERS["F"]
-                * PARAMETERS["g8s"]
-                * BARE["eta-AP"] ** 2
-            )
-            * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
-        )
-        / (3 * PARAMETERS["F"] ** 3 * PROPAGATION["AP"] ** 2)
     )
     etaP_pi_k = (
-        1
-        / (6 * PARAMETERS["F"] ** 3 * PROPAGATION["AP"] ** 2)
-        * sym.I
-        * (
-            2 * sym.sqrt(6) * PARAMETERS["g8"] * PROPAGATION["AP"] ** 2
-            + 3 * sym.sqrt(6) * PARAMETERS["g8s"] * PROPAGATION["AP"] ** 2
-            - 6
-            * (PARAMETERS["ad"] + PARAMETERS["au"])
-            * PARAMETERS["F"]
-            * PARAMETERS["g8"]
-            * BARE["etaP-AP"] ** 2
-            - 6
-            * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-            * PARAMETERS["F"]
-            * PARAMETERS["g8s"]
-            * BARE["etaP-AP"] ** 2
-        )
+        sym.I
         * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
-        + (
-            2
-            * sym.I
-            * (PARAMETERS["ad"] - PARAMETERS["as"])
-            * PARAMETERS["g8"]
-            * PROPAGATION["Kpm"]
+        / PARAMETERS["F"] ** 3
+        * (
+            -PARAMETERS["F"]
             * BARE["etaP-AP"] ** 2
-            * PARAMETERS["Echi"]
-        )
-        / (PARAMETERS["F"] ** 2 * PROPAGATION["AP"] ** 2)
-        + (
-            sym.I
-            * PROPAGATION["Kpm"]
+            / PROPAGATION["AP"] ** 2
             * (
-                -2 * sym.sqrt(6) * PARAMETERS["g8"] * PROPAGATION["AP"] ** 2
-                - 3 * sym.sqrt(6) * PARAMETERS["g8s"] * PROPAGATION["AP"] ** 2
-                + 6
-                * (PARAMETERS["ad"] + PARAMETERS["au"])
-                * PARAMETERS["F"]
-                * PARAMETERS["g8"]
-                * BARE["etaP-AP"] ** 2
-                + 6
+                PARAMETERS["g8"] * (PARAMETERS["ad"] + PARAMETERS["au"])
+                + PARAMETERS["g8s"]
                 * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-                * PARAMETERS["F"]
-                * PARAMETERS["g8s"]
-                * BARE["etaP-AP"] ** 2
             )
-            * PARAMETERS["Epipm"]
+            - sym.sqrt(6) / 3 * PARAMETERS["g8"]
+            - sym.sqrt(6) / 2 * PARAMETERS["g8s"]
         )
-        / (3 * PARAMETERS["F"] ** 3 * PROPAGATION["AP"] ** 2)
+        + 2
+        * sym.I
+        * PARAMETERS["Echi"]
+        * BARE["etaP-AP"] ** 2
+        * PROPAGATION["Kpm"]
+        / (PARAMETERS["F"] ** 2 * PROPAGATION["AP"] ** 2)
+        * (PARAMETERS["ad"] - PARAMETERS["as"])
+        + sym.I
+        * PARAMETERS["Epipm"]
+        * PROPAGATION["Kpm"]
+        / PARAMETERS["F"] ** 3
+        * (
+            2
+            * PARAMETERS["F"]
+            * BARE["etaP-AP"] ** 2
+            / PROPAGATION["AP"] ** 2
+            * (
+                PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
+                + PARAMETERS["g8s"]
+                * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
+            )
+            - 2 * sym.sqrt(6) / 3 * PARAMETERS["g8"]
+            - sym.sqrt(6) * PARAMETERS["g8s"]
+        )
     )
     return tuple(
         [
