@@ -23,6 +23,7 @@ from .solver import (
     MASS_QUARK,
     MASS_CHARGED_PION,
     MASS_CHARGED_KAON,
+    PhysicsError,
     B_0,
     L_4,
     L_5,
@@ -50,6 +51,17 @@ def calculate_uvw(
     :return: u, v, w
     :rtype: tuple[float, float, float]
     """
+    for m, meson in zip(
+        [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
+    ):
+        if m > m_axial**2:
+            phys = PhysicsError(
+                "The kinetic mixing cannot be removed for this combination of model parameters"
+            )
+            phys.add_note(f"m_{{{meson} AP}} is larger than m_AP^2")
+            phys.add_note("The model is likely unstable")
+            phys.add_note("The predicted couplings will be unphysical!")
+            raise phys
     parameter = {
         PROPAGATION["AP"]: m_axial,
         BARE["pi0-AP"]: m_pi0_axial,
@@ -105,6 +117,19 @@ def axial_calculate_meson_couplings(
     :return: pion-chi, eta-chi, eta^prime-chi
     :rtype: tuple[float, float, float]
     """
+    if m_axial <= 0:
+        raise ValueError("Axial vector mediator mass should be strictly positive")
+    for m, meson in zip(
+        [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
+    ):
+        if m > m_axial**2:
+            phys = PhysicsError(
+                "The kinetic mixing cannot be removed for this combination of model parameters"
+            )
+            phys.add_note(f"m_{{{meson} AP}} is larger than m_AP^2")
+            phys.add_note("The model is likely unstable")
+            phys.add_note("The predicted couplings will be unphysical!")
+            raise phys
     parameter = {
         AXIAL_COUPLING["a"]: l_axial,
         PROPAGATION["AP"]: m_axial,
@@ -186,18 +211,18 @@ def axial_calculate_bare_masses(
 def axial_calculate_bare_kaon(
     energy_pion: float,
     energy_dm: float,
-    mass_axial: float,
+    m_axial: float,
     coupling_up: float,
     coupling_down: float,
     coupling_strange: float,
-    mass_pion_axial: float,
-    mass_eta_axial: float,
-    mass_etap_axial: float,
+    m_pi0_axial: float,
+    m_eta_axial: float,
+    m_etap_axial: float,
     pion_decay: float = PION_DECAY,
     g_8: float = G_8,
     g_8s: float = G_8S,
-    mass_pion: float = MASS_CHARGED_PION,
-    mass_kaon: float = MASS_CHARGED_KAON,
+    m_pion: float = MASS_CHARGED_PION,
+    m_kaon: float = MASS_CHARGED_KAON,
 ) -> tuple[float, float, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
@@ -209,48 +234,61 @@ def axial_calculate_bare_kaon(
     :type energy_pion: float
     :param energy_dm: Dark matter energy
     :type energy_dm: float
-    :param mass_axial: Axial vector mediator mass
-    :type mass_axial: float
+    :param m_axial: Axial vector mediator mass
+    :type m_axial: float
     :param coupling_up: Up coupling
     :type coupling_up: float
     :param coupling_down: Down coupling
     :type coupling_down: float
     :param coupling_strange: Strange coupling
     :type coupling_strange: float
-    :param mass_pion_axial: Pion - mediator mass
-    :type mass_pion_axial: float
-    :param mass_eta_axial: Eta - mediator mass
-    :type mass_eta_axial: float
-    :param mass_etap_axial: Eta prime - mediator mass
-    :type mass_etap_axial: float
+    :param m_pi0_axial: Pion - mediator mass
+    :type m_pi0_axial: float
+    :param m_eta_axial: Eta - mediator mass
+    :type m_eta_axial: float
+    :param m_etap_axial: Eta prime - mediator mass
+    :type m_etap_axial: float
     :param pion_decay: The pion decay constant, defaults to PION_DECAY
     :type pion_decay: float
     :param g_8: g_{8}, defaults to G_8
     :type g_8: float
     :param g_8s: g_{8s}, defaults to G_8S
     :type g_8s: float
-    :param mass_pion: Chared pion mass, defaults to MASS_CHARGED_PION
-    :type mass_pion: float, optional
-    :param mass_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
-    :type mass_kaon: float, optional
+    :param m_pion: Chared pion mass, defaults to MASS_CHARGED_PION
+    :type m_pion: float, optional
+    :param m_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
+    :type m_kaon: float, optional
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
     :rtype: tuple[float, float, float]
     """
+    if m_axial <= 0:
+        raise ValueError("Axial vector mediator mass should be strictly positive")
+    for m, meson in zip(
+        [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
+    ):
+        if m > m_axial**2:
+            phys = PhysicsError(
+                "The kinetic mixing cannot be removed for this combination of model parameters"
+            )
+            phys.add_note(f"m_{{{meson} AP}} is larger than m_AP^2")
+            phys.add_note("The model is likely unstable")
+            phys.add_note("The predicted couplings will be unphysical!")
+            raise phys
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,
         PARAMETERS["Echi"]: energy_dm,
-        PROPAGATION["AP"]: mass_axial,
+        PROPAGATION["AP"]: m_axial,
         PARAMETERS["au"]: coupling_up,
         PARAMETERS["ad"]: coupling_down,
         PARAMETERS["as"]: coupling_strange,
-        BARE["pi0-AP"]: mass_pion_axial,
-        BARE["eta-AP"]: mass_eta_axial,
-        BARE["etaP-AP"]: mass_etap_axial,
+        BARE["pi0-AP"]: m_pi0_axial,
+        BARE["eta-AP"]: m_eta_axial,
+        BARE["etaP-AP"]: m_etap_axial,
         PARAMETERS["F"]: pion_decay,
         PARAMETERS["g8"]: g_8,
         PARAMETERS["g8s"]: g_8s,
-        PROPAGATION["pipm"]: mass_pion,
-        PROPAGATION["Kpm"]: mass_kaon,
+        PROPAGATION["pipm"]: m_pion,
+        PROPAGATION["Kpm"]: m_kaon,
     }
     coupling = []
     for l in bare_axial_kaon_couplings():
@@ -260,7 +298,7 @@ def axial_calculate_bare_kaon(
 
 
 def axial_calculate_kaon_couplings(
-    bare_pion_pion_kaon: float,
+    bare_pi0_pion_kaon: float,
     bare_eta_pion_kaon: float,
     bare_etap_pion_kaon: float,
     u: float,
@@ -274,8 +312,8 @@ def axial_calculate_kaon_couplings(
 
     Specific to the axial vector mediator case.
 
-    :param bare_pion_pion_kaon: Un-rotated pion-pion-kaon coupling
-    :type bare_pion_pion_kaon: float
+    :param bare_pi0_pion_kaon: Un-rotated pion-pion-kaon coupling
+    :type bare_pi0_pion_kaon: float
     :param bare_eta_pion_kaon: Un-rotated eta-pion-kaon coupling
     :type bare_eta_pion_kaon: float
     :param bare_etap_pion_kaon: Un-rotated eta^prime-pion-kaon coupling
@@ -296,7 +334,7 @@ def axial_calculate_kaon_couplings(
     :rtype: tuple[float, float, float]
     """
     parameter = {
-        AXIAL_COUPLING["pi0Bare-pi-K"]: bare_pion_pion_kaon,
+        AXIAL_COUPLING["pi0Bare-pi-K"]: bare_pi0_pion_kaon,
         AXIAL_COUPLING["etaBare-pi-K"]: bare_eta_pion_kaon,
         AXIAL_COUPLING["etaPBare-pi-K"]: bare_etap_pion_kaon,
         ANGLE["u"]: u,
