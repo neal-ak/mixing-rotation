@@ -272,8 +272,7 @@ def bare_axial_kaon_couplings() -> (
         * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
         / PARAMETERS["F"] ** 3
         * (
-            -2
-            * PARAMETERS["F"]
+            -PARAMETERS["F"]
             * BARE["eta-AP"] ** 2
             / PROPAGATION["AP"] ** 2
             * (
@@ -292,7 +291,7 @@ def bare_axial_kaon_couplings() -> (
             2
             * PARAMETERS["F"]
             * BARE["eta-AP"] ** 2
-            / PROPAGATION["AP"]
+            / PROPAGATION["AP"] ** 2
             * (PARAMETERS["as"] - PARAMETERS["ad"])
             + sym.sqrt(3)
         )
@@ -323,8 +322,8 @@ def bare_axial_kaon_couplings() -> (
                 + PARAMETERS["g8s"]
                 * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
             )
-            - sym.sqrt(6) / 3 * PARAMETERS["g8"]
-            - sym.sqrt(6) / 2 * PARAMETERS["g8s"]
+            + sym.sqrt(6) / 3 * PARAMETERS["g8"]
+            + sym.sqrt(6) / 2 * PARAMETERS["g8s"]
         )
         + 2
         * sym.I
