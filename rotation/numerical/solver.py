@@ -41,7 +41,7 @@ G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
 
 
-class PhysicsError(ValueError):
+class PhysicsError(Exception):
     pass
 
 
