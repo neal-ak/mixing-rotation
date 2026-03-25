@@ -157,11 +157,12 @@ def create_func(
     :type arg_unknown: list[sympy.Symbol]
     :param knowns: Known arguments and their values in the system
     :type knowns: dict[sympy.Symbol, float]
+    :raises ValueError: Raised if bare pseudo scalar mass input less than zero
     :return: The function Scipy can use to optimize
     :rtype: Callable
     """
     if BARE["phiBare"] in knowns and knowns[BARE["phiBare"]] < 0:
-        raise ValueError("Pseudo scalar mediator mass should be non-negative")
+        raise ValueError(f"Pseudo scalar mediator mass should be non-negative ({knowns[BARE["phiBare"]]:.4e} GeV)")
 
     def function(x):
         calling = _build_call(arg_ordering, x, knowns)
@@ -194,6 +195,7 @@ def debug_solve_mixing(
     :type abs_tolerance: float | None
     :param bounds: Bounds for each of the unknown arguments
     :type bounds: dict[sympy.Symbol, tuple[float, float]] | None
+    :raises PhysicsError: Raised if solution values outside physically permitted ranges
     :return: Dictionary of solved values and the raw OptimizeResult output
     :rtype: tuple[dict[sympy.Symbol, float], scipy.optimize.OptimizeResult]
     """
@@ -224,7 +226,7 @@ def debug_solve_mixing(
     )
     if PROPAGATION["phi"] in solve[0] and solve[0][PROPAGATION["phi"]] < 0:
         phys = PhysicsError(
-            f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass"
+            f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][PROPAGATION["phi"]]:.4e} GeV)"
         )
         phys.add_note(
             "The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with"
@@ -241,7 +243,7 @@ def debug_solve_mixing(
         if BARE[meson + "Bare"] in solve[0]:
             if solve[0][BARE[meson + "Bare"]] < 0:
                 phys = PhysicsError(
-                    f"This combination of model parameters produces a negative {meson} bare mass"
+                    f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][BARE[meson + "Bare"]]:.4e} GeV)"
                 )
                 phys.add_note(
                     "The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with"
@@ -253,7 +255,7 @@ def debug_solve_mixing(
             max_rotation = MASS_CHARGED_PION - MASS_NEUTRAL_PION
             if np.abs(solve[0][BARE[meson + "Bare"]] - mass) > max_rotation:
                 phys = PhysicsError(
-                    f"This combination of model parameters predicts a bare {meson} mass that differs by more than {max_rotation:.4e} GeV from its observed value"
+                    f"This combination of model parameters predicts a bare {meson} mass ({solve[0][BARE[meson + "Bare"]]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value"
                 )
                 phys.add_note(
                     "This may be in conflict with some predictions from the ChEFT Lagrangian!"

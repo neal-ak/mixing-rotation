@@ -48,6 +48,7 @@ def calculate_uvw(
     :type m_eta_axial: float
     :param m_etap_axial: Eta prime - mediator mass
     :type m_etap_axial: float
+    :raises PhysicsError: Raised if solution values outside physically permitted ranges
     :return: u, v, w
     :rtype: tuple[float, float, float]
     """
@@ -58,7 +59,7 @@ def calculate_uvw(
             phys = PhysicsError(
                 "The kinetic mixing cannot be removed for this combination of model parameters"
             )
-            phys.add_note(f"m_{{{meson} AP}} is larger than m_AP^2")
+            phys.add_note(f"m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2)")
             phys.add_note("The model is likely unstable")
             phys.add_note("The predicted couplings will be unphysical!")
             raise phys
@@ -114,6 +115,8 @@ def axial_calculate_meson_couplings(
     :type beta: float
     :param gamma: 3rd rotation angle
     :type gamma: float
+    :raises ValueError: Raised if the input axial vector mass is not strictly positive
+    :raises PhysicsError: Raised if solution values outside physically permitted ranges
     :return: pion-chi, eta-chi, eta^prime-chi
     :rtype: tuple[float, float, float]
     """
@@ -126,7 +129,7 @@ def axial_calculate_meson_couplings(
             phys = PhysicsError(
                 "The kinetic mixing cannot be removed for this combination of model parameters"
             )
-            phys.add_note(f"m_{{{meson} AP}} is larger than m_AP^2")
+            phys.add_note(f"m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2)")
             phys.add_note("The model is likely unstable")
             phys.add_note("The predicted couplings will be unphysical!")
             raise phys
@@ -258,6 +261,8 @@ def axial_calculate_bare_kaon(
     :type m_pion: float, optional
     :param m_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
     :type m_kaon: float, optional
+    :raises ValueError: Raised if the input axial vector mass is not strictly positive
+    :raises PhysicsError: Raised if solution values outside physically permitted ranges
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
     :rtype: tuple[float, float, float]
     """
@@ -270,7 +275,7 @@ def axial_calculate_bare_kaon(
             phys = PhysicsError(
                 "The kinetic mixing cannot be removed for this combination of model parameters"
             )
-            phys.add_note(f"m_{{{meson} AP}} is larger than m_AP^2")
+            phys.add_note(f"m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2)")
             phys.add_note("The model is likely unstable")
             phys.add_note("The predicted couplings will be unphysical!")
             raise phys
