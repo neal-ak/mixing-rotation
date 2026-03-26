@@ -56,17 +56,23 @@ You then need to prepare two dictionaries, one representing fixed known quantiti
 
 ```python
 # Pseudo scalar mediator case
+import rotation.numerical.pseudo
+piphi, etaphi = rotation.numerical.pseudo.pseudo_calculate_bare_masses(
+    coupling_up=0.7,
+    coupling_down=0.1,
+    coupling_strange=-0.2,
+)
 known = {
     rotation.symbolic.general.PROPAGATION["pi0"]: 0.1349768,
     rotation.symbolic.general.PROPAGATION["eta"]: 0.547862,
-    rotation.symbolic.general.BARE["phi"]: 1.0,
-    rotation.symbolic.general.BARE["pi0-phi"]: 0.1,
-    rotation.symbolic.general.BARE["eta-phi"]: 0.3,
+    rotation.symbolic.general.BARE["phiBare"]: 2.5,
+    rotation.symbolic.general.BARE["pi0-phi"]: piphi,
+    rotation.symbolic.general.BARE["eta-phi"]: etaphi,
 }
 unknown = {
-    rotation.symbolic.general.PROPAGATION["phi"]: 1.0,
-    rotation.symbolic.general.BARE["pi0"]: 0.1349768,
-    rotation.symbolic.general.BARE["eta"]: 0.547862,
+    rotation.symbolic.general.PROPAGATION["phi"]: 2.5,
+    rotation.symbolic.general.BARE["pi0Bare"]: 0.1349768,
+    rotation.symbolic.general.BARE["etaBare"]: 0.547862,
     rotation.symbolic.general.ANGLE["alpha"]: 0.0,
     rotation.symbolic.general.ANGLE["beta"]: 0.0,
     rotation.symbolic.general.ANGLE["gamma"]: 0.0,
@@ -78,24 +84,29 @@ Extra note: for the axial vector mediator, the kinetic mixing angles can ether b
 ```python
 # Axial vector mediator case
 import rotation.numerical.axial
+piA, etaA, etaPA = rotation.numerical.axial.axial_calculate_bare_masses(
+    coupling_up=0.7,
+    coupling_down=0.1,
+    coupling_strange=-0.2,
+)
 kin_u, kin_v, kin_w = rotation.numerical.axial.calculate_uvw(
-    m_axial=5,
-    m_pi0_axial=0.1349768,
-    m_eta_axial=0.547862,
-    m_eta0_axial=0.547862*0.9,
+    m_axial=1.0,
+    m_pi0_axial=piA,
+    m_eta_axial=etaA,
+    m_etap_axial=etaPA,
 )
 known = {
     rotation.symbolic.general.PROPAGATION["pi0"]: 0.1349768,
     rotation.symbolic.general.PROPAGATION["eta"]: 0.547862,
-    rotation.symbolic.general.PROPAGATION["eta0"]: 0.547862*0.9,
+    rotation.symbolic.general.PROPAGATION["etaP"]: 0.95778,
     rotation.symbolic.general.ANGLE["u"]: kin_u,
     rotation.symbolic.general.ANGLE["v"]: kin_v,
     rotation.symbolic.general.ANGLE["w"]: kin_w,
 }
 unknown = {
-    rotation.symbolic.general.BARE["pi0"]: 0.1349768,
-    rotation.symbolic.general.BARE["eta"]: 0.547862,
-    rotation.symbolic.general.BARE["eta0"]: 0.547862*0.9,
+    rotation.symbolic.general.BARE["pi0Bare"]: 0.1349768,
+    rotation.symbolic.general.BARE["etaBare"]: 0.547862,
+    rotation.symbolic.general.BARE["etaPBare"]: 0.95778,
     rotation.symbolic.general.ANGLE["alpha"]: 0.0,
     rotation.symbolic.general.ANGLE["beta"]: 0.0,
     rotation.symbolic.general.ANGLE["gamma"]: 0.0,
