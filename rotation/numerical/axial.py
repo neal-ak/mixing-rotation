@@ -5,8 +5,7 @@ import sympy as sym
 
 # %%
 from ..symbolic.general import (
-    BARE,
-    PROPAGATION,
+    MASS,
     ANGLE,
     AXIAL_COUPLING,
     PARAMETERS,
@@ -56,12 +55,14 @@ def calculate_uvw(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m > m_axial**2:
-            raise PhysicsError(f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!")
+            raise PhysicsError(
+                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!"
+            )
     parameter = {
-        PROPAGATION["AP"]: m_axial,
-        BARE["pi0-AP"]: m_pi0_axial,
-        BARE["eta-AP"]: m_eta_axial,
-        BARE["etaP-AP"]: m_etap_axial,
+        MASS["AP"]: m_axial,
+        MASS["pi0-AP"]: m_pi0_axial,
+        MASS["eta-AP"]: m_eta_axial,
+        MASS["etaP-AP"]: m_etap_axial,
     }
     uvw = []
     for s in kinetic_sines():
@@ -120,13 +121,15 @@ def axial_calculate_meson_couplings(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m > m_axial**2:
-            raise PhysicsError(f"The kinetic mixing cannot be removed for this combination of model parameters, m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2), The model is likely unstable, The predicted couplings will be unphysical!")
+            raise PhysicsError(
+                f"The kinetic mixing cannot be removed for this combination of model parameters, m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2), The model is likely unstable, The predicted couplings will be unphysical!"
+            )
     parameter = {
         AXIAL_COUPLING["a"]: l_axial,
-        PROPAGATION["AP"]: m_axial,
-        BARE["pi0-AP"]: m_pi0_axial,
-        BARE["eta-AP"]: m_eta_axial,
-        BARE["etaP-AP"]: m_etap_axial,
+        MASS["AP"]: m_axial,
+        MASS["pi0-AP"]: m_pi0_axial,
+        MASS["eta-AP"]: m_eta_axial,
+        MASS["etaP-AP"]: m_etap_axial,
         ANGLE["u"]: u,
         ANGLE["v"]: v,
         ANGLE["w"]: w,
@@ -188,9 +191,9 @@ def axial_calculate_bare_masses(
         PARAMETERS["F"]: pion_decay,
         PARAMETERS["L4"]: l_4,
         PARAMETERS["L5"]: l_5,
-        PARAMETERS["mu"]: mass_up,
-        PARAMETERS["md"]: mass_down,
-        PARAMETERS["ms"]: mass_strange,
+        MASS["u"]: mass_up,
+        MASS["d"]: mass_down,
+        MASS["s"]: mass_strange,
     }
     masses = []
     for m in bare_axial_masses():
@@ -260,23 +263,25 @@ def axial_calculate_bare_kaon(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m > m_axial**2:
-            phys = PhysicsError(f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!")
+            phys = PhysicsError(
+                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!"
+            )
             raise phys
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,
         PARAMETERS["Echi"]: energy_dm,
-        PROPAGATION["AP"]: m_axial,
+        MASS["AP"]: m_axial,
         PARAMETERS["au"]: coupling_up,
         PARAMETERS["ad"]: coupling_down,
         PARAMETERS["as"]: coupling_strange,
-        BARE["pi0-AP"]: m_pi0_axial,
-        BARE["eta-AP"]: m_eta_axial,
-        BARE["etaP-AP"]: m_etap_axial,
+        MASS["pi0-AP"]: m_pi0_axial,
+        MASS["eta-AP"]: m_eta_axial,
+        MASS["etaP-AP"]: m_etap_axial,
         PARAMETERS["F"]: pion_decay,
         PARAMETERS["g8"]: g_8,
         PARAMETERS["g8s"]: g_8s,
-        PROPAGATION["pipm"]: m_pion,
-        PROPAGATION["Kpm"]: m_kaon,
+        MASS["pipm"]: m_pion,
+        MASS["Kpm"]: m_kaon,
     }
     coupling = []
     for l in bare_axial_kaon_couplings():

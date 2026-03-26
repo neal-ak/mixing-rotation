@@ -9,7 +9,7 @@ from scipy import optimize
 import sympy as sym
 
 # %%
-from ..symbolic.general import ANGLE, BARE, COUPLING, PARAMETERS, PROPAGATION, ROTATED
+from ..symbolic.general import ANGLE, MASS, COUPLING, PARAMETERS
 
 
 # %%
@@ -133,7 +133,7 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
     :rtype: tuple[list[sympy.Symbol], list[Callable]]
     """
     arg_ordering = []
-    for d in [ANGLE, BARE, COUPLING, PARAMETERS, PROPAGATION, ROTATED]:
+    for d in [ANGLE, MASS, COUPLING, PARAMETERS]:
         arg_ordering += [v for v in d.values() if v in equation.free_symbols]
     system = []
     for eqn in [e for i, e in enumerate(equation) if i not in [3, 6, 7]]:
@@ -161,8 +161,10 @@ def create_func(
     :return: The function Scipy can use to optimize
     :rtype: Callable
     """
-    if BARE["phiBare"] in knowns and knowns[BARE["phiBare"]] < 0:
-        raise ValueError(f"Pseudo scalar mediator mass should be non-negative ({knowns[BARE['phiBare']]:.4e} GeV)")
+    if MASS["phiBare"] in knowns and knowns[MASS["phiBare"]] < 0:
+        raise ValueError(
+            f"Pseudo scalar mediator mass should be non-negative ({knowns[MASS['phiBare']]:.4e} GeV)"
+        )
 
     def function(x):
         calling = _build_call(arg_ordering, x, knowns)
@@ -204,7 +206,7 @@ def debug_solve_mixing(
     if bounds is None:
         kwargs["bounds"] = [], []
         for arg in unknown_args:
-            if arg in list(BARE.values()) + list(PROPAGATION.values()):
+            if arg in MASS.values():
                 kwargs["bounds"][0].append(0)
                 kwargs["bounds"][1].append(np.inf)
             elif arg in ANGLE.values():
@@ -224,19 +226,25 @@ def debug_solve_mixing(
     solve = _least_sqr_tolerance(
         func, arg_ordering, init_unknowns, abs_tolerance, **kwargs
     )
-    if PROPAGATION["phi"] in solve[0] and solve[0][PROPAGATION["phi"]] < 0:
-        raise PhysicsError(f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][PROPAGATION['phi']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!")
+    if MASS["phi"] in solve[0] and solve[0][MASS["phi"]] < 0:
+        raise PhysicsError(
+            f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][MASS['phi']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!"
+        )
     for meson, mass in {
         "pi0": MASS_NEUTRAL_PION,
         "eta": MASS_ETA,
         "etaP": MASS_ETA_PRIME,
     }.items():
-        if BARE[meson + "Bare"] in solve[0]:
-            if solve[0][BARE[meson + "Bare"]] < 0:
-                raise PhysicsError(f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][BARE[meson + 'Bare']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!")
+        if MASS[meson + "Bare"] in solve[0]:
+            if solve[0][MASS[meson + "Bare"]] < 0:
+                raise PhysicsError(
+                    f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!"
+                )
             max_rotation = MASS_CHARGED_PION - MASS_NEUTRAL_PION
-            if np.abs(solve[0][BARE[meson + "Bare"]] - mass) > max_rotation:
-                raise PhysicsError(f"This combination of model parameters predicts a bare {meson} mass ({solve[0][BARE[meson + 'Bare']]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value. This may be in conflict with some predictions from the ChEFT Lagrangian!")
+            if np.abs(solve[0][MASS[meson + "Bare"]] - mass) > max_rotation:
+                raise PhysicsError(
+                    f"This combination of model parameters predicts a bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value. This may be in conflict with some predictions from the ChEFT Lagrangian!"
+                )
     return solve
 
 

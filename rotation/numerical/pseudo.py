@@ -8,8 +8,7 @@ from ..symbolic.general import (
     ANGLE,
     COUPLING,
     PARAMETERS,
-    PROPAGATION,
-    ROTATED,
+    MASS,
 )
 from ..symbolic.pseudo import (
     rotated_pseudo_meson_couplings,
@@ -130,8 +129,8 @@ def pseudo_calculate_photon_coupling(
         ANGLE["alpha"]: alpha,
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,
-        ROTATED["pi0-gamma"]: known_pion_photon_coupling,
-        ROTATED["eta-gamma"]: known_eta_photon_coupling,
+        COUPLING["pi0-gamma"]: known_pion_photon_coupling,
+        COUPLING["eta-gamma"]: known_eta_photon_coupling,
     }
     g = rotated_pseudo_photon_coupling()
     call = list(g.free_symbols)
@@ -159,8 +158,8 @@ def pseudo_calculate_bare_kaon(
     """
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,
-        PROPAGATION["pi0"]: mass_pion,
-        PROPAGATION["Kpm"]: mass_kaon,
+        MASS["pi0"]: mass_pion,
+        MASS["Kpm"]: mass_kaon,
     }
     coupling = []
     for g in bare_pseudo_kaon_couplings():

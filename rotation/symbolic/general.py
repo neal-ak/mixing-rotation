@@ -25,9 +25,12 @@ ANGLE = {
 }
 
 # %%
-PROPAGATION = {
+MASS = {
     _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [
+        "u",
+        "d",
+        "s",
         r"\pi^{0}",
         r"\tilde{\phi}",
         r"\eta",
@@ -35,13 +38,6 @@ PROPAGATION = {
         r"A^{\prime}",
         r"\pi^{\pm}",
         r"K^{\pm}",
-    ]
-}
-
-# %%
-BARE = {
-    _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
-    for k in [
         r"\pi^{0}_{b}",
         r"\tilde{\phi}_{b}",
         r"\eta_{b}",
@@ -61,8 +57,8 @@ COUPLING = {
         "u",
         "d",
         "s",
-        r"\pi^{0}_{b} \chi",
         r"\chi",
+        r"\pi^{0}_{b} \chi",
         r"\eta_{b} \chi",
         r"\pi^{0}_{b} \gamma",
         r"\tilde{\phi}_{b} \gamma",
@@ -70,13 +66,6 @@ COUPLING = {
         r"\pi^{0}_{b} \pi K",
         r"\tilde{\phi}_{b} \pi K",
         r"\eta_{b} \pi K",
-    ]
-}
-
-# %%
-ROTATED = {
-    _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
-    for k in [
         r"\pi^{0} \chi",
         r"\tilde{\phi} \chi",
         r"\eta \chi",
@@ -100,13 +89,6 @@ AXIAL_COUPLING = {
         r"\pi^{0}_{b} \pi K",
         r"\eta_{b} \pi K",
         r"\eta^{\prime}_{b} \pi K",
-    ]
-}
-
-# %%
-AXIAL_ROTATED = {
-    _preprocess_symbol(k): sym.Symbol(f"\\lambda_{{{k}}}", real=True)
-    for k in [
         r"\pi^{0} \chi",
         r"\eta^{\prime} \chi",
         r"\eta \chi",
@@ -121,6 +103,7 @@ PARAMETERS = {
     _preprocess_symbol(k): sym.Symbol(k, real=True)
     for k in [
         r"E_{\pi^\pm}",
+        r"E_{\chi}",
         "F",
         r"B_{0}",
         r"L_{4}",
@@ -128,12 +111,8 @@ PARAMETERS = {
         r"a_{u}",
         r"a_{d}",
         r"a_{s}",
-        r"m_{u}",
-        r"m_{d}",
-        r"m_{s}",
         r"g_{8}",
         r"g_{8}^{s}",
-        r"E_{\chi}",
     ]
 }
 

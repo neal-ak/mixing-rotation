@@ -63,16 +63,16 @@ piphi, etaphi = rotation.numerical.pseudo.pseudo_calculate_bare_masses(
     coupling_strange=-0.2,
 )
 known = {
-    rotation.symbolic.general.PROPAGATION["pi0"]: 0.1349768,
-    rotation.symbolic.general.PROPAGATION["eta"]: 0.547862,
-    rotation.symbolic.general.BARE["phiBare"]: 2.5,
-    rotation.symbolic.general.BARE["pi0-phi"]: piphi,
-    rotation.symbolic.general.BARE["eta-phi"]: etaphi,
+    rotation.symbolic.general.MASS["pi0"]: 0.1349768,
+    rotation.symbolic.general.MASS["eta"]: 0.547862,
+    rotation.symbolic.general.MASS["phiBare"]: 2.5,
+    rotation.symbolic.general.MASS["pi0-phi"]: piphi,
+    rotation.symbolic.general.MASS["eta-phi"]: etaphi,
 }
 unknown = {
-    rotation.symbolic.general.PROPAGATION["phi"]: 2.5,
-    rotation.symbolic.general.BARE["pi0Bare"]: 0.1349768,
-    rotation.symbolic.general.BARE["etaBare"]: 0.547862,
+    rotation.symbolic.general.MASS["phi"]: 2.5,
+    rotation.symbolic.general.MASS["pi0Bare"]: 0.1349768,
+    rotation.symbolic.general.MASS["etaBare"]: 0.547862,
     rotation.symbolic.general.ANGLE["alpha"]: 0.0,
     rotation.symbolic.general.ANGLE["beta"]: 0.0,
     rotation.symbolic.general.ANGLE["gamma"]: 0.0,
@@ -96,17 +96,17 @@ kin_u, kin_v, kin_w = rotation.numerical.axial.calculate_uvw(
     m_etap_axial=etaPA,
 )
 known = {
-    rotation.symbolic.general.PROPAGATION["pi0"]: 0.1349768,
-    rotation.symbolic.general.PROPAGATION["eta"]: 0.547862,
-    rotation.symbolic.general.PROPAGATION["etaP"]: 0.95778,
+    rotation.symbolic.general.MASS["pi0"]: 0.1349768,
+    rotation.symbolic.general.MASS["eta"]: 0.547862,
+    rotation.symbolic.general.MASS["etaP"]: 0.95778,
     rotation.symbolic.general.ANGLE["u"]: kin_u,
     rotation.symbolic.general.ANGLE["v"]: kin_v,
     rotation.symbolic.general.ANGLE["w"]: kin_w,
 }
 unknown = {
-    rotation.symbolic.general.BARE["pi0Bare"]: 0.1349768,
-    rotation.symbolic.general.BARE["etaBare"]: 0.547862,
-    rotation.symbolic.general.BARE["etaPBare"]: 0.95778,
+    rotation.symbolic.general.MASS["pi0Bare"]: 0.1349768,
+    rotation.symbolic.general.MASS["etaBare"]: 0.547862,
+    rotation.symbolic.general.MASS["etaPBare"]: 0.95778,
     rotation.symbolic.general.ANGLE["alpha"]: 0.0,
     rotation.symbolic.general.ANGLE["beta"]: 0.0,
     rotation.symbolic.general.ANGLE["gamma"]: 0.0,

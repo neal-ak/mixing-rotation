@@ -7,9 +7,8 @@ import sympy as sym
 from .general import (
     ANGLE,
     AXIAL_COUPLING,
-    BARE,
+    MASS,
     PARAMETERS,
-    PROPAGATION,
     create_3d_rotation,
 )
 
@@ -71,16 +70,16 @@ def create_axial_mix_equation(
     kinetic_transpose = kinetic.transpose()
     bare_matrix = sym.Matrix(
         [
-            [BARE["pi0Bare"] ** 2, 0, 0],
-            [0, BARE["etaBare"] ** 2, 0],
-            [0, 0, BARE["etaPBare"] ** 2],
+            [MASS["pi0Bare"] ** 2, 0, 0],
+            [0, MASS["etaBare"] ** 2, 0],
+            [0, 0, MASS["etaPBare"] ** 2],
         ]
     )
     prop_matrix = sym.Matrix(
         [
-            [PROPAGATION["pi0"] ** 2, 0, 0],
-            [0, PROPAGATION["eta"] ** 2, 0],
-            [0, 0, PROPAGATION["etaP"] ** 2],
+            [MASS["pi0"] ** 2, 0, 0],
+            [0, MASS["eta"] ** 2, 0],
+            [0, 0, MASS["etaP"] ** 2],
         ]
     )
     mixing_equation = sym.Eq(
@@ -101,7 +100,7 @@ def create_axial_mix_equation(
 # %%
 def _kinetic_sine(m1, m2) -> sym.core.mul.Mul:
     """Helper to automate sine of kinetic mixing angle."""
-    ma = PROPAGATION["AP"]
+    ma = MASS["AP"]
     return (
         -m1 * m2 / (2 * ma**2 * sym.sqrt((1 - (m1 / ma) ** 2) * (1 - (m2 / ma) ** 2)))
     )
@@ -114,9 +113,9 @@ def kinetic_sines() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mu
     :return: sine(u), sine(v), sine(w)
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    s_u = _kinetic_sine(BARE["pi0-AP"], BARE["eta-AP"])
-    s_v = _kinetic_sine(BARE["pi0-AP"], BARE["etaP-AP"])
-    s_w = _kinetic_sine(BARE["etaP-AP"], BARE["eta-AP"])
+    s_u = _kinetic_sine(MASS["pi0-AP"], MASS["eta-AP"])
+    s_v = _kinetic_sine(MASS["pi0-AP"], MASS["etaP-AP"])
+    s_w = _kinetic_sine(MASS["etaP-AP"], MASS["eta-AP"])
     return s_u, s_v, s_w
 
 
@@ -131,13 +130,13 @@ def bare_axial_meson_couplings() -> (
     :return: pion-chi, eta-chi, eta^prime-chi
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    masses = [BARE[f"{k}-AP"] for k in ["pi0", "eta", "etaP"]]
+    masses = [MASS[f"{k}-AP"] for k in ["pi0", "eta", "etaP"]]
     return tuple(
         [
             AXIAL_COUPLING["a"]
             * m
-            / PROPAGATION["AP"] ** 2
-            / sym.sqrt(1 - (m / PROPAGATION["AP"]) ** 2)
+            / MASS["AP"] ** 2
+            / sym.sqrt(1 - (m / MASS["AP"]) ** 2)
             for m in masses
         ]
     )
@@ -171,7 +170,7 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
     terms = [
         (
             PARAMETERS["au"] - PARAMETERS["ad"],
-            PARAMETERS["au"] * PARAMETERS["mu"] - PARAMETERS["ad"] * PARAMETERS["md"],
+            PARAMETERS["au"] * MASS["u"] - PARAMETERS["ad"] * MASS["d"],
         ),
         (
             1
@@ -180,9 +179,9 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
             1
             / sym.sqrt(3)
             * (
-                PARAMETERS["au"] * PARAMETERS["mu"]
-                + PARAMETERS["ad"] * PARAMETERS["md"]
-                - 2 * PARAMETERS["as"] * PARAMETERS["ms"]
+                PARAMETERS["au"] * MASS["u"]
+                + PARAMETERS["ad"] * MASS["d"]
+                - 2 * PARAMETERS["as"] * MASS["s"]
             ),
         ),
         (
@@ -190,9 +189,9 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
             sym.sqrt(6)
             / 3
             * (
-                PARAMETERS["au"] * PARAMETERS["mu"]
-                + PARAMETERS["ad"] * PARAMETERS["md"]
-                + PARAMETERS["as"] * PARAMETERS["ms"]
+                PARAMETERS["au"] * MASS["u"]
+                + PARAMETERS["ad"] * MASS["d"]
+                + PARAMETERS["as"] * MASS["s"]
             ),
         ),
     ]
@@ -207,7 +206,7 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
                     * PARAMETERS["B0"]
                     * PARAMETERS["L4"]
                     / PARAMETERS["F"] ** 2
-                    * (PARAMETERS["mu"] + PARAMETERS["md"] + PARAMETERS["ms"])
+                    * (MASS["u"] + MASS["d"] + MASS["s"])
                 )
                 + b * 16 * PARAMETERS["B0"] * PARAMETERS["L5"] / PARAMETERS["F"] ** 2
             )
@@ -229,9 +228,9 @@ def bare_axial_kaon_couplings() -> (
     """
     pi_pi_k = (
         -sym.I
-        * BARE["pi0-AP"] ** 2
-        * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
-        / (PARAMETERS["F"] ** 2 * PROPAGATION["AP"] ** 2)
+        * MASS["pi0-AP"] ** 2
+        * (MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
+        / (PARAMETERS["F"] ** 2 * MASS["AP"] ** 2)
         * (
             PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
             + PARAMETERS["g8s"]
@@ -240,26 +239,26 @@ def bare_axial_kaon_couplings() -> (
         + sym.I
         * PARAMETERS["Echi"]
         * PARAMETERS["g8"]
-        * PROPAGATION["Kpm"]
+        * MASS["Kpm"]
         / PARAMETERS["F"] ** 3
         * (
             1
             + 2
             * PARAMETERS["F"]
-            * BARE["pi0-AP"] ** 2
-            / PROPAGATION["AP"] ** 2
+            * MASS["pi0-AP"] ** 2
+            / MASS["AP"] ** 2
             * (PARAMETERS["ad"] - PARAMETERS["as"])
         )
         - sym.I
         * PARAMETERS["Epipm"]
-        * PROPAGATION["Kpm"]
+        * MASS["Kpm"]
         / (PARAMETERS["F"] ** 3)
         * (
             PARAMETERS["g8"]
             - PARAMETERS["F"]
             * 2
-            * BARE["pi0-AP"] ** 2
-            / PROPAGATION["AP"] ** 2
+            * MASS["pi0-AP"] ** 2
+            / MASS["AP"] ** 2
             * (
                 PARAMETERS["g8"] * (PARAMETERS["ad"] + PARAMETERS["au"])
                 + PARAMETERS["g8s"]
@@ -269,12 +268,12 @@ def bare_axial_kaon_couplings() -> (
     )
     eta_pi_k = (
         sym.I
-        * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
+        * (MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
         / PARAMETERS["F"] ** 3
         * (
             -PARAMETERS["F"]
-            * BARE["eta-AP"] ** 2
-            / PROPAGATION["AP"] ** 2
+            * MASS["eta-AP"] ** 2
+            / MASS["AP"] ** 2
             * (
                 PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
                 + PARAMETERS["g8s"]
@@ -285,26 +284,26 @@ def bare_axial_kaon_couplings() -> (
         - sym.I
         * PARAMETERS["Echi"]
         * PARAMETERS["g8"]
-        * PROPAGATION["Kpm"]
+        * MASS["Kpm"]
         / PARAMETERS["F"] ** 3
         * (
             2
             * PARAMETERS["F"]
-            * BARE["eta-AP"] ** 2
-            / PROPAGATION["AP"] ** 2
+            * MASS["eta-AP"] ** 2
+            / MASS["AP"] ** 2
             * (PARAMETERS["as"] - PARAMETERS["ad"])
             + sym.sqrt(3)
         )
         + sym.I
         * PARAMETERS["Epipm"]
-        * PROPAGATION["Kpm"]
+        * MASS["Kpm"]
         / PARAMETERS["F"] ** 3
         * (
             -sym.sqrt(3) / 3 * PARAMETERS["g8"]
             + 2
             * PARAMETERS["F"]
-            * BARE["eta-AP"] ** 2
-            / PROPAGATION["AP"] ** 2
+            * MASS["eta-AP"] ** 2
+            / MASS["AP"] ** 2
             * (
                 PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
                 + PARAMETERS["g8s"]
@@ -314,12 +313,12 @@ def bare_axial_kaon_couplings() -> (
     )
     etaP_pi_k = (
         sym.I
-        * (PROPAGATION["Kpm"] ** 2 + PROPAGATION["pipm"] ** 2)
+        * (MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
         / PARAMETERS["F"] ** 3
         * (
             -PARAMETERS["F"]
-            * BARE["etaP-AP"] ** 2
-            / PROPAGATION["AP"] ** 2
+            * MASS["etaP-AP"] ** 2
+            / MASS["AP"] ** 2
             * (
                 PARAMETERS["g8"] * (PARAMETERS["ad"] + PARAMETERS["au"])
                 + PARAMETERS["g8s"]
@@ -332,19 +331,19 @@ def bare_axial_kaon_couplings() -> (
         * sym.I
         * PARAMETERS["Echi"]
         * PARAMETERS["g8"]
-        * BARE["etaP-AP"] ** 2
-        * PROPAGATION["Kpm"]
-        / (PARAMETERS["F"] ** 2 * PROPAGATION["AP"] ** 2)
+        * MASS["etaP-AP"] ** 2
+        * MASS["Kpm"]
+        / (PARAMETERS["F"] ** 2 * MASS["AP"] ** 2)
         * (PARAMETERS["ad"] - PARAMETERS["as"])
         + sym.I
         * PARAMETERS["Epipm"]
-        * PROPAGATION["Kpm"]
+        * MASS["Kpm"]
         / PARAMETERS["F"] ** 3
         * (
             2
             * PARAMETERS["F"]
-            * BARE["etaP-AP"] ** 2
-            / PROPAGATION["AP"] ** 2
+            * MASS["etaP-AP"] ** 2
+            / MASS["AP"] ** 2
             * (
                 PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
                 + PARAMETERS["g8s"]
@@ -356,9 +355,9 @@ def bare_axial_kaon_couplings() -> (
     )
     return tuple(
         [
-            l / sym.sqrt(1 - (m / PROPAGATION["AP"]) ** 2)
+            l / sym.sqrt(1 - (m / MASS["AP"]) ** 2)
             for m, l in zip(
-                [BARE[f"{k}-AP"] for k in ["pi0", "eta", "etaP"]],
+                [MASS[f"{k}-AP"] for k in ["pi0", "eta", "etaP"]],
                 [pi_pi_k, eta_pi_k, etaP_pi_k],
             )
         ]

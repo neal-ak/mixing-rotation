@@ -5,11 +5,9 @@ import sympy as sym
 
 # %%
 from .general import (
-    BARE,
+    MASS,
     COUPLING,
     PARAMETERS,
-    PROPAGATION,
-    ROTATED,
     create_3d_rotation,
 )
 
@@ -28,20 +26,20 @@ def create_mix_equation(
     rotation_transpose = rotation.transpose()
     bare_matrix = sym.Matrix(
         [
-            [BARE["pi0Bare"] ** 2, BARE["pi0-phi"] / 2, 0],
+            [MASS["pi0Bare"] ** 2, MASS["pi0-phi"] / 2, 0],
             [
-                BARE["pi0-phi"] / 2,
-                BARE["phiBare"] ** 2,
-                BARE["eta-phi"] / 2,
+                MASS["pi0-phi"] / 2,
+                MASS["phiBare"] ** 2,
+                MASS["eta-phi"] / 2,
             ],
-            [0, BARE["eta-phi"] / 2, BARE["etaBare"] ** 2],
+            [0, MASS["eta-phi"] / 2, MASS["etaBare"] ** 2],
         ]
     )
     prop_matrix = sym.Matrix(
         [
-            [PROPAGATION["pi0"] ** 2, 0, 0],
-            [0, PROPAGATION["phi"] ** 2, 0],
-            [0, 0, PROPAGATION["eta"] ** 2],
+            [MASS["pi0"] ** 2, 0, 0],
+            [0, MASS["phi"] ** 2, 0],
+            [0, 0, MASS["eta"] ** 2],
         ]
     )
     mixing_equation = sym.Eq(
@@ -109,20 +107,20 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
     gamma_eqns = [
         sym.Eq(g, e)
         for g, e in zip(
-            [ROTATED[k] for k in ["pi0-gamma", "phi-gamma", "eta-gamma"]],
+            [COUPLING[k] for k in ["pi0-gamma", "phi-gamma", "eta-gamma"]],
             gamma_matrix,
         )
     ]
     gamma_solutions = sym.solve(
         gamma_eqns,
         [
-            ROTATED["phi-gamma"],
+            COUPLING["phi-gamma"],
             COUPLING["pi0Bare-gamma"],
             COUPLING["etaBare-gamma"],
         ],
         dict=True,
     )
-    return gamma_solutions[0][ROTATED["phi-gamma"]].trigsimp()
+    return gamma_solutions[0][COUPLING["phi-gamma"]].trigsimp()
 
 
 # %%
@@ -136,11 +134,9 @@ def bare_pseudo_kaon_couplings() -> (
     :return: pion-pion-kaon, eta-pion-kaon
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    pi_pi_kaon = PROPAGATION["Kpm"] ** 2 - 2 * PROPAGATION["Kpm"] * PARAMETERS["Epipm"]
+    pi_pi_kaon = MASS["Kpm"] ** 2 - 2 * MASS["Kpm"] * PARAMETERS["Epipm"]
     eta_pi_kaon = (
-        PROPAGATION["Kpm"] ** 2
-        - 2 * PROPAGATION["Kpm"] * PARAMETERS["Epipm"]
-        - PROPAGATION["pi0"] ** 2
+        MASS["Kpm"] ** 2 - 2 * MASS["Kpm"] * PARAMETERS["Epipm"] - MASS["pi0"] ** 2
     ) / sym.sqrt(3)
     return pi_pi_kaon, eta_pi_kaon
 
