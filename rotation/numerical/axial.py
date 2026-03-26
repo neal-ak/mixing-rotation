@@ -56,13 +56,7 @@ def calculate_uvw(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m > m_axial**2:
-            phys = PhysicsError(
-                "The kinetic mixing cannot be removed for this combination of model parameters"
-            )
-            phys.add_note(f"m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2)")
-            phys.add_note("The model is likely unstable")
-            phys.add_note("The predicted couplings will be unphysical!")
-            raise phys
+            raise PhysicsError(f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!")
     parameter = {
         PROPAGATION["AP"]: m_axial,
         BARE["pi0-AP"]: m_pi0_axial,
@@ -126,13 +120,7 @@ def axial_calculate_meson_couplings(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m > m_axial**2:
-            phys = PhysicsError(
-                "The kinetic mixing cannot be removed for this combination of model parameters"
-            )
-            phys.add_note(f"m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2)")
-            phys.add_note("The model is likely unstable")
-            phys.add_note("The predicted couplings will be unphysical!")
-            raise phys
+            raise PhysicsError(f"The kinetic mixing cannot be removed for this combination of model parameters, m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2), The model is likely unstable, The predicted couplings will be unphysical!")
     parameter = {
         AXIAL_COUPLING["a"]: l_axial,
         PROPAGATION["AP"]: m_axial,
@@ -272,12 +260,7 @@ def axial_calculate_bare_kaon(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m > m_axial**2:
-            phys = PhysicsError(
-                "The kinetic mixing cannot be removed for this combination of model parameters"
-            )
-            phys.add_note(f"m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2)")
-            phys.add_note("The model is likely unstable")
-            phys.add_note("The predicted couplings will be unphysical!")
+            phys = PhysicsError(f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!")
             raise phys
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,

@@ -225,16 +225,7 @@ def debug_solve_mixing(
         func, arg_ordering, init_unknowns, abs_tolerance, **kwargs
     )
     if PROPAGATION["phi"] in solve[0] and solve[0][PROPAGATION["phi"]] < 0:
-        phys = PhysicsError(
-            f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][PROPAGATION['phi']]:.4e} GeV)"
-        )
-        phys.add_note(
-            "The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with"
-        )
-        phys.add_note(
-            "The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!"
-        )
-        raise phys
+        raise PhysicsError(f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][PROPAGATION['phi']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!")
     for meson, mass in {
         "pi0": MASS_NEUTRAL_PION,
         "eta": MASS_ETA,
@@ -242,25 +233,10 @@ def debug_solve_mixing(
     }.items():
         if BARE[meson + "Bare"] in solve[0]:
             if solve[0][BARE[meson + "Bare"]] < 0:
-                phys = PhysicsError(
-                    f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][BARE[meson + 'Bare']]:.4e} GeV)"
-                )
-                phys.add_note(
-                    "The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with"
-                )
-                phys.add_note(
-                    "The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!"
-                )
-                raise phys
+                raise PhysicsError(f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][BARE[meson + 'Bare']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!")
             max_rotation = MASS_CHARGED_PION - MASS_NEUTRAL_PION
             if np.abs(solve[0][BARE[meson + "Bare"]] - mass) > max_rotation:
-                phys = PhysicsError(
-                    f"This combination of model parameters predicts a bare {meson} mass ({solve[0][BARE[meson + 'Bare']]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value"
-                )
-                phys.add_note(
-                    "This may be in conflict with some predictions from the ChEFT Lagrangian!"
-                )
-                raise phys
+                raise PhysicsError(f"This combination of model parameters predicts a bare {meson} mass ({solve[0][BARE[meson + 'Bare']]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value. This may be in conflict with some predictions from the ChEFT Lagrangian!")
     return solve
 
 
