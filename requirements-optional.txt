@@ -1,2 +1,2 @@
-jupyter==1.1.1
-matplotlib==3.10.8
+jupyter~=1.1
+matplotlib~=3.10

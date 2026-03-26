@@ -2,7 +2,7 @@
 
 ## Requirements
 
-This was tested on Python versions 3.12.3, 3.13.11, and 3.14.2.
+This was tested on Python versions 3.10 through 3.14.
 
 To run the rotation solver you'll need
 
