@@ -32,9 +32,9 @@ B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
 # https://arxiv.org/abs/1405.6488
 L_4 = 1.87e-3
 L_5 = 1.22e-3
-# eqn F3 in tex
+# below eqn F3 in tex
 G_8 = 3.62
-# From Melissa
+# https://arxiv.org/abs/hep-ph/0508189
 G_8S = -0.38 * G_8
 # eqn 34 in tex, use natural units for elementary charge
 G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
