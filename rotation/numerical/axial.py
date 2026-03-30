@@ -54,7 +54,7 @@ def calculate_uvw(
     for m, meson in zip(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
-        if m > m_axial**2:
+        if m**2 > m_axial**2:
             raise PhysicsError(
                 f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!"
             )
@@ -120,7 +120,7 @@ def axial_calculate_meson_couplings(
     for m, meson in zip(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
-        if m > m_axial**2:
+        if m**2 > m_axial**2:
             raise PhysicsError(
                 f"The kinetic mixing cannot be removed for this combination of model parameters, m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2), The model is likely unstable, The predicted couplings will be unphysical!"
             )
@@ -262,7 +262,7 @@ def axial_calculate_bare_kaon(
     for m, meson in zip(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
-        if m > m_axial**2:
+        if m**2 > m_axial**2:
             phys = PhysicsError(
                 f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!"
             )
