@@ -1,6 +1,9 @@
 """Contains functions to numerically evaluate the axial mixing equation."""
 
 # %%
+import warnings
+
+# %%
 import sympy as sym
 
 # %%
@@ -22,7 +25,7 @@ from .solver import (
     MASS_QUARK,
     MASS_CHARGED_PION,
     MASS_CHARGED_KAON,
-    PhysicsError,
+    PhysicsWarning,
     B_0,
     L_4,
     L_5,
@@ -47,7 +50,7 @@ def calculate_uvw(
     :type m_eta_axial: float
     :param m_etap_axial: Eta prime - mediator mass
     :type m_etap_axial: float
-    :raises PhysicsError: Raised if solution values outside physically permitted ranges
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
     :return: u, v, w
     :rtype: tuple[float, float, float]
     """
@@ -55,8 +58,9 @@ def calculate_uvw(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m**2 > m_axial**2:
-            raise PhysicsError(
-                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!"
+            warnings.warn(
+                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                PhysicsWarning,
             )
     parameter = {
         MASS["AP"]: m_axial,
@@ -111,7 +115,7 @@ def axial_calculate_meson_couplings(
     :param gamma: 3rd rotation angle
     :type gamma: float
     :raises ValueError: Raised if the input axial vector mass is not strictly positive
-    :raises PhysicsError: Raised if solution values outside physically permitted ranges
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
     :return: pion-chi, eta-chi, eta^prime-chi
     :rtype: tuple[float, float, float]
     """
@@ -121,8 +125,9 @@ def axial_calculate_meson_couplings(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m**2 > m_axial**2:
-            raise PhysicsError(
-                f"The kinetic mixing cannot be removed for this combination of model parameters, m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2), The model is likely unstable, The predicted couplings will be unphysical!"
+            warnings.warn(
+                f"The kinetic mixing cannot be removed for this combination of model parameters, m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2), The model is likely unstable, The predicted couplings will be unphysical!",
+                PhysicsWarning,
             )
     parameter = {
         AXIAL_COUPLING["a"]: l_axial,
@@ -253,7 +258,7 @@ def axial_calculate_bare_kaon(
     :param m_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
     :type m_kaon: float, optional
     :raises ValueError: Raised if the input axial vector mass is not strictly positive
-    :raises PhysicsError: Raised if solution values outside physically permitted ranges
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
     :rtype: tuple[float, float, float]
     """
@@ -263,10 +268,10 @@ def axial_calculate_bare_kaon(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
         if m**2 > m_axial**2:
-            phys = PhysicsError(
-                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!"
+            warnings.warn(
+                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                PhysicsWarning,
             )
-            raise phys
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,
         PARAMETERS["Echi"]: energy_dm,

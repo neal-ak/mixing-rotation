@@ -2,6 +2,7 @@
 
 # %%
 from collections.abc import Callable
+import warnings
 
 # %%
 import numpy as np
@@ -41,7 +42,8 @@ G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
 
 
-class PhysicsError(Exception):
+# %%
+class PhysicsWarning(Warning):
     pass
 
 
@@ -197,7 +199,7 @@ def debug_solve_mixing(
     :type abs_tolerance: float | None
     :param bounds: Bounds for each of the unknown arguments
     :type bounds: dict[sympy.Symbol, tuple[float, float]] | None
-    :raises PhysicsError: Raised if solution values outside physically permitted ranges
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
     :return: Dictionary of solved values and the raw OptimizeResult output
     :rtype: tuple[dict[sympy.Symbol, float], scipy.optimize.OptimizeResult]
     """
@@ -227,8 +229,9 @@ def debug_solve_mixing(
         func, arg_ordering, init_unknowns, abs_tolerance, **kwargs
     )
     if MASS["phi"] in solve[0] and solve[0][MASS["phi"]] < 0:
-        raise PhysicsError(
-            f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][MASS['phi']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!"
+        warnings.warn(
+            f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][MASS['phi']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!",
+            PhysicsWarning,
         )
     for meson, mass in {
         "pi0": MASS_NEUTRAL_PION,
@@ -237,13 +240,15 @@ def debug_solve_mixing(
     }.items():
         if MASS[meson + "Bare"] in solve[0]:
             if solve[0][MASS[meson + "Bare"]] < 0:
-                raise PhysicsError(
-                    f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!"
+                warnings.warn(
+                    f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!",
+                    PhysicsWarning,
                 )
             max_rotation = MASS_CHARGED_PION - MASS_NEUTRAL_PION
             if np.abs(solve[0][MASS[meson + "Bare"]] - mass) > max_rotation:
-                raise PhysicsError(
-                    f"This combination of model parameters predicts a bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value. This may be in conflict with some predictions from the ChEFT Lagrangian!"
+                warnings.warn(
+                    f"This combination of model parameters predicts a bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value. This may be in conflict with some predictions from the ChEFT Lagrangian!",
+                    PhysicsWarning,
                 )
     return solve
 
