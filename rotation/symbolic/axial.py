@@ -227,12 +227,12 @@ def bare_axial_kaon_couplings() -> (
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     #helpers
-    L_AprimeK = PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"]) + PARAMETERS["g8s"] * (
-        PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]
-    )
-    L_Aprimepi = PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"]) + PARAMETERS["g8s"] * (
-        PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]
-    )
+    # L_AprimeK = PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"]) + PARAMETERS["g8s"] * (
+    #     PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]
+    # )
+    # L_Aprimepi = PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"]) + PARAMETERS["g8s"] * (
+    #     PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]
+    # )
     L_AprimepiKj_over_m_j = (
         (2 * sym.I / MASS["AP"]**2) / PARAMETERS["F"]**2 *
         (PARAMETERS["g8"] * ((PARAMETERS["ad"] + PARAMETERS["au"]) * (PARAMETERS["Epipm"] * MASS["Kpm"] - MASS["pipm"]**2)
@@ -243,7 +243,7 @@ def bare_axial_kaon_couplings() -> (
 
     pi_pi_k = (
         sym.I*PARAMETERS["g8"]*(MASS["Kpm"]**2-2*MASS["Kpm"]*PARAMETERS["Epipm"])/PARAMETERS["F"]**3 
-        + L_AprimeKj_over_m_j*MASS["pi0-AP"]
+        + L_AprimepiKj_over_m_j*MASS["pi0-AP"]
     )
     eta_pi_k = (
         sym.I
@@ -251,7 +251,7 @@ def bare_axial_kaon_couplings() -> (
         * sym.sqrt(3)*2*(MASS["Kpm"] ** 2 -MASS['pipm']**2) + L_AprimepiKj_over_m_j*MASS["eta-AP"]
     )
     etaP_pi_k = (
-        sym.I/PARAMETERS["F"]**2/3
+        sym.I/PARAMETERS["F"]**3/3
         *sym.sqrt(6)*(2*PARAMETERS["g8"] + 3*PARAMETERS["g8s"])*(MASS["Kpm"] ** 2 - MASS['pipm']**2) 
         + L_AprimepiKj_over_m_j*MASS["etaP-AP"]
     )
