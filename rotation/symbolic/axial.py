@@ -227,12 +227,6 @@ def bare_axial_kaon_couplings() -> (
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     #helpers
-    # L_AprimeK = PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"]) + PARAMETERS["g8s"] * (
-    #     PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]
-    # )
-    # L_Aprimepi = PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"]) + PARAMETERS["g8s"] * (
-    #     PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]
-    # )
     L_AprimepiKj_over_m_j = (
         (2 * sym.I / MASS["AP"]**2) / PARAMETERS["F"]**2 *
         (PARAMETERS["g8"] * ((PARAMETERS["ad"] + PARAMETERS["au"]) * (PARAMETERS["Epipm"] * MASS["Kpm"] - MASS["pipm"]**2)
@@ -240,9 +234,8 @@ def bare_axial_kaon_couplings() -> (
          + PARAMETERS["g8s"] * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]) * (MASS["Kpm"]**2 - MASS["pipm"]**2))
     )
 
-
     pi_pi_k = (
-        sym.I*PARAMETERS["g8"]*(MASS["Kpm"]**2-2*MASS["Kpm"]*PARAMETERS["Epipm"])/PARAMETERS["F"]**3 
+        sym.I*PARAMETERS["g8"]*(MASS["Kpm"]**2-2*MASS["Kpm"]*PARAMETERS["Epipm"])/PARAMETERS["F"]**3
         + L_AprimepiKj_over_m_j*MASS["pi0-AP"]
     )
     eta_pi_k = (
@@ -252,136 +245,9 @@ def bare_axial_kaon_couplings() -> (
     )
     etaP_pi_k = (
         sym.I/PARAMETERS["F"]**3/3
-        *sym.sqrt(6)*(2*PARAMETERS["g8"] + 3*PARAMETERS["g8s"])*(MASS["Kpm"] ** 2 - MASS['pipm']**2) 
+        *sym.sqrt(6)*(2*PARAMETERS["g8"] + 3*PARAMETERS["g8s"])*(MASS["Kpm"] ** 2 - MASS['pipm']**2)
         + L_AprimepiKj_over_m_j*MASS["etaP-AP"]
     )
-    # pi_pi_k = (
-    #     -sym.I
-    #     * MASS["pi0-AP"] ** 2
-    #     * (MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
-    #     / (PARAMETERS["F"] ** 2 * MASS["AP"] ** 2)
-    #     * (
-    #         PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
-    #         + PARAMETERS["g8s"]
-    #         * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
-    #     )
-    #     + sym.I
-    #     * PARAMETERS["Echi"]
-    #     * PARAMETERS["g8"]
-    #     * MASS["Kpm"]
-    #     / PARAMETERS["F"] ** 3
-    #     * (
-    #         1
-    #         + 2
-    #         * PARAMETERS["F"]
-    #         * MASS["pi0-AP"] ** 2
-    #         / MASS["AP"] ** 2
-    #         * (PARAMETERS["ad"] - PARAMETERS["as"])
-    #     )
-    #     - sym.I
-    #     * PARAMETERS["Epipm"]
-    #     * MASS["Kpm"]
-    #     / (PARAMETERS["F"] ** 3)
-    #     * (
-    #         PARAMETERS["g8"]
-    #         - PARAMETERS["F"]
-    #         * 2
-    #         * MASS["pi0-AP"] ** 2
-    #         / MASS["AP"] ** 2
-    #         * (
-    #             PARAMETERS["g8"] * (PARAMETERS["ad"] + PARAMETERS["au"])
-    #             + PARAMETERS["g8s"]
-    #             * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
-    #         )
-    #     )
-    # )
-    # eta_pi_k = (
-    #     sym.I
-    #     * (MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
-    #     / PARAMETERS["F"] ** 3
-    #     * (
-    #         -PARAMETERS["F"]
-    #         * MASS["eta-AP"] ** 2
-    #         / MASS["AP"] ** 2
-    #         * (
-    #             PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
-    #             + PARAMETERS["g8s"]
-    #             * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
-    #         )
-    #         + sym.sqrt(3) / 3 * PARAMETERS["g8"]
-    #     )
-    #     - sym.I
-    #     * PARAMETERS["Echi"]
-    #     * PARAMETERS["g8"]
-    #     * MASS["Kpm"]
-    #     / PARAMETERS["F"] ** 3
-    #     * (
-    #         2
-    #         * PARAMETERS["F"]
-    #         * MASS["eta-AP"] ** 2
-    #         / MASS["AP"] ** 2
-    #         * (PARAMETERS["as"] - PARAMETERS["ad"])
-    #         + sym.sqrt(3)
-    #     )
-    #     + sym.I
-    #     * PARAMETERS["Epipm"]
-    #     * MASS["Kpm"]
-    #     / PARAMETERS["F"] ** 3
-    #     * (
-    #         -sym.sqrt(3) / 3 * PARAMETERS["g8"]
-    #         + 2
-    #         * PARAMETERS["F"]
-    #         * MASS["eta-AP"] ** 2
-    #         / MASS["AP"] ** 2
-    #         * (
-    #             PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
-    #             + PARAMETERS["g8s"]
-    #             * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
-    #         )
-    #     )
-    # )
-    # etaP_pi_k = (
-    #     sym.I
-    #     * (MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
-    #     / PARAMETERS["F"] ** 3
-    #     * (
-    #         -PARAMETERS["F"]
-    #         * MASS["etaP-AP"] ** 2
-    #         / MASS["AP"] ** 2
-    #         * (
-    #             PARAMETERS["g8"] * (PARAMETERS["ad"] + PARAMETERS["au"])
-    #             + PARAMETERS["g8s"]
-    #             * (PARAMETERS["ad"] + PARAMETERS["as"] + PARAMETERS["au"])
-    #         )
-    #         + sym.sqrt(6) / 3 * PARAMETERS["g8"]
-    #         + sym.sqrt(6) / 2 * PARAMETERS["g8s"]
-    #     )
-    #     + 2
-    #     * sym.I
-    #     * PARAMETERS["Echi"]
-    #     * PARAMETERS["g8"]
-    #     * MASS["etaP-AP"] ** 2
-    #     * MASS["Kpm"]
-    #     / (PARAMETERS["F"] ** 2 * MASS["AP"] ** 2)
-    #     * (PARAMETERS["ad"] - PARAMETERS["as"])
-    #     + sym.I
-    #     * PARAMETERS["Epipm"]
-    #     * MASS["Kpm"]
-    #     / PARAMETERS["F"] ** 3
-    #     * (
-    #         2
-    #         * PARAMETERS["F"]
-    #         * MASS["etaP-AP"] ** 2
-    #         / MASS["AP"] ** 2
-    #         * (
-    #             PARAMETERS["g8"] * (PARAMETERS["au"] + PARAMETERS["ad"])
-    #             + PARAMETERS["g8s"]
-    #             * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
-    #         )
-    #         - 2 * sym.sqrt(6) / 3 * PARAMETERS["g8"]
-    #         - sym.sqrt(6) * PARAMETERS["g8s"]
-    #     )
-    # )
     return tuple(
         [
             l / sym.sqrt(1 - (m / MASS["AP"]) ** 2)
