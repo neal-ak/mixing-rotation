@@ -134,9 +134,9 @@ def bare_pseudo_kaon_couplings() -> (
     :return: pion-pion-kaon, eta-pion-kaon
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    pi_pi_kaon = MASS["Kpm"] ** 2 - 2 * MASS["Kpm"] * PARAMETERS["Epipm"]
+    pi_pi_kaon = -MASS["Kpm"] ** 2 + 2 * MASS["Kpm"] * PARAMETERS["Epipm"]
     eta_pi_kaon = (
-        MASS["Kpm"] ** 2 - 2 * MASS["Kpm"] * PARAMETERS["Epipm"] - MASS["pi0"] ** 2
+        MASS["Kpm"] ** 2 - 6 * MASS["Kpm"] * PARAMETERS["Epipm"] + MASS["pi0"] ** 2
     ) / sym.sqrt(3)
     return pi_pi_kaon, eta_pi_kaon
 
