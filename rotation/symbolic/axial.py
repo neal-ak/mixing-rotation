@@ -226,27 +226,48 @@ def bare_axial_kaon_couplings() -> (
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    #helpers
+    # helpers
     L_AprimepiKj_over_m_j = (
-        (2 * sym.I / MASS["AP"]**2) / PARAMETERS["F"]**2 *
-        (PARAMETERS["g8"] * ((PARAMETERS["ad"] + PARAMETERS["au"]) * (PARAMETERS["Epipm"] * MASS["Kpm"] - MASS["pipm"]**2)
-         - (PARAMETERS["as"] + PARAMETERS["au"]) * (PARAMETERS["Epipm"] * MASS["Kpm"] - MASS["Kpm"]**2))
-         + PARAMETERS["g8s"] * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]) * (MASS["Kpm"]**2 - MASS["pipm"]**2))
+        (2 * sym.I / MASS["AP"] ** 2)
+        / PARAMETERS["F"] ** 2
+        * (
+            PARAMETERS["g8"]
+            * (
+                (PARAMETERS["ad"] + PARAMETERS["au"])
+                * (PARAMETERS["Epipm"] * MASS["Kpm"] - MASS["pipm"] ** 2)
+                - (PARAMETERS["as"] + PARAMETERS["au"])
+                * (PARAMETERS["Epipm"] * MASS["Kpm"] - MASS["Kpm"] ** 2)
+            )
+            + PARAMETERS["g8s"]
+            * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"])
+            * (MASS["Kpm"] ** 2 - MASS["pipm"] ** 2)
+        )
     )
 
     pi_pi_k = (
-        sym.I*PARAMETERS["g8"]*(MASS["Kpm"]**2-2*MASS["Kpm"]*PARAMETERS["Epipm"])/PARAMETERS["F"]**3
-        + L_AprimepiKj_over_m_j*MASS["pi0-AP"]
+        sym.I
+        * PARAMETERS["g8"]
+        * (MASS["Kpm"] ** 2 - 2 * MASS["Kpm"] * PARAMETERS["Epipm"])
+        / PARAMETERS["F"] ** 3
+        + L_AprimepiKj_over_m_j * MASS["pi0-AP"]
     )
     eta_pi_k = (
         sym.I
-        * PARAMETERS["g8"]/(3*PARAMETERS["F"]**3)
-        * sym.sqrt(3)*2*(MASS["Kpm"] ** 2 -MASS['pipm']**2) + L_AprimepiKj_over_m_j*MASS["eta-AP"]
+        * PARAMETERS["g8"]
+        / (3 * PARAMETERS["F"] ** 3)
+        * sym.sqrt(3)
+        * 2
+        * (MASS["Kpm"] ** 2 - MASS["pipm"] ** 2)
+        + L_AprimepiKj_over_m_j * MASS["eta-AP"]
     )
     etaP_pi_k = (
-        sym.I/PARAMETERS["F"]**3/3
-        *sym.sqrt(6)*(2*PARAMETERS["g8"] + 3*PARAMETERS["g8s"])*(MASS["Kpm"] ** 2 - MASS['pipm']**2)
-        + L_AprimepiKj_over_m_j*MASS["etaP-AP"]
+        sym.I
+        / PARAMETERS["F"] ** 3
+        / 3
+        * sym.sqrt(6)
+        * (2 * PARAMETERS["g8"] + 3 * PARAMETERS["g8s"])
+        * (MASS["Kpm"] ** 2 - MASS["pipm"] ** 2)
+        + L_AprimepiKj_over_m_j * MASS["etaP-AP"]
     )
     return tuple(
         [
