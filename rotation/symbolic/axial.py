@@ -246,25 +246,24 @@ def bare_axial_kaon_couplings() -> (
 
     pi_pi_k = (
         sym.I
+        * PARAMETERS["F"] ** -3
         * PARAMETERS["g8"]
         * (MASS["Kpm"] ** 2 - 2 * MASS["Kpm"] * PARAMETERS["Epipm"])
-        / PARAMETERS["F"] ** 3
         + L_AprimepiKj_over_m_j * MASS["pi0-AP"]
     )
     eta_pi_k = (
-        sym.I
-        * PARAMETERS["g8"]
-        / (3 * PARAMETERS["F"] ** 3)
-        * sym.sqrt(3)
-        * 2
+        sym.sqrt(3) ** -1
+        * sym.I
+        * PARAMETERS["F"] ** -3
+        * (2 * PARAMETERS["g8"])
         * (MASS["Kpm"] ** 2 - MASS["pipm"] ** 2)
         + L_AprimepiKj_over_m_j * MASS["eta-AP"]
     )
     etaP_pi_k = (
-        sym.I
-        / PARAMETERS["F"] ** 3
-        / 3
-        * sym.sqrt(6)
+        sym.sqrt(2)
+        * sym.sqrt(3) ** -1
+        * sym.I
+        * PARAMETERS["F"] ** -3
         * (2 * PARAMETERS["g8"] + 3 * PARAMETERS["g8s"])
         * (MASS["Kpm"] ** 2 - MASS["pipm"] ** 2)
         + L_AprimepiKj_over_m_j * MASS["etaP-AP"]
