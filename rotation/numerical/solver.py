@@ -12,7 +12,6 @@ import sympy as sym
 # %%
 from ..symbolic.general import ANGLE, MASS, COUPLING, PARAMETERS
 
-
 # %%
 # https://inspirehep.net/literature/303682
 PION_DECAY = 0.0924
