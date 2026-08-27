@@ -32,6 +32,8 @@ B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
 # https://arxiv.org/abs/1405.6488
 L_4 = 1.87e-3
 L_5 = 1.22e-3
+L_6 = 1.46e-3
+L_7 = -0.39e-3
 # below eqn F3 in tex
 G_8 = 3.62
 # https://arxiv.org/abs/hep-ph/0508189
