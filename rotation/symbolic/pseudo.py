@@ -52,31 +52,31 @@ def create_mix_equation(
 
 # %%
 def rotated_pseudo_meson_couplings() -> (
-    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
 ):
     """Symbolic expressions for the rotated meson to dark matter couplings.
 
     Using the pseudo scalar mediator phi.
 
-    :return: pion-chi, mediator-chi, eta-chi
-    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    :return:  mediator-chi, pion-chi, eta-chi, etap-chi
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    bare_couplings = sym.Matrix([[0, COUPLING["chi"], 0]])
+    bare_couplings = sym.Matrix([[COUPLING["chi"],0, 0, 0]])
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)
 
 
 # %%
-def bare_pseudo_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul]:
+def bare_pseudo_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
     """The bare pseudo scalar mediator off-diagonal terms.
 
     :return: pion-mediator, eta-mediator, etap-mediator
-    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul]
+    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     masses = [
         (COUPLING["u"] - COUPLING["d"])+(COUPLING["u"] - COUPLING["d"])*32 *PARAMETERS["B0"]/PARAMETERS["F"]**2*PARAMETERS["L6"]*(MASS["u"]+MASS["d"]+MASS["s"])+32*(COUPLING["u"] + COUPLING["d"]+COUPLING["s"])*PARAMETERS["B0"]/PARAMETERS["F"]**2*PARAMETERS["L7"]*(MASS["u"]-MASS["d"]),
-        sym.sqrt(3) / 3 * (COUPLING["u"] + COUPLING["d"] - 2 * COUPLING["s"])*(1+),
-    ]
+        sym.sqrt(3) / 3 * (COUPLING["u"] + COUPLING["d"] - 2 * COUPLING["s"])*(1+32*PARAMETERS["B0"]/PARAMETERS["F"]**2*PARAMETERS["L6"]*(MASS["u"]+MASS["d"]+MASS["s"]))+32*(COUPLING["u"] + COUPLING["d"]+COUPLING["s"])*PARAMETERS["B0"]/PARAMETERS["F"]**2*PARAMETERS["L7"]*(MASS["u"]+MASS["d"]-2*MASS["s"]),
+   sym.sqrt(6)/3* (COUPLING["u"] + COUPLING["d"]+COUPLING["s"])*(1+32*PARAMETERS["B0"]/PARAMETERS["F"]**2*(PARAMETERS["L6"]+PARAMETERS["L7"])*(MASS["u"]+MASS["d"]+MASS["s"])),]
     return tuple([PARAMETERS["B0"] * PARAMETERS["F"] * m for m in masses])
 
 
@@ -96,9 +96,10 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
         sym.Matrix(
             [
                 [
-                    COUPLING["pi0Bare-gamma"],
                     0,
+                    COUPLING["pi0Bare-gamma"],
                     COUPLING["etaBare-gamma"],
+                    COUPLING["etapBare-gamma"],
                 ]
             ]
         )
@@ -107,7 +108,7 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
     gamma_eqns = [
         sym.Eq(g, e)
         for g, e in zip(
-            [COUPLING[k] for k in ["pi0-gamma", "phi-gamma", "eta-gamma"]],
+            [COUPLING[k] for k in ["phi-gamma", "pi0-gamma",  "eta-gamma", "etap-gamma"]],
             gamma_matrix,
         )
     ]
@@ -117,6 +118,7 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
             COUPLING["phi-gamma"],
             COUPLING["pi0Bare-gamma"],
             COUPLING["etaBare-gamma"],
+            COUPLING["etapBare-gamma"],
         ],
         dict=True,
     )
@@ -125,35 +127,38 @@ def rotated_pseudo_photon_coupling() -> sym.core.mul.Mul:
 
 # %%
 def bare_pseudo_kaon_couplings() -> (
-    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
 ):
     """Symbolic expressions for the un-rotated kaon couplings.
 
     Using the pseudo scalar mediator phi.
 
-    :return: pion-pion-kaon, eta-pion-kaon
+    :return: pion-pion-kaon, eta-pion-kaon, etap-pion-kaon
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul]
     """
-    pi_pi_kaon = -MASS["Kpm"] ** 2 + 2 * MASS["Kpm"] * PARAMETERS["Epipm"]
+    pi_pi_kaon = (-MASS["Kpm"] ** 2 + 2 * MASS["Kpm"] * PARAMETERS["Epipm"])
     eta_pi_kaon = (
-        MASS["Kpm"] ** 2 - 6 * MASS["Kpm"] * PARAMETERS["Epipm"] + MASS["pi0"] ** 2
+        MASS["Kpm"] ** 2 - 6 * MASS["Kpm"] * PARAMETERS["Epipm"] + MASS["pipm"] ** 2
     ) / sym.sqrt(3)
-    return pi_pi_kaon, eta_pi_kaon
+    etap_pi_kaon = sym.sqrt(6)*(3*g8s+2*g8)*(
+        MASS["pipm"] ** 2 -  MASS["Kpm"] ** 2
+    ) /3
+    return pi_pi_kaon, eta_pi_kaon, etap_pi_kaon
 
 
 # %%
 def rotated_pseudo_kaon_couplings() -> (
-    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
 ):
     """Symbolic expressions for the rotated kaon couplings.
 
     Using the pseudo scalar mediator phi.
 
-    :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
-    :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+    :return:  mediator-pion-kaon, pion-pion-kaon, eta-pion-kaon, etap-pion-kaon
+    :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
     """
     bare_couplings = sym.Matrix(
-        [[COUPLING[f"{k}Bare-pi-K"] for k in ["pi0", "phi", "eta"]]]
+        [[COUPLING[f"{k}Bare-pi-K"] for k in ["phi", "pi0", "eta","etap"]]]
     )
     rotated_couplings = bare_couplings * create_3d_rotation()[0].transpose()
     return tuple(rotated_couplings)
