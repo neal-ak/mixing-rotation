@@ -74,7 +74,7 @@ def bare_pseudo_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul]:
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     masses = [
-        (COUPLING["u"] - COUPLING["d"])+32 *PARAMETERS["B0"]/PARAMETERS["F"]**2*PARAMETERS["L_6"]*(MASSES["u"]+MASSES["d"]+MASSES["s"]),
+        (COUPLING["u"] - COUPLING["d"])+32 *PARAMETERS["B0"]/PARAMETERS["F"]**2*PARAMETERS["L_{6}"]*(MASS["u"]+MASS["d"]+MASS["s"]),
         sym.sqrt(3) / 3 * (COUPLING["u"] + COUPLING["d"] - 2 * COUPLING["s"]),
     ]
     return tuple([PARAMETERS["B0"] * PARAMETERS["F"] * m for m in masses])
