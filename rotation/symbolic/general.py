@@ -21,7 +21,17 @@ def _preprocess_symbol(s):
 # %%
 ANGLE = {
     _preprocess_symbol(k): sym.Symbol(k, real=True)
-    for k in [r"\alpha", r"\beta", r"\gamma", "u", "v", "w"]
+    for k in [
+        r"\alpha",
+        r"\beta",
+        r"\gamma",
+        r"\delta",
+        r"\zeta",
+        r"\kappa",
+        "u",
+        "v",
+        "w",
+    ]
 }
 
 # %%
@@ -118,13 +128,11 @@ PARAMETERS = {
 
 
 # %%
-def create_3d_rotation() -> (
-    tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
-):
-    """Creates the 3D rotation matrix from three 2D rotation matrices.
+def _create_nd_rotation(n_dim) -> tuple[sym.Matrix, list[sym.Matrix], sym.Matrix]:
+    """Creates the n-D rotation matrix from 2D rotation matrices.
 
-    :return: Rotation matrix, (alpha, beta, gamma) rotations, 2D matrix
-    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+    :return: Rotation matrix, list of 2D rotations, generic 2D rotation
+    :rtype: tuple[sym.Matrix, list[sym.Matrix], sym.Matrix]
     """
     theta = sym.Symbol(r"\theta", real=True)
     basic_2d = sym.Matrix(
@@ -133,15 +141,53 @@ def create_3d_rotation() -> (
             [sym.sin(theta), sym.cos(theta)],
         ]
     )
-    rotate = [
-        sym.Matrix(sym.BlockDiagMatrix(basic_2d, sym.Matrix([1]))),
-        sym.Matrix(
-            [[basic_2d[0], 0, basic_2d[1]], [0, 1, 0], [basic_2d[2], 0, basic_2d[3]]]
-        ),
-        sym.Matrix(sym.BlockDiagMatrix(sym.Matrix([1]), basic_2d)),
-    ]
+    index_pairs = []
+    for i in range(n_dim):
+        for j in range(i + 1, n_dim):
+            index_pairs.append(tuple([i, j]))
+    rotate = []
+    for indices in index_pairs:
+        matrix_2d = sym.Matrix(sym.Identity(n_dim))
+        for i, a in enumerate(indices):
+            for j, b in enumerate(indices):
+                matrix_2d[a, b] = basic_2d[i, j]
+        rotate.append(matrix_2d)
     for i, (m, s) in enumerate(
-        zip(rotate, [ANGLE[k] for k in ["alpha", "beta", "gamma"]])
+        zip(
+            rotate,
+            [ANGLE[k] for k in ["alpha", "beta", "gamma", "delta", "zeta", "kappa"]],
+        )
     ):
         rotate[i] = m.subs(theta, s)
-    return rotate[0] * rotate[1] * rotate[2], tuple(rotate), basic_2d
+    result = 1
+    for _x in rotate:
+        result *= _x
+    return result, rotate, basic_2d
+
+
+# %%
+def create_3d_rotation() -> (
+    tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+):
+    """Creates the 3D rotation matrix from three 2D rotation matrices.
+
+    :return: Rotation matrix, (alpha, beta, gamma) rotations, 2D matrix
+    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+    """
+    rotation, matrices, basic_2d = _create_nd_rotation(3)
+    return rotation, tuple(matrices), basic_2d
+
+
+# %%
+def create_4d_rotation() -> tuple[
+    sym.Matrix,
+    tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix],
+    sym.Matrix,
+]:
+    """Creates the 4D rotation matrix from six 2D rotation matrices.
+
+    :return: Rotation matrix, (alpha, beta, gamma, delta, zeta, kappa) rotations, 2D matrix
+    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+    """
+    rotation, matrices, basic_2d = _create_nd_rotation(4)
+    return rotation, tuple(matrices), basic_2d
