@@ -27,14 +27,14 @@ MASS_CHARGED_KAON = 0.493677
 MASS_ETA = 0.547862
 # https://pdglive.lbl.gov/Particle.action?node=M002
 MASS_ETA_PRIME = 0.95778
-# eqn 3 in tex
+# below eqn 3 in tex
 B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
 # https://arxiv.org/abs/1405.6488
 L_4 = 1.87e-3
 L_5 = 1.22e-3
 L_6 = 1.46e-3
 L_7 = -0.39e-3
-# below eqn F3 in tex
+# below eqn 7 in tex
 G_8 = 3.62
 # https://arxiv.org/abs/hep-ph/0508189
 G_8S = -0.38 * G_8
@@ -127,20 +127,23 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
 
     Sets up the argument call order for the lambdified sympy equations, the
     equations themselves and their partials. Due to redundancy the callable
-    system drops the lower diagonal component of the matrix (6 equations in the
-    system).
+    system drops the lower diagonal component of the matrix (it is a symmetric
+    matrix).
 
     :param equation: Matrix representing the system of equations
     :type equation: sym.Matrix
     :return: Argument call order, and the system of equations
     :rtype: tuple[list[sympy.Symbol], list[Callable]]
     """
+    if not equation.is_symmetric():
+        raise ValueError("The equation matrix must be symmetric")
     arg_ordering = []
     for d in [ANGLE, MASS, COUPLING, PARAMETERS]:
         arg_ordering += [v for v in d.values() if v in equation.free_symbols]
     system = []
-    for eqn in [e for i, e in enumerate(equation) if i not in [3, 6, 7]]:
-        system.append(sym.lambdify(arg_ordering, eqn))
+    for r in range(equation.rows):
+        for c in range(r, equation.cols):
+            system.append(sym.lambdify(arg_ordering, equation[r,c]))
     return arg_ordering, system
 
 
