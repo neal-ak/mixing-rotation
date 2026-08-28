@@ -119,7 +119,7 @@ def bare_pseudo_masses() -> dict[sym.Symbol, sym.core.mul.Mul]:
             * (MASS["u"] + MASS["d"] + MASS["s"])
         )
     )
-    return dict([(MASS[f"{k}-phi"], masses[k]) for k in PARTICLE_ORDER])
+    return dict([(MASS[f"{k}-phi"], v) for k, v in masses.items()])
 
 
 # %%
@@ -169,7 +169,7 @@ def bare_pseudo_kaon_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
     :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     particle_pi_kaon = {}
-    particle_pi_kaon["phi"] = 0 * sym.Symbol("a")
+    particle_pi_kaon["phi"] = 0 * sym.Symbol("")
     particle_pi_kaon["pi0"] = -MASS["Kpm"] ** 2 + 2 * MASS["Kpm"] * PARAMETERS["Epipm"]
     particle_pi_kaon["eta"] = (
         MASS["Kpm"] ** 2 - 6 * MASS["Kpm"] * PARAMETERS["Epipm"] + MASS["pipm"] ** 2
@@ -180,7 +180,7 @@ def bare_pseudo_kaon_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
         * (MASS["pipm"] ** 2 - MASS["Kpm"] ** 2)
         / 3
     )
-    return dict([(COUPLING[f"{k}Bare-pi-K"], particle_pi_kaon[k]) for k in particles])
+    return dict([(COUPLING[f"{k}Bare-pi-K"], v) for k, v in particle_pi_kaon.items()])
 
 
 # %%

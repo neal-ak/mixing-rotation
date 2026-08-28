@@ -27,6 +27,12 @@ MASS_CHARGED_KAON = 0.493677
 MASS_ETA = 0.547862
 # https://pdglive.lbl.gov/Particle.action?node=M002
 MASS_ETA_PRIME = 0.95778
+# https://pdglive.lbl.gov/BranchingRatio.action?desig=6&parCode=M002
+DECAY_ETA_PRIME_2GAMMA = 4.34e-06
+# equation 28 in tex
+ETA_PRIME_DECAY = (
+    7.2973525693e-3 * MASS_ETA_PRIME / 8 / np.sqrt(np.pi) ** 3 / DECAY_ETA_PRIME_2GAMMA
+)
 # below eqn 3 in tex
 B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
 # https://arxiv.org/abs/1405.6488
@@ -38,9 +44,10 @@ L_7 = -0.39e-3
 G_8 = 3.62
 # https://arxiv.org/abs/hep-ph/0508189
 G_8S = -0.38 * G_8
-# eqn 34 in tex, use natural units for elementary charge
+# eqn 28 in tex, use natural units for elementary charge
 G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
+G_ETA_PRIME_GAMMA = G_PI_GAMMA * np.pi * PION_DECAY / ETA_PRIME_DECAY
 
 
 # %%
@@ -143,7 +150,7 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
     system = []
     for r in range(equation.rows):
         for c in range(r, equation.cols):
-            system.append(sym.lambdify(arg_ordering, equation[r,c]))
+            system.append(sym.lambdify(arg_ordering, equation[r, c]))
     return arg_ordering, system
 
 
