@@ -19,9 +19,14 @@ from ..symbolic.pseudo import (
 )
 from .solver import (
     PION_DECAY,
-    MASS_NEUTRAL_PION,
+    MASS_QUARK,
+    MASS_CHARGED_PION,
     MASS_CHARGED_KAON,
     B_0,
+    L_6,
+    L_7,
+    G_8,
+    G_8S,
     G_PI_GAMMA,
     G_ETA_GAMMA,
 )
@@ -29,11 +34,12 @@ from .solver import (
 
 # %%
 def pseudo_calculate_meson_couplings(
+    n_dim: int,
     bare_mediator_dm_coupling: float,
     alpha: float,
     beta: float,
     gamma: float,
-) -> tuple[float, float, float]:
+) -> dict[sympy.Symbol, float]:
     """Numerical calculation of the rotated meson to dark matter couplings.
 
     Specific to the pseudo scalar mediator phi case.
@@ -46,8 +52,8 @@ def pseudo_calculate_meson_couplings(
     :type beta: float
     :param gamma: mixing angle gamma
     :type gamma: float
-    :return: pion-chi, phi-chi, eta-chi
-    :rtype: tuple[float, float, float]
+    :return: rotated particle-DM couplings
+    :rtype: dict[sympy.Symbol, float]
     """
     parameter = {
         COUPLING["chi"]: bare_mediator_dm_coupling,
@@ -55,11 +61,11 @@ def pseudo_calculate_meson_couplings(
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,
     }
-    coupling = []
-    for g in rotated_pseudo_meson_couplings():
+    coupling = {}
+    for k,g in rotated_pseudo_meson_couplings(n_dim).items():
         call = list(g.free_symbols)
-        coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
-    return tuple(coupling)
+        coupling[k] = sym.lambdify(call, g)(*[parameter[k] for k in call])
+    return coupling
 
 
 def pseudo_calculate_bare_masses(
@@ -68,7 +74,7 @@ def pseudo_calculate_bare_masses(
     coupling_strange: float,
     b_0: float = B_0,
     pion_decay: float = PION_DECAY,
-) -> tuple[float, float]:
+) -> dict[sym.Symbol, float]:
     """Numerical calculation of the bare off-diagonal meson masses.
 
     Specific to the pseudo scalar mediator phi case.
@@ -83,25 +89,31 @@ def pseudo_calculate_bare_masses(
     :type b_0: float
     :param pion_decay: The pion decay constant, defaults to PION_DECAY
     :type pion_decay: float
-    :return: pion-mediator, eta-mediator
-    :rtype: tuple[float, float]
+    :return: bare particle-mediator couplings
+    :rtype: dict[sympy.Symbol, float]
     """
     parameter = {
         COUPLING["u"]: coupling_up,
         COUPLING["d"]: coupling_down,
         COUPLING["s"]: coupling_strange,
+        MASS["u"]: MASS_QUARK["up"],
+        MASS["d"]: MASS_QUARK["down"],
+        MASS["s"]: MASS_QUARK["strange"],
         PARAMETERS["B0"]: b_0,
         PARAMETERS["F"]: pion_decay,
+        PARAMETERS["L6"]: L_6,
+        PARAMETERS["L7"]: L_7,
     }
-    masses = []
-    for m in bare_pseudo_masses():
+    masses = {}
+    for k,m in bare_pseudo_masses().items():
         call = list(m.free_symbols)
-        masses.append(sym.lambdify(call, m)(*[parameter[k] for k in call]))
-    return tuple(masses)
+        masses[k] = sym.lambdify(call, m)(*[parameter[k] for k in call])
+    return masses
 
 
 # %%
 def pseudo_calculate_photon_coupling(
+    n_dim: int,
     alpha: float,
     beta: float,
     gamma: float,
@@ -132,7 +144,7 @@ def pseudo_calculate_photon_coupling(
         COUPLING["pi0-gamma"]: known_pion_photon_coupling,
         COUPLING["eta-gamma"]: known_eta_photon_coupling,
     }
-    g = rotated_pseudo_photon_coupling()
+    g = rotated_pseudo_photon_coupling(n_dim)
     call = list(g.free_symbols)
     return sym.lambdify(call, g)(*[parameter[k] for k in call])
 
@@ -140,36 +152,43 @@ def pseudo_calculate_photon_coupling(
 # %%
 def pseudo_calculate_bare_kaon(
     energy_pion: float,
-    mass_pion: float = MASS_NEUTRAL_PION,
+    energy_kaon: float,
+    mass_pion: float = MASS_CHARGED_PION,
     mass_kaon: float = MASS_CHARGED_KAON,
-) -> tuple[float, float, float]:
+) -> dict[sym.Symbol, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
     Specific to the pseudo scalar mediator case.
 
     :param energy_pion: Pion energy
     :type energy_pion: float
-    :param mass_pion: Neutral pion mass, defaults to MASS_NEUTRAL_PION
+    :param energy_kaon: Kaon energy
+    :type energy_kaon: float
+    :param mass_pion: Charged pion mass, defaults to MASS_CHARGED_PION
     :type mass_pion: float
     :param mass_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
     :type mass_kaon: float
-    :return: pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
-    :rtype: tuple[float, float, float]
+    :return: bare particle-pion-kaon couplings
+    :rtype: dict[sympy.Symbol, float]
     """
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,
-        MASS["pi0"]: mass_pion,
+        PARAMETERS["EKpm"]: energy_kaon,
+        PARAMETERS["g8"]: G_8,
+        PARAMETERS["g8s"]: G_8S,
+        MASS["pipm"]: mass_pion,
         MASS["Kpm"]: mass_kaon,
     }
-    coupling = []
-    for g in bare_pseudo_kaon_couplings():
+    coupling = {}
+    for s,g in bare_pseudo_kaon_couplings().items():
         call = list(g.free_symbols)
-        coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
-    return tuple([coupling[0], 0, coupling[1]])
+        coupling[s] = sym.lambdify(call, g)(*[parameter[k] for k in call])
+    return coupling
 
 
 # %%
 def pseudo_calculate_kaon_couplings(
+    n_dim: int,
     bare_pion_pion_kaon_coupling: float,
     bare_mediator_pion_kaon_coupling: float,
     bare_eta_pion_kaon_coupling: float,
@@ -193,7 +212,7 @@ def pseudo_calculate_kaon_couplings(
     :type beta: float
     :param gamma: Gamma mixing
     :type gamma: float
-    :return: rotated pion-pion-kaon, mediator-pion-kaon, eta-pion-kaon
+    :return: rotated particle-pion-kaon couplings
     :rtype: _type_
     """
     parameter = {
@@ -204,8 +223,8 @@ def pseudo_calculate_kaon_couplings(
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,
     }
-    coupling = []
-    for g in rotated_pseudo_kaon_couplings():
+    coupling = {}
+    for s,g in rotated_pseudo_kaon_couplings(n_dim).items():
         call = list(g.free_symbols)
-        coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
-    return tuple(coupling)
+        coupling[s] = sym.lambdify(call, g)(*[parameter[k] for k in call])
+    return coupling

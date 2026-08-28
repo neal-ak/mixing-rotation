@@ -51,9 +51,10 @@ MASS = {
         r"\pi^{0}_{b}",
         r"\tilde{\phi}_{b}",
         r"\eta_{b}",
+        r"\eta^{\prime}_{b}",
         r"\pi^{0} \tilde{\phi}",
         r"\eta \tilde{\phi}",
-        r"\eta^{\prime}_{b}",
+        r"\eta^{\prime} \tilde{\phi}",
         r"\pi^{0} A^{\prime}",
         r"\eta A^{\prime}",
         r"\eta^{\prime} A^{\prime}",
@@ -70,21 +71,26 @@ COUPLING = {
         r"\chi",
         r"\pi^{0}_{b} \chi",
         r"\eta_{b} \chi",
-        r"\pi^{0}_{b} \gamma",
         r"\tilde{\phi}_{b} \gamma",
+        r"\pi^{0}_{b} \gamma",
         r"\eta_{b} \gamma",
-        r"\pi^{0}_{b} \pi K",
+        r"\eta^{\prime}_{b} \gamma",
         r"\tilde{\phi}_{b} \pi K",
+        r"\pi^{0}_{b} \pi K",
         r"\eta_{b} \pi K",
-        r"\pi^{0} \chi",
+        r"\eta^{\prime}_{b} \pi K",
         r"\tilde{\phi} \chi",
+        r"\pi^{0} \chi",
         r"\eta \chi",
-        r"\pi^{0} \gamma",
+        r"\eta^{\prime} \chi",
         r"\tilde{\phi} \gamma",
+        r"\pi^{0} \gamma",
         r"\eta \gamma",
-        r"\pi^{0} \pi K",
+        r"\eta^{\prime} \gamma",
         r"\tilde{\phi} \pi K",
+        r"\pi^{0} \pi K",
         r"\eta \pi K",
+        r"\eta^{\prime} \pi K",
     ]
 }
 
@@ -113,6 +119,7 @@ PARAMETERS = {
     _preprocess_symbol(k): sym.Symbol(k, real=True)
     for k in [
         r"E_{\pi^\pm}",
+        r"E_{K^\pm}",
         r"E_{\chi}",
         "F",
         r"B_{0}",
@@ -149,7 +156,7 @@ def _create_nd_rotation(n_dim) -> tuple[sym.Matrix, list[sym.Matrix], sym.Matrix
             index_pairs.append(tuple([i, j]))
     rotate = []
     for indices in index_pairs:
-        matrix_2d = sym.Matrix(sym.Identity(n_dim))
+        matrix_2d = sym.Matrix.eye(n_dim)
         for i, a in enumerate(indices):
             for j, b in enumerate(indices):
                 matrix_2d[a, b] = basic_2d[i, j]
