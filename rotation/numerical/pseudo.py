@@ -44,6 +44,8 @@ def pseudo_calculate_meson_couplings(
 
     Specific to the pseudo scalar mediator phi case.
 
+    :param n_dim: number of rotation dimension
+    :type n_dim: int
     :param bare_mediator_dm_coupling: un-rotated mediator to dark matter coupling
     :type bare_mediator_dm_coupling: float
     :param alpha: mixing angle alpha
@@ -124,6 +126,8 @@ def pseudo_calculate_photon_coupling(
 
     Specific to the pseudo scalar mediator case.
 
+    :param n_dim: number of rotation dimension
+    :type n_dim: int
     :param alpha: alpha mixing angle
     :type alpha: float
     :param beta: beta mixing angle
@@ -200,6 +204,8 @@ def pseudo_calculate_kaon_couplings(
 
     Specific to the pseudo scalar mediator case.
 
+    :param n_dim: number of rotation dimension
+    :type n_dim: int
     :param bare_pion_pion_kaon_coupling: Un-rotated pion-pion-kaon coupling
     :type bare_pion_pion_kaon_coupling: float
     :param bare_mediator_pion_kaon_coupling: Un-rotated mediator-pion-kaon coupling
