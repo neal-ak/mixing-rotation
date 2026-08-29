@@ -47,7 +47,7 @@ G_8S = -0.38 * G_8
 # eqn 28 in tex, use natural units for elementary charge
 G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
-G_ETA_PRIME_GAMMA = G_PI_GAMMA * np.pi * PION_DECAY / ETA_PRIME_DECAY
+G_ETA_PRIME_GAMMA = G_PI_GAMMA * PION_DECAY / ETA_PRIME_DECAY
 
 
 # %%
