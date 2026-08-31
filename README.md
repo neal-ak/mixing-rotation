@@ -35,7 +35,7 @@ import rotation.symbolic.general
 import rotation.symbolic.pseudo
 import rotation.numerical.solver
 
-rotation_matrix = rotation.symbolic.general.create_3d_rotation()[0]
+rotation_matrix = rotation.symbolic.general.create_4d_rotation()[0]
 pseudo_mixing_equation = rotation.symbolic.pseudo.create_mix_equation(rotation_matrix)[0]
 argument_order, system_of_equations = rotation.numerical.solver.initialize_system(pseudo_mixing_equation.lhs - pseudo_mixing_equation.rhs)
 ```
@@ -57,7 +57,7 @@ You then need to prepare two dictionaries, one representing fixed known quantiti
 ```python
 # Pseudo scalar mediator case
 import rotation.numerical.pseudo
-piphi, etaphi = rotation.numerical.pseudo.pseudo_calculate_bare_masses(
+bare_masses = rotation.numerical.pseudo.pseudo_calculate_bare_masses(
     coupling_up=0.7,
     coupling_down=0.1,
     coupling_strange=-0.2,
@@ -65,17 +65,23 @@ piphi, etaphi = rotation.numerical.pseudo.pseudo_calculate_bare_masses(
 known = {
     rotation.symbolic.general.MASS["pi0"]: 0.1349768,
     rotation.symbolic.general.MASS["eta"]: 0.547862,
-    rotation.symbolic.general.MASS["phiBare"]: 2.5,
-    rotation.symbolic.general.MASS["pi0-phi"]: piphi,
-    rotation.symbolic.general.MASS["eta-phi"]: etaphi,
+    rotation.symbolic.general.MASS["phiBare"]: 5,
+    rotation.symbolic.general.MASS["pi0-phi"]: bare_masses[MASS["pi0-phi"]],
+    rotation.symbolic.general.MASS["eta-phi"]: bare_masses[MASS["eta-phi"]],
+    rotation.symbolic.general.MASS["etaP"]: 0.95778,
+    rotation.symbolic.general.MASS["etaP-phi"]: bare_masses[MASS["etaP-phi"]],
 }
 unknown = {
-    rotation.symbolic.general.MASS["phi"]: 2.5,
+    rotation.symbolic.general.MASS["phi"]: 5,
     rotation.symbolic.general.MASS["pi0Bare"]: 0.1349768,
     rotation.symbolic.general.MASS["etaBare"]: 0.547862,
     rotation.symbolic.general.ANGLE["alpha"]: 0.0,
     rotation.symbolic.general.ANGLE["beta"]: 0.0,
     rotation.symbolic.general.ANGLE["gamma"]: 0.0,
+    rotation.symbolic.general.MASS["etaPBare"]: 0.95778,
+    rotation.symbolic.general.ANGLE["delta"]: 0.0,
+    rotation.symbolic.general.ANGLE["zeta"]: 0.0,
+    rotation.symbolic.general.ANGLE["kappa"]: 0.0,
 }
 ```
 
