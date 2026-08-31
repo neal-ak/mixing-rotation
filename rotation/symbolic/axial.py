@@ -5,6 +5,7 @@ import sympy as sym
 
 # %%
 from .general import (
+    PARTICLE_ORDER,
     ANGLE,
     AXIAL_COUPLING,
     MASS,
@@ -120,59 +121,58 @@ def kinetic_sines() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mu
 
 
 # %%
-def bare_axial_meson_couplings() -> (
-    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
-):
+def bare_axial_meson_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
     """Symbolic expressions for the un-rotated meson to dark matter couplings.
 
     Using the axial vector mediator A.
 
-    :return: pion-chi, eta-chi, eta^prime-chi
-    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    :return: bare particle couplings
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
-    masses = [MASS[f"{k}-AP"] for k in ["pi0", "eta", "etaP"]]
-    return tuple(
-        [
-            AXIAL_COUPLING["a"]
-            * m
-            / MASS["AP"] ** 2
-            / sym.sqrt(1 - (m / MASS["AP"]) ** 2)
-            for m in masses
-        ]
-    )
+    couplings = {
+        AXIAL_COUPLING[m + "Bare-pi-K"]: AXIAL_COUPLING["a"]
+        * MASS[f"{m}-AP"]
+        / MASS["AP"] ** 2
+        / sym.sqrt(1 - (MASS[f"{m}-AP"] / MASS["AP"]) ** 2)
+        for m in PARTICLE_ORDER
+    }
+    return couplings
 
 
 # %%
-def rotated_axial_meson_couplings() -> (
-    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
-):
+def rotated_axial_meson_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
     """Symbolic expressions for the rotated meson to dark matter couplings.
 
     Using the axial vector mediator A.
 
-    :return: pion-chi, eta-chi, eta^prime-chi
-    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    :return: rotated particle couplings
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
-    bare_couplings = sym.Matrix([[*bare_axial_meson_couplings()]])
+    bares = bare_axial_meson_couplings()
+    bare_couplings = sym.Matrix(
+        [[*[bares[AXIAL_COUPLING[x + "Bare-pi-K"]] for x in PARTICLE_ORDER]]]
+    )
     rotated_couplings = (
         bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()
     )
-    return tuple(rotated_couplings)
+    return dict(
+        [*zip([AXIAL_COUPLING[x + "-pi-K"] for x in PARTICLE_ORDER], rotated_couplings)]
+    )
 
 
 # %%
 def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
     """The bare axial mediator off-diagonal terms.
 
-    :return: pion-mediator, eta-mediator, eta^prime-mediator
+    :return: bare particle masses
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
-    terms = [
-        (
+    terms = {
+        MASS["pi0"]: (
             PARAMETERS["au"] - PARAMETERS["ad"],
             PARAMETERS["au"] * MASS["u"] - PARAMETERS["ad"] * MASS["d"],
         ),
-        (
+        MASS["eta"]: (
             1
             / sym.sqrt(3)
             * (PARAMETERS["au"] + PARAMETERS["ad"] - 2 * PARAMETERS["as"]),
@@ -184,7 +184,7 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
                 - 2 * PARAMETERS["as"] * MASS["s"]
             ),
         ),
-        (
+        MASS["etaP"]: (
             sym.sqrt(6) / 3 * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]),
             sym.sqrt(6)
             / 3
@@ -194,37 +194,34 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
                 + PARAMETERS["as"] * MASS["s"]
             ),
         ),
-    ]
-    return tuple(
-        [
-            PARAMETERS["F"]
+    }
+    bare = {
+        k: PARAMETERS["F"]
+        * (
+            a
             * (
-                a
-                * (
-                    1
-                    + 16
-                    * PARAMETERS["B0"]
-                    * PARAMETERS["L4"]
-                    / PARAMETERS["F"] ** 2
-                    * (MASS["u"] + MASS["d"] + MASS["s"])
-                )
-                + b * 16 * PARAMETERS["B0"] * PARAMETERS["L5"] / PARAMETERS["F"] ** 2
+                1
+                + 16
+                * PARAMETERS["B0"]
+                * PARAMETERS["L4"]
+                / PARAMETERS["F"] ** 2
+                * (MASS["u"] + MASS["d"] + MASS["s"])
             )
-            for a, b in terms
-        ]
-    )
+            + b * 16 * PARAMETERS["B0"] * PARAMETERS["L5"] / PARAMETERS["F"] ** 2
+        )
+        for k, (a, b) in terms.items()
+    }
+    return bare
 
 
 # %%
-def bare_axial_kaon_couplings() -> (
-    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
-):
+def bare_axial_kaon_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
     """Symbolic expressions for the un-rotated kaon couplings.
 
     Using the axial vector mediator A.
 
-    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
-    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    :return: bare particle couplings
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     # helpers
     L_AprimepiKj_over_m_j = -(
@@ -244,60 +241,60 @@ def bare_axial_kaon_couplings() -> (
         )
     )
 
-    pi_pi_k = (
-        sym.I
-        * PARAMETERS["F"] ** -3
-        * PARAMETERS["g8"]
-        * (-MASS["Kpm"] ** 2 + 2 * MASS["Kpm"] * PARAMETERS["Epipm"])
-        + L_AprimepiKj_over_m_j * MASS["pi0-AP"]
-    )
-    eta_pi_k = (
-        sym.sqrt(3) ** -1
-        * sym.I
-        * PARAMETERS["F"] ** -3
-        * (2 * PARAMETERS["g8"])
-        * (
-            MASS["Kpm"] ** 2
-            - 6 * MASS["Kpm"] * PARAMETERS["Epipm"]
-            + 2 * MASS["pipm"] ** 2
-        )
-        + L_AprimepiKj_over_m_j * MASS["eta-AP"]
-    )
-    etaP_pi_k = (
-        sym.sqrt(2)
-        * sym.sqrt(3) ** -1
-        * sym.I
-        * PARAMETERS["F"] ** -3
-        * (2 * PARAMETERS["g8"] + 3 * PARAMETERS["g8s"])
-        * (-MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
-        + L_AprimepiKj_over_m_j * MASS["etaP-AP"]
-    )
-    return tuple(
-        [
-            l / sym.sqrt(1 - (m / MASS["AP"]) ** 2)
-            for m, l in zip(
-                [MASS[f"{k}-AP"] for k in ["pi0", "eta", "etaP"]],
-                [pi_pi_k, eta_pi_k, etaP_pi_k],
+    couplings = {
+        "pi0": (
+            sym.I
+            * PARAMETERS["F"] ** -3
+            * PARAMETERS["g8"]
+            * (-MASS["Kpm"] ** 2 + 2 * MASS["Kpm"] * PARAMETERS["Epipm"])
+            + L_AprimepiKj_over_m_j * MASS["pi0-AP"]
+        ),
+        "eta": (
+            sym.sqrt(3) ** -1
+            * sym.I
+            * PARAMETERS["F"] ** -3
+            * (2 * PARAMETERS["g8"])
+            * (
+                MASS["Kpm"] ** 2
+                - 6 * MASS["Kpm"] * PARAMETERS["Epipm"]
+                + 2 * MASS["pipm"] ** 2
             )
-        ]
-    )
+            + L_AprimepiKj_over_m_j * MASS["eta-AP"]
+        ),
+        "etaP": (
+            sym.sqrt(2)
+            * sym.sqrt(3) ** -1
+            * sym.I
+            * PARAMETERS["F"] ** -3
+            * (2 * PARAMETERS["g8"] + 3 * PARAMETERS["g8s"])
+            * (-MASS["Kpm"] ** 2 + MASS["pipm"] ** 2)
+            + L_AprimepiKj_over_m_j * MASS["etaP-AP"]
+        ),
+    }
+
+    bare = {
+        AXIAL_COUPLING[k + "Bare-pi-K"]: l
+        / sym.sqrt(1 - (MASS[f"{k}-AP"] / MASS["AP"]) ** 2)
+        for k, l in couplings.items()
+    }
+    return bare
 
 
 # %%
-def rotated_axial_kaon_couplings() -> (
-    tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
-):
+def rotated_axial_kaon_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
     """Symbolic expressions for the rotated kaon couplings.
 
     Using the axial vector mediator A.
 
-    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
-    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    :return: rotated particle couplings
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     bare_couplings = sym.Matrix(
-        [[AXIAL_COUPLING[f"{k}Bare-pi-K"] for k in ["pi0", "eta", "etaP"]]]
+        [[AXIAL_COUPLING[f"{k}Bare-pi-K"] for k in PARTICLE_ORDER]]
     )
     rotated_couplings = (
         bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()
     )
-    return tuple(rotated_couplings)
+    return dict(
+        [*zip([AXIAL_COUPLING[x + "-pi-K"] for x in PARTICLE_ORDER], rotated_couplings)]
+    )
