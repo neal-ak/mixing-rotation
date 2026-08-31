@@ -3,6 +3,8 @@
 # %%
 import sympy as sym
 
+PARTICLE_ORDER = "pi0", "eta", "etaP"
+
 
 # %%
 def _preprocess_symbol(s):

@@ -5,13 +5,12 @@ import sympy as sym
 
 # %%
 from .general import (
+    PARTICLE_ORDER,
     MASS,
     COUPLING,
     PARAMETERS,
     _create_nd_rotation,
 )
-
-PARTICLE_ORDER = "pi0", "eta", "etaP"
 
 
 # %%
