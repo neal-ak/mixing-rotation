@@ -168,11 +168,11 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
     :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
     """
     terms = {
-        MASS["pi0"]: (
+        MASS["pi0-AP"]: (
             PARAMETERS["au"] - PARAMETERS["ad"],
             PARAMETERS["au"] * MASS["u"] - PARAMETERS["ad"] * MASS["d"],
         ),
-        MASS["eta"]: (
+        MASS["eta-AP"]: (
             1
             / sym.sqrt(3)
             * (PARAMETERS["au"] + PARAMETERS["ad"] - 2 * PARAMETERS["as"]),
@@ -184,7 +184,7 @@ def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mu
                 - 2 * PARAMETERS["as"] * MASS["s"]
             ),
         ),
-        MASS["etaP"]: (
+        MASS["etaP-AP"]: (
             sym.sqrt(6) / 3 * (PARAMETERS["au"] + PARAMETERS["ad"] + PARAMETERS["as"]),
             sym.sqrt(6)
             / 3

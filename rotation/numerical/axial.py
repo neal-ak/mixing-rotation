@@ -142,11 +142,11 @@ def axial_calculate_meson_couplings(
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,
     }
-    coupling = []
-    for l in rotated_axial_meson_couplings():
+    coupling = {}
+    for s, l in rotated_axial_meson_couplings().items():
         call = list(l.free_symbols)
-        coupling.append(sym.lambdify(call, sym.asin(l))(*[parameter[k] for k in call]))
-    return tuple(coupling)
+        coupling[s] = sym.lambdify(call, sym.asin(l))(*[parameter[k] for k in call])
+    return coupling
 
 
 def axial_calculate_bare_masses(
@@ -160,7 +160,7 @@ def axial_calculate_bare_masses(
     mass_up: float = MASS_QUARK["up"],
     mass_down: float = MASS_QUARK["down"],
     mass_strange: float = MASS_QUARK["strange"],
-) -> tuple[float, float, float]:
+) -> dict[sym.Symbol, float]:
     """Numerical calculation of the bare off-diagonal meson masses.
 
     Specific to the axial vector mediator case.
@@ -186,7 +186,7 @@ def axial_calculate_bare_masses(
     :param mass_strange: Strange mass, defaults to MASS_QUARK["strange"]
     :type mass_strange: float, optional
     :return: pion-mediator, eta-mediator, eta^prime-mediator
-    :rtype: tuple[float, float, float]
+    :rtype: dict[sympy.Symbol, float]
     """
     parameter = {
         PARAMETERS["au"]: coupling_up,
@@ -200,11 +200,11 @@ def axial_calculate_bare_masses(
         MASS["d"]: mass_down,
         MASS["s"]: mass_strange,
     }
-    masses = []
-    for m in bare_axial_masses():
+    masses = {}
+    for s,m in bare_axial_masses().items():
         call = list(m.free_symbols)
-        masses.append(sym.lambdify(call, m)(*[parameter[k] for k in call]))
-    return tuple(masses)
+        masses[s] = sym.lambdify(call, m)(*[parameter[k] for k in call])
+    return masses
 
 
 def axial_calculate_bare_kaon(
@@ -222,7 +222,7 @@ def axial_calculate_bare_kaon(
     g_8s: float = G_8S,
     m_pion: float = MASS_CHARGED_PION,
     m_kaon: float = MASS_CHARGED_KAON,
-) -> tuple[float, float, float]:
+) -> dict[sympy.Symbol, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
     Specific to the axial vector mediator case. Defaults are from the PDG
@@ -260,7 +260,7 @@ def axial_calculate_bare_kaon(
     :raises ValueError: Raised if the input axial vector mass is not strictly positive
     :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
-    :rtype: tuple[float, float, float]
+    :rtype: dict[sympy.Symbol, float]
     """
     if m_axial <= 0:
         raise ValueError("Axial vector mediator mass should be strictly positive")
@@ -288,11 +288,11 @@ def axial_calculate_bare_kaon(
         MASS["pipm"]: m_pion,
         MASS["Kpm"]: m_kaon,
     }
-    coupling = []
-    for l in bare_axial_kaon_couplings():
+    coupling = {}
+    for s, l in bare_axial_kaon_couplings().items():
         call = list(l.free_symbols)
-        coupling.append(sym.lambdify(call, l)(*[parameter[k] for k in call]))
-    return tuple([coupling[0], 0, coupling[1]])
+        coupling[s] = sym.lambdify(call, l)(*[parameter[k] for k in call])
+    return coupling
 
 
 def axial_calculate_kaon_couplings(
@@ -305,7 +305,7 @@ def axial_calculate_kaon_couplings(
     alpha: float,
     beta: float,
     gamma: float,
-) -> tuple[float, float, float]:
+) -> dict[sym.Symbol, float]:
     """Numerical calculation of the rotated kaon couplings.
 
     Specific to the axial vector mediator case.
@@ -329,7 +329,7 @@ def axial_calculate_kaon_couplings(
     :param gamma: 3rd rotation angle
     :type gamma: float
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
-    :rtype: tuple[float, float, float]
+    :rtype: dict[sympy.Symbol, float]
     """
     parameter = {
         AXIAL_COUPLING["pi0Bare-pi-K"]: bare_pi0_pion_kaon,
@@ -342,8 +342,8 @@ def axial_calculate_kaon_couplings(
         ANGLE["beta"]: beta,
         ANGLE["gamma"]: gamma,
     }
-    coupling = []
-    for g in rotated_axial_kaon_couplings():
+    coupling = {}
+    for s, g in rotated_axial_kaon_couplings().items():
         call = list(g.free_symbols)
-        coupling.append(sym.lambdify(call, g)(*[parameter[k] for k in call]))
-    return tuple(coupling)
+        coupling[s] = sym.lambdify(call, g)(*[parameter[k] for k in call])
+    return coupling
