@@ -199,11 +199,11 @@ def kaon_plot(ax, xs, phi, pi0, eta, etaP, m_phi, m_pi0_phi, m_eta_phi, m_etaP_p
 # %%
 if __name__ == "__main__":
     rotate = general.create_4d_rotation()[0]
-    x_limits, num, tolerance = (1e-6, 3.5), 101, 1e-13
+    x_limits, num, tolerance = (1e-6, 1e3), 101, 1e-13
     results = []
     for quarks in [(1,1,1), (2,-1,-1)]:
-        for m_phi_bare in [1e-4, 1e-2, 1e0, 1e2]:
-            results.append([*scan_quarks(rotate, x_limits, quarks, m_phi_bare, num=11, tolerance=1e-8), quarks, tolerance])
+        for m_phi_bare in [1e-6, 1e-3, 1e0, 1e3, solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]:
+            results.append([*scan_quarks(rotate, x_limits, quarks, m_phi_bare, num=num, tolerance=tolerance), quarks, tolerance])
 
 # %%
     for result in results:
