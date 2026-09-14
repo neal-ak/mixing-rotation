@@ -226,7 +226,7 @@ if __name__ == "__main__":
                 delta = result[1][general.ANGLE["delta"]],
                 zeta = result[1][general.ANGLE["zeta"]],
                 kappa = result[1][general.ANGLE["kappa"]],
-            )
+        )
         result[1] |= pseudo.pseudo_calculate_bare_kaon(
             energy_pion=result[1][general.PARAMETERS["Epipm"]],
             energy_kaon=result[1][general.PARAMETERS["EKpm"]],
