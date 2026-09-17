@@ -181,7 +181,7 @@ def meson_and_gamma_plot(ax, xs, phi, pi0, eta, etaP, gamma, g_chi, m_phi, m_pi0
         if approx is not None:
             ax.plot(xs, approx, color=colour, label=f"${str(label)[:-1]},\\text{{approx}}}}$", linestyle=":", marker="")
         if couple is not None and approx is not None:
-            custom_linestyle = {"color": colour, "label": f"squared: ${label} / {str(label)[:-1]},\\text{{approx}}}}$", "linestyle": "-.", "marker":""}
+            custom_linestyle = {"color": colour, "label": f"${label} / {str(label)[:-1]},\\text{{approx}}}}$", "linestyle": "-.", "marker":""}
             compare = couple/approx
             if fractional:
                 custom_linestyle["label"] += "$-1$"
