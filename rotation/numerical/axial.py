@@ -4,6 +4,7 @@
 import warnings
 
 # %%
+import numpy as np
 import sympy as sym
 
 # %%
@@ -57,11 +58,13 @@ def calculate_uvw(
     for m, meson in zip(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
-        if m**2 > m_axial**2:
-            warnings.warn(
-                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
-                PhysicsWarning,
-            )
+        if np.any(m**2 > m_axial**2):
+            bad = np.array(m**2 > m_axial**2)
+            for a,b in zip(m[bad], m_axial[bad]):
+                warnings.warn(
+                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({b**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    PhysicsWarning,
+                )
     parameter = {
         MASS["AP"]: m_axial,
         MASS["pi0-AP"]: m_pi0_axial,
@@ -87,7 +90,7 @@ def axial_calculate_meson_couplings(
     alpha: float,
     beta: float,
     gamma: float,
-) -> tuple[float, float, float]:
+) -> dict[sym.Symbol, float]:
     """Numerically calculates the rotated meson to dark matter couplings.
 
     Specific to the axial vector mediator case.
@@ -117,18 +120,20 @@ def axial_calculate_meson_couplings(
     :raises ValueError: Raised if the input axial vector mass is not strictly positive
     :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
     :return: pion-chi, eta-chi, eta^prime-chi
-    :rtype: tuple[float, float, float]
+    :rtype: dict[sympy.Symbol, float]
     """
-    if m_axial <= 0:
+    if np.any(m_axial <= 0):
         raise ValueError("Axial vector mediator mass should be strictly positive")
     for m, meson in zip(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
-        if m**2 > m_axial**2:
-            warnings.warn(
-                f"The kinetic mixing cannot be removed for this combination of model parameters, m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2), The model is likely unstable, The predicted couplings will be unphysical!",
-                PhysicsWarning,
-            )
+        if np.any(m**2 > m_axial**2):
+            bad = np.array(m**2 > m_axial**2)
+            for a,b in zip(m[bad], m_axial[bad]):
+                warnings.warn(
+                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({b**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    PhysicsWarning,
+                )
     parameter = {
         AXIAL_COUPLING["a"]: l_axial,
         MASS["AP"]: m_axial,
@@ -262,16 +267,18 @@ def axial_calculate_bare_kaon(
     :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
     :rtype: dict[sympy.Symbol, float]
     """
-    if m_axial <= 0:
+    if np.any(m_axial <= 0):
         raise ValueError("Axial vector mediator mass should be strictly positive")
     for m, meson in zip(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
-        if m**2 > m_axial**2:
-            warnings.warn(
-                f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({m:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
-                PhysicsWarning,
-            )
+        if np.any(m**2 > m_axial**2):
+            bad = np.array(m**2 > m_axial**2)
+            for a,b in zip(m[bad], m_axial[bad]):
+                warnings.warn(
+                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({b**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    PhysicsWarning,
+                )
     parameter = {
         PARAMETERS["Epipm"]: energy_pion,
         PARAMETERS["Echi"]: energy_dm,

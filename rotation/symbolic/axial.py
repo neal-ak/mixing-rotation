@@ -156,7 +156,7 @@ def rotated_axial_meson_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
         bare_couplings * create_kinetic() * create_3d_rotation()[0].transpose()
     )
     return dict(
-        [*zip([AXIAL_COUPLING[x + "-pi-K"] for x in PARTICLE_ORDER], rotated_couplings)]
+        [*zip([AXIAL_COUPLING[x + "-chi"] for x in PARTICLE_ORDER], rotated_couplings)]
     )
 
 
