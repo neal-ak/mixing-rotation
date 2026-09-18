@@ -68,7 +68,7 @@ def scan_quarks(rotation_matrix, x_limits: tuple[float, float], quarks: tuple[fl
     previous = None
     num_fails = None
     for index, (know, unknow) in enumerate(zip(knowns, unknowns)):
-        if num_fails is not None and num_fails > len(x_points)/4:
+        if num_fails is not None and num_fails > len(x_points)/8:
             break
         if previous is not None:
             for k in unknow:
@@ -230,7 +230,7 @@ def kaon_plot(ax, xs, phi, pi0, eta, etaP, m_phi, m_pi0_phi, m_eta_phi, m_etaP_p
 
 # %%
 if __name__ == "__main__":
-    storage = pathlib.Path() / "results_pseudo_tol6_hist.pkl"
+    storage = pathlib.Path() / "results_pseudo_tol8_hist.pkl"
     if storage.is_file():
         print(f"Loading results from {storage}")
         with open(storage, "rb") as f:
@@ -238,28 +238,34 @@ if __name__ == "__main__":
     else:
         print(f"Solving... this will take a bit...")
         rotate = general.create_4d_rotation()[0]
-        num, tolerance = 601, 1e-6
+        num, tolerance = 401, 1e-8
         mass_limits = {
             1e-3: (1e-4, 1e-1),
             1e-2: (1e-4, 1e-1),
             solver.MASS_NEUTRAL_PION*0.9: (1e-4, 3e-1),
             solver.MASS_NEUTRAL_PION*0.99: (1e-4, 3e-1),
             solver.MASS_NEUTRAL_PION*0.999: (1e-5, 3e-1),
+            solver.MASS_NEUTRAL_PION*0.9999: (1e-5, 3e-1),
             solver.MASS_NEUTRAL_PION: (1e-6, 3e-1),
+            solver.MASS_NEUTRAL_PION*1.0001: (1e-5, 3e-1),
             solver.MASS_NEUTRAL_PION*1.001: (1e-5, 3e-1),
             solver.MASS_NEUTRAL_PION*1.01: (1e-4, 3e-1),
             solver.MASS_NEUTRAL_PION*1.1: (1e-4, 3e-1),
             solver.MASS_ETA*0.9: (1e-3, 1e0),
             solver.MASS_ETA*0.99: (1e-3, 1e0),
             solver.MASS_ETA*0.999: (1e-4, 1e0),
+            solver.MASS_ETA*0.9999: (1e-4, 1e0),
             solver.MASS_ETA: (1e-5, 1e0),
+            solver.MASS_ETA*1.0001: (1e-4, 1e0),
             solver.MASS_ETA*1.001: (1e-4, 1e0),
             solver.MASS_ETA*1.01: (1e-3, 1e0),
             solver.MASS_ETA*1.1: (1e-3, 1e0),
             solver.MASS_ETA_PRIME*0.9: (1e-3, 1e0),
             solver.MASS_ETA_PRIME*0.99: (1e-3, 1e0),
             solver.MASS_ETA_PRIME*0.999: (1e-3, 1e0),
+            solver.MASS_ETA_PRIME*0.9999: (1e-3, 1e0),
             solver.MASS_ETA_PRIME: (1e-4, 1e0),
+            solver.MASS_ETA_PRIME*1.0001: (1e-3, 1e0),
             solver.MASS_ETA_PRIME*1.001: (1e-3, 1e0),
             solver.MASS_ETA_PRIME*1.01: (1e-3, 1e0),
             solver.MASS_ETA_PRIME*1.1: (1e-3, 1e0),
@@ -273,7 +279,7 @@ if __name__ == "__main__":
                 # if not quarks == (1,1,1) or not m_phi_bare == solver.MASS_ETA_PRIME:
                 #     continue
                 print(quarks, m_phi_bare)
-                results.append([*scan_quarks(rotate, x_limits, quarks, m_phi_bare, num=num, tolerance=tolerance), quarks, tolerance])
+                results.append([*scan_quarks(rotate, (1e-7, 1e1), quarks, m_phi_bare, num=num, tolerance=tolerance), quarks, tolerance])
 
         for result in results:
             result[1] |= pseudo.pseudo_calculate_meson_couplings(
