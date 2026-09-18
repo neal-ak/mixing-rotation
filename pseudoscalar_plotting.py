@@ -177,6 +177,8 @@ def meson_and_gamma_plot(ax, xs, phi, pi0, eta, etaP, gamma, g_chi, m_phi, m_pi0
     ax_sec = ax.twinx()
     for (label,(couple,approx)),colour in zip(couples.items(), ["black"]+list(plt.get_cmap("tab10").colors)):
         if couple is not None:
+            if label == general.COUPLING["phi-chi"]:
+                continue
             ax.plot(xs, couple, color=colour, label=f"${label}$", linestyle="--", marker="")
         if approx is not None:
             ax.plot(xs, approx, color=colour, label=f"${str(label)[:-1]},\\text{{approx}}}}$", linestyle=":", marker="")
@@ -313,11 +315,19 @@ if __name__ == "__main__":
 
 # %%
     for result in results:
-        # if not result[3] == (1,1,1) or not np.all(result[1][general.MASS["phiBare"]] == solver.MASS_ETA_PRIME):
-        #     continue
+        if not result[3] == (1,1,1) or not np.all(np.abs(result[1][general.MASS["phiBare"]] - solver.MASS_NEUTRAL_PION)<0.85):
+            continue
         nan = np.isnan(result[1][general.ANGLE["alpha"]])
-        fig, axs = plt.subplots(2,2, figsize=(15,15), sharex=True)
-        fig.suptitle(f"${general.MASS['phiBare']} = {result[1][general.MASS['phiBare']][0]}$ GeV, tol$={result[4]}$")
+        fig, axs = plt.subplots(2,2, figsize=(12,12), sharex=True)
+        mass_name = f"{result[1][general.MASS['phiBare']][0]:.1e}"
+        for s,m in zip([general.MASS[k] for k in ("pi0", "eta", "etaP")], [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]):
+            if result[1][general.MASS["phiBare"]][0] == m:
+                mass_name = f"{s}"
+                break
+            elif 0.8 <= result[1][general.MASS["phiBare"]][0]/m <= 1.2:
+                mass_name = f"{result[1][general.MASS['phiBare']][0]/m:.3f} {s}"
+                break
+        fig.suptitle(f"${general.MASS['phiBare']} = {mass_name}$ GeV, tol$={result[4]}$")
 
         axs[0,0].set_title("Rotation Angles")
         ax_degree = angle_plot(
@@ -327,15 +337,16 @@ if __name__ == "__main__":
                 "alpha",
                 "beta",
                 "gamma",
-                "delta",
-                "zeta",
-                "kappa"
+                # "delta",
+                # "zeta",
+                # "kappa"
             ]],
             m_phi=result[1][general.MASS["phiBare"]][~nan],
             m_pi0_phi=result[1][general.MASS["pi0-phi"]][~nan],
             m_eta_phi=result[1][general.MASS["eta-phi"]][~nan],
             m_etaP_phi=result[1][general.MASS["etaP-phi"]][~nan],
         )
+        axs[0,0].set_ylim(-0.15, 0.15)
 
         axs[0,1].set_title("Particle Masses")
         ax_mass = mass_plot(
@@ -351,6 +362,8 @@ if __name__ == "__main__":
             etaP=result[1][general.MASS["etaP"]][~nan],
             # fractional=True,
         )
+        axs[0,1].set_ylim(0.1, 1)
+        ax_mass.set_ylim(1-0.002, 1.012)
 
         axs[1,0].set_title(f"Meson and Gamma Couplings: ${general.COUPLING["chi"]} = {result[1][general.COUPLING["chi"]][0]}$")
         ax_meson = meson_and_gamma_plot(
@@ -368,6 +381,8 @@ if __name__ == "__main__":
             m_etaP_phi=result[1][general.MASS["etaP-phi"]][~nan],
             # fractional=True,
         )
+        axs[1,0].set_ylim(-1, 0.2)
+        ax_meson.set_ylim(0.97, 1.02)
 
         axs[1,1].set_title("Kaon Couplings: " + ", ".join([f"${general.PARAMETERS[k]} = {result[1][general.PARAMETERS[k]][0]}$ GeV" for k in ["Epipm", "EKpm"]]))
         ax_kaon = kaon_plot(
@@ -383,15 +398,18 @@ if __name__ == "__main__":
             m_etaP_phi=result[1][general.MASS["etaP-phi"]][~nan],
             # fractional=True,
         )
+        axs[1,1].set_ylim(-2, 1)
+        ax_kaon.set_ylim(1-0.001, 1+0.001)
 
         for ax in axs.flat:
-            ax.legend()
+            ax.legend(loc="lower left")
             ax.set_xlabel(f"$\\text{{Quark coupling strength: (}}{',\\quad'.join([f'{general.COUPLING[s]}={p}' for s,p in zip('uds',result[3])])} \\text{{)}}$")
             ax.set_xscale("symlog", linthresh=result[0][~nan].min()*1e-2)
             # xlims = ax.get_xlim()
             # if xlims[0] < 1e-7:
             #     ax.set_xlim(1e-6, xlims[1])
-            ax.set_xlim(result[0].min(), result[0].max())
+            # ax.set_xlim(result[0].min(), result[0].max())
+            ax.set_xlim(1e-5, 1e0)
 
         fig.tight_layout()
         if result[3] == (1,1,1):
@@ -400,6 +418,19 @@ if __name__ == "__main__":
             file_name = "charge"
         else:
             file_name = "(" + "_".join([f"{_x:.1e}" for _x in result[3]]) + ")"
-        file_name += f"_{result[1][solver.MASS["phiBare"]][0]:.4e}"
-        fig.savefig(f"pseudo_{file_name}_hist.pdf")
+        if "m" in mass_name:
+            try:
+                a,b = mass_name.split(" ", maxsplit=1)
+            except ValueError:
+                a,b = f"{1:.3f}", mass_name
+            if "pi" in b:
+                file_name += f"_pi0-{a}"
+            elif "prime" in b:
+                file_name += f"_etaP-{a}"
+            else:
+                file_name += f"_eta-{a}"
+        else:
+            file_name += f"_{mass_name}"
+        fig.savefig(f"pseudo_{file_name}_hist.png")
         # fig.show()
+        plt.close(fig)
