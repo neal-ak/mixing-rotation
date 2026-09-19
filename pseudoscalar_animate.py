@@ -93,6 +93,9 @@ if __name__ == "__main__":
                 "etaP": np.abs(phB/solver.MASS_ETA_PRIME - 1) < 0.11,
             }
             masks["other"] = ~masks["pi"] & ~masks["eta"] & ~masks["etaP"]
+            
+            scan |= pseudo.pseudo_calculate_meson_couplings(4, g_chi, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]])
+            scan[general.COUPLING["phi-gamma"]] = pseudo.pseudo_calculate_photon_coupling(4, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]], scan[general.ANGLE["delta"]], scan[general.ANGLE["zeta"]], scan[general.ANGLE["kappa"]])
             m_diag = pseudo.pseudo_calculate_bare_masses(*(xs*np.array(quarks)[:,np.newaxis,np.newaxis]))
             approx = {general.ANGLE[a]: f(scan[general.MASS["phi"]], m_diag[general.MASS[m+"-phi"]]) for a, f, m in zip(("alpha", "beta", "gamma"), (small_alpha, small_beta, small_gamma), ("pi0", "eta", "etaP"))}
             approx |= {
@@ -101,23 +104,29 @@ if __name__ == "__main__":
                 general.COUPLING["etaP-chi"]: approx[general.ANGLE["gamma"]] * g_chi,
                 general.COUPLING["phi-gamma"]: -solver.G_PI_GAMMA*approx[general.ANGLE["alpha"]] - solver.G_ETA_GAMMA*approx[general.ANGLE["beta"]] - solver.G_ETA_PRIME_GAMMA*approx[general.ANGLE["gamma"]],
             }
-            scan |= pseudo.pseudo_calculate_meson_couplings(4, g_chi, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]])
-            scan[general.COUPLING["phi-gamma"]] = pseudo.pseudo_calculate_photon_coupling(4, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]], scan[general.ANGLE["delta"]], scan[general.ANGLE["zeta"]], scan[general.ANGLE["kappa"]])
+            ratio = {k: scan[k]/v for k,v in approx.items()}
+            ratio |= {
+                general.MASS["phi"]: scan[general.MASS["phi"]] / phB[...,np.newaxis],
+                general.MASS["pi0Bare"]: solver.MASS_NEUTRAL_PION / scan[general.MASS["pi0Bare"]],
+                general.MASS["etaBare"]: solver.MASS_ETA / scan[general.MASS["etaBare"]],
+                general.MASS["etaPBare"]: solver.MASS_ETA_PRIME / scan[general.MASS["etaPBare"]],
+            }
+
             mask, mask_name = (), "all"
             for mask_name, mask in masks.items():
                 fig, axs = plt.subplots(3,2, squeeze=False, figsize=(10,15), sharex=True)
-                for label in angle_style:
-                    axs[0,0].plot(xs[mask].T, scan[label][mask].T)
-                    axs[0,0].plot(xs[mask].T, approx[label][mask].T)
-                for label in mass_style:
-                    axs[1,0].plot(xs[mask].T, scan[label][mask].T)
-                for label in meson_style:
-                    axs[2,0].plot(xs[mask].T, scan[label][mask].T)
+                limits = np.empty((*axs.shape, 2))
                 axs[0,0].set_xscale("log")
                 axs[1,0].set_yscale("log")
-                angle_limits = axs[0,0].get_xlim(), axs[0,0].get_ylim()
-                mass_limits = axs[1,0].get_xlim(), axs[1,0].get_ylim()
-                meson_limits = axs[2,0].get_xlim(), axs[2,0].get_ylim()
+                for index, style in enumerate((angle_style, mass_style, meson_style)):
+                    for label in style:
+                        axs[index,0].plot(xs[mask].T, scan[label][mask].T)
+                        if label in approx:
+                            axs[index,0].plot(xs[mask].T, approx[label][mask].T)
+                        if label in ratio:
+                            axs[index,1].plot(xs[mask].T, ratio[label][mask].T)
+                    limits[index,0,:] = axs[index,0].get_ylim()
+                    limits[index,1,:] = axs[index,1].get_ylim()
                 plt.close()
 
                 fig, axs = plt.subplots(3,2, squeeze=False, figsize=(10,15), sharex=True)
@@ -129,21 +138,20 @@ if __name__ == "__main__":
                     ax.grid()
 
                 # Angles
-                angle_lines = []
-                small_lines = []
+                angle_lines, small_lines = [], []
                 for label, colours in angle_style.items():
                     angle_lines.append(axs[0,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.")[0])
                     small_lines.append(axs[0,0].plot(xs[mask][0], approx[label][mask][0], label=f"${label}_{{\\text{{approx}}}}$", color=colours[1], linewidth=1/2)[0])
                 axs[0,0].set(
-                    # ylim=(-np.pi/2, np.pi/2),
-                    ylim=(-np.pi/16, np.pi/16),
+                    ylim=(-np.pi/6, np.pi/6),
                     ylabel="Angle [Rad]",
                 )
                 axs[0,0].legend(loc="lower left")
                 if mask_name == "other":
-                    axs[0,0].set_ylim(angle_limits[1])
+                    axs[0,0].set_ylim(limits[0,0])
                 sec_y = axs[0,0].secondary_yaxis("right", functions=(lambda x: x*180/np.pi, lambda x: x*np.pi/180))
                 sec_y.set_ylabel("Angle [Deg]")
+                axs[0,1].set_ylim(limits[0,1])
 
                 # Masses
                 mass_lines = []
@@ -153,11 +161,12 @@ if __name__ == "__main__":
                 for m, colours in zip((solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME), tab20):
                     axs[1,0].axhline(m, color=colours[1], linewidth=1)
                 axs[1,0].set(
-                    ylim=mass_limits[1],
+                    ylim=limits[1,0],
                     ylabel="Mass [GeV]",
                     yscale="log",
                 )
                 axs[1,0].legend(loc="lower left")
+                axs[1,1].set_ylim(limits[1,1])
 
                 # Couplings
                 meson_lines = []
@@ -165,12 +174,13 @@ if __name__ == "__main__":
                 for label, colours in meson_style.items():
                     meson_lines.append(axs[2,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.")[0])
                 axs[2,0].set(
-                    ylim=(-0.15,0.15),
+                    ylim=(-0.2,0.2),
                     ylabel="Coupling",
                 )
                 if mask_name == "other":
-                    axs[2,0].set_ylim(meson_limits[1])
+                    axs[2,0].set_ylim(limits[2,0])
                 axs[2,0].legend(loc="lower left")
+                axs[2,1].set_ylim(limits[2,1])
 
                 fig.suptitle(f"${general.MASS['phiBare']} = $")
                 fig.tight_layout()
@@ -205,5 +215,4 @@ if __name__ == "__main__":
                     case _:
                         quark_name = str(quarks)
                 ani.save(filename=f"animate_{tolerance:.1e}_{quark_name}_{mask_name}.gif", writer="pillow")
-                break
-            break
+                plt.close()
