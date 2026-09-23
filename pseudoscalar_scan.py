@@ -121,8 +121,43 @@ def scan_quarks(coupling_strength: list[float], tolerance: float, quarks: tuple[
         new_results[k] = np.take_along_axis(v, sort_results, axis=-1)
     return new_results
 
-# %%
-if __name__ == "__main__":
+def main():
     storage = pathlib.Path() / "results_pseudo.pkl"
     with open(storage, "rb") as f:
         old_results = pickle.load(f)
+
+    for tol in [1e-8]:
+        for quark in [(2,-1,-1), (1,1,1)]:
+            # log spacing from 1e-3 to 1e3
+            mphis = np.linspace(-3,3,num=1+22*6)
+
+            # fractional offsets from each meson mass
+            x = np.linspace(-4, -0.75, num=42)
+            fracs = np.sort(np.concatenate((x, np.linspace(-4-13*np.diff(x).mean(),-4,num=1+13)[:-1])))
+            fracs = 1 + np.concatenate((-10**fracs[::-1], [0], 10**fracs))
+            for m in [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]:
+                mphis = np.concatenate((mphis, m*fracs))
+
+            for mphi in mphis:
+                # Don't redo initialization of mphi points
+                if not (tol in old_results and quark in old_results[tol] and np.any(np.abs(mphi/np.array(list(old_results[tol][quark].keys()))-1) <=1e-13)):
+                    print(tol, quark, mphi, "Initial")
+                    old_results[tol][quark][mphi] = scan_quarks(np.logspace(-7,1, num=401), tol, quark, mphi)
+
+                # Iteratively approach the numerical instability at high coupling strengths
+                while True:
+                    old_xs = np.log10(old_results[tol][quark][mphi]["coupling"])
+                    print(tol, quark, mphi, 10**old_xs[-1])
+                    new_xs = np.logspace(old_xs.max(), old_xs.max()+np.diff(old_xs)[-1], num=101)
+                    old_results[tol][quark][mphi] = scan_quarks(new_xs, tol, quark, mphi, old_results[tol][quark][mphi])
+                    if not len(set(np.log10(old_results[tol][quark][mphi]["coupling"])) - set(old_xs)):
+                        break
+
+    if storage.is_file():
+        storage.move(storage.with_suffix(".bak"))
+    with open(storage, "wb") as f:
+        pickle.dump(old_results, f)
+
+# %%
+if __name__ == "__main__":
+    main()
