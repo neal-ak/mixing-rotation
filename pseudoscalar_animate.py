@@ -54,16 +54,17 @@ if __name__ == "__main__":
     mass_style = dict(zip([general.MASS[k] for k in ["phi", "pi0Bare", "etaBare", "etaPBare"]], tab20[[7,0,1,2]]))
     meson_style = dict(zip([general.COUPLING[k] for k in ["phi-chi", "pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]], tab20[[7,0,1,2,6]]))
     g_chi = 1
+    fractional = np.array((True, False, True), dtype=bool)
     height, width, figsize = 3, 2, 5
-    for tolerance in stored:
+    for tolerance in [1e-8]:
         for quarks, scan in stored[tolerance].items():
             phB, xs = scan[general.MASS["phiBare"]], scan["coupling"]
             masks = {
-                "pi": np.abs(phB/solver.MASS_NEUTRAL_PION - 1) < 0.11,
-                "eta": np.abs(phB/solver.MASS_ETA - 1) < 0.11,
-                "etaP": np.abs(phB/solver.MASS_ETA_PRIME - 1) < 0.11,
+                "pi": np.abs(phB/solver.MASS_NEUTRAL_PION - 1) < 2e-1,
+                "eta": np.abs(phB/solver.MASS_ETA - 1) < 2e-1,
+                "etaP": np.abs(phB/solver.MASS_ETA_PRIME - 1) < 2e-1,
             }
-            masks["other"] = ~masks["pi"] & ~masks["eta"] & ~masks["etaP"]
+            masks["other"] = (np.log10(phB)-np.log10(phB).min()) % np.diff(np.log10(phB))[0] < 1e-3
             erratic = (np.abs(phB/solver.MASS_NEUTRAL_PION-1)<=1e-3) | (np.abs(phB/solver.MASS_ETA-1)<=1e-3) | (np.abs(phB/solver.MASS_ETA_PRIME-1)<=1e-3)
 
             scan |= pseudo.pseudo_calculate_meson_couplings(4, g_chi, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]])
@@ -89,6 +90,15 @@ if __name__ == "__main__":
                 general.MASS["etaBare"]: solver.MASS_ETA / scan[general.MASS["etaBare"]],
                 general.MASS["etaPBare"]: solver.MASS_ETA_PRIME / scan[general.MASS["etaPBare"]],
             }
+            if fractional[0]:
+                for k in [_x for _x in general.ANGLE.values() if _x in ratio]:
+                    ratio[k] = np.abs(ratio[k]-1)
+            if fractional[1]:
+                for k in [_x for _x in general.MASS.values() if _x in ratio]:
+                    ratio[k] = np.abs(ratio[k]-1)
+            if fractional[2]:
+                for k in [_x for _x in general.COUPLING.values() if _x in ratio]:
+                    ratio[k] = np.abs(ratio[k]-1)
 
             mask, mask_name = np.ones_like(next(iter(masks.values())), dtype=bool), "all"
             for mask_name, mask in masks.items():
@@ -111,8 +121,8 @@ if __name__ == "__main__":
                 limits[1,0][0] = max(limits[1,0][0], 1e-6)
                 for index,l in enumerate(limits[:,1]):
                     limits[index,1] = (
-                        max(l[0], -10),
-                        min(l[1], 10),
+                        max(l[0], -(1 if fractional[index] else 10)),
+                        min(l[1], 1 if fractional[index] else 10),
                     )
 
                 fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
@@ -138,7 +148,7 @@ if __name__ == "__main__":
                 sec_y.set_ylabel("Angle [Deg]")
                 axs[0,1].set(
                     ylim=limits[0,1],
-                    ylabel="Angle / Small Angle Approximation",
+                    ylabel=("|" if fractional[0] else "")+"Angle / Small Angle Approximation"+(" - 1|" if fractional[0] else ""),
                 )
                 axs[0,1].legend(loc="lower left")
 
@@ -159,7 +169,7 @@ if __name__ == "__main__":
                 axs[1,0].legend(loc="lower left")
                 axs[1,1].set(
                     ylim=limits[1,1],
-                    ylabel="Mass / Bare Mass",
+                    ylabel=("|" if fractional[1] else "")+"Mass / Bare Mass"+(" - 1|" if fractional[1] else ""),
                 )
                 axs[1,1].legend(loc="lower left")
 
@@ -179,7 +189,7 @@ if __name__ == "__main__":
                 axs[2,0].legend(loc="lower left")
                 axs[2,1].set(
                     ylim=limits[2,1],
-                    ylabel="Coupling / Coupling Approximation",
+                    ylabel=("|" if fractional[2] else "")+"Coupling / Coupling Approximation"+(" - 1|" if fractional[2] else ""),
                 )
                 axs[2,1].legend(loc="lower left")
 
@@ -216,15 +226,15 @@ if __name__ == "__main__":
                     mass_name = f"{phB[mask][frame]:.3e}"
                     for s,m in zip([general.MASS[k] for k in ("pi0", "eta", "etaP")], [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]):
                         if phB[mask][frame] == m:
-                            mass_name = f"{s}"
+                            mass_name = f"{1.0:.5f} {s}"
                             break
                         if 0.8 <= phB[mask][frame]/m <= 1.2:
-                            mass_name = f"{phB[mask][frame]/m:.4f} {s}"
+                            mass_name = f"{phB[mask][frame]/m:.5f} {s}"
                             break
                     fig.suptitle(f"${general.MASS['phiBare']} = {mass_name}$")
                     return angle_lines+small_lines+mass_lines+[phi_hline]+meson_lines+approx_lines
 
-                ani = animation.FuncAnimation(fig, update, frames=len(xs[mask]), interval=1000)
+                ani = animation.FuncAnimation(fig, update, frames=len(xs[mask]), interval=3000/len(xs[mask&~erratic]))
                 match quarks:
                     case (1,1,1):
                         quark_name = "equal"
