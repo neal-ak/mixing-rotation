@@ -27,36 +27,6 @@ if __name__ == "__main__":
     else:
         stored = {}
 
-#     old_file = pathlib.Path() / "results_pseudo_tol8_hist.pkl"
-#     if old_file.is_file():
-#         with open(old_file, "rb") as f:
-#             results = pickle.load(f)
-
-#     for xs, saved, err, quarks, tol in results:
-#         if tol not in stored:
-#             stored[tol] = {}
-#         if quarks not in stored[tol]:
-#             stored[tol][quarks] = {}
-#         if saved[general.MASS["phiBare"]][0] in stored[tol][quarks]:
-#             raise ValueError("Bare Phi mass already present")
-#         solved = {}
-#         for k,v in saved.items():
-#             if r"\tilde{g}" in str(k) or r"E_{" in str(k):
-#                 break
-#             solved[k] = v
-#         m_phi_bare = solved[general.MASS["phiBare"]][0]
-#         for k in [general.MASS["phiBare"], general.MASS["pi0"], general.MASS["eta"], general.MASS["etaP"], general.MASS["pi0-phi"], general.MASS["eta-phi"], general.MASS["etaP-phi"]]:
-#             del solved[k]
-#         stored[tol][quarks][saved[general.MASS["phiBare"]][0]] = {"coupling": xs}
-#         stored[tol][quarks][saved[general.MASS["phiBare"]][0]] |= solved
-#         finite = np.isfinite(stored[tol][quarks][saved[general.MASS["phiBare"]][0]][general.ANGLE["alpha"]])
-#         for k,v in stored[tol][quarks][saved[general.MASS["phiBare"]][0]].items():
-#             stored[tol][quarks][saved[general.MASS["phiBare"]][0]][k] = v[finite]
-
-# # # %%
-#     with open(stored_results, "wb") as f:
-#         pickle.dump(stored, f)
-
 # %%
     for tolerance in stored:
         for quarks, scan in stored[tolerance].items():
@@ -84,6 +54,7 @@ if __name__ == "__main__":
     mass_style = dict(zip([general.MASS[k] for k in ["phi", "pi0Bare", "etaBare", "etaPBare"]], tab20[[7,0,1,2]]))
     meson_style = dict(zip([general.COUPLING[k] for k in ["phi-chi", "pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]], tab20[[7,0,1,2,6]]))
     g_chi = 1
+    height, width, figsize = 3, 2, 5
     for tolerance in stored:
         for quarks, scan in stored[tolerance].items():
             phB, xs = scan[general.MASS["phiBare"]], scan["coupling"]
@@ -121,37 +92,43 @@ if __name__ == "__main__":
 
             mask, mask_name = np.ones_like(next(iter(masks.values())), dtype=bool), "all"
             for mask_name, mask in masks.items():
-                fig, axs = plt.subplots(3,2, squeeze=False, figsize=(10,15), sharex=True)
+                fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
                 limits = np.empty((*axs.shape, 2))
                 axs[0,0].set_xscale("log")
                 axs[1,0].set_yscale("log")
                 for index, style in enumerate((angle_style, mass_style, meson_style)):
                     for label in style:
-                        axs[index,0].plot(xs[mask&~erratic].T, scan[label][mask&~erratic].T)
+                        axs[index,0].plot(xs[mask&~erratic].T, scan[label][mask&~erratic].T, marker="")
                         if label in approx:
-                            axs[index,0].plot(xs[mask&~erratic].T, approx[label][mask&~erratic].T)
+                            axs[index,0].plot(xs[mask&~erratic].T, approx[label][mask&~erratic].T, marker="")
                         if label in ratio:
-                            axs[index,1].plot(xs[mask&~erratic].T, ratio[label][mask&~erratic].T)
+                            axs[index,1].plot(xs[mask&~erratic].T, ratio[label][mask&~erratic].T, marker="")
+                    axs[index,0].margins(0)
+                    axs[index,1].margins(0)
                     limits[index,0,:] = axs[index,0].get_ylim()
                     limits[index,1,:] = axs[index,1].get_ylim()
                 plt.close()
+                limits[1,0][0] = max(limits[1,0][0], 1e-6)
+                for index,l in enumerate(limits[:,1]):
+                    limits[index,1] = (
+                        max(l[0], -10),
+                        min(l[1], 10),
+                    )
 
-                fig, axs = plt.subplots(3,2, squeeze=False, figsize=(10,15), sharex=True)
+                fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
                 for ax in axs[-1,:]:
                     ax.set_xlabel(f"$\\text{{Quark coupling strength: (}}{',\\quad'.join([f'{general.COUPLING[s]}={p}' for s,p in zip('uds',quarks)])} \\text{{)}}$")
                     ax.set_xlim(1e-7, 1e1)
                     ax.set_xscale("log")
-                for ax in axs.flat:
-                    ax.grid()
 
                 # Angles
                 angle_lines, small_lines, angle_ratio = [], [], []
                 for label, colours in angle_style.items():
-                    angle_lines.append(axs[0,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.")[0])
+                    angle_lines.append(axs[0,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")[0])
                     l = f"${label}_{{\\text{{approx}}}}$" if not np.all(np.isnan(approx[label][mask][0])) else ""
-                    small_lines.append(axs[0,0].plot(xs[mask][0], approx[label][mask][0], label=l, color=colours[1], linewidth=1)[0])
+                    small_lines.append(axs[0,0].plot(xs[mask][0], approx[label][mask][0], label=l, color=colours[1], linewidth=1, marker="")[0])
                     l = f"${label}$" if not np.all(np.isnan(ratio[label][mask][0])) else ""
-                    angle_ratio.append(axs[0,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0])[0])
+                    angle_ratio.append(axs[0,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0], marker="")[0])
                 axs[0,0].set(
                     ylim=limits[0,0],
                     ylabel="Angle [Rad]",
@@ -169,13 +146,13 @@ if __name__ == "__main__":
                 mass_lines, mass_ratio = [], []
                 phi_hline = axs[1,0].axhline(phB[0], color="black", linewidth=1)
                 for label, colours in mass_style.items():
-                    mass_lines.append(axs[1,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.")[0])
+                    mass_lines.append(axs[1,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")[0])
                     l = f"${label}$" if not np.all(np.isnan(ratio[label][mask][0])) else ""
-                    mass_ratio.append(axs[1,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0])[0])
+                    mass_ratio.append(axs[1,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0], marker="")[0])
                 for m, colours in zip((solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME), tab20):
                     axs[1,0].axhline(m, color=colours[1], linewidth=1)
                 axs[1,0].set(
-                    ylim=limits[1,0],
+                    ylim=(max(limits[1,0][0], 1e-6), limits[1,0][1]),
                     ylabel="Mass [GeV]",
                     yscale="log",
                 )
@@ -190,11 +167,11 @@ if __name__ == "__main__":
                 meson_lines, approx_lines, meson_ratio = [], [], []
                 axs[2,0].axhline(g_chi, color=tab20[7,1], linewidth=1, label=f"${general.COUPLING['chi']} = {g_chi}$")
                 for label, colours in meson_style.items():
-                    meson_lines.append(axs[2,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.")[0])
+                    meson_lines.append(axs[2,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")[0])
                     l = f"${str(label)[:-1]},\\text{{approx}}}}$" if not np.all(np.isnan(approx[label][mask][0])) else ""
-                    approx_lines.append(axs[2,0].plot(xs[mask][0], approx[label][mask][0], label=l, color=colours[1], linewidth=1)[0])
+                    approx_lines.append(axs[2,0].plot(xs[mask][0], approx[label][mask][0], label=l, color=colours[1], linewidth=1, marker="")[0])
                     l = f"${label}$" if not np.all(np.isnan(ratio[label][mask][0])) else ""
-                    meson_ratio.append(axs[2,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0])[0])
+                    meson_ratio.append(axs[2,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0], marker="")[0])
                 axs[2,0].set(
                     ylim=limits[2,0],
                     ylabel="Coupling",
@@ -205,6 +182,19 @@ if __name__ == "__main__":
                     ylabel="Coupling / Coupling Approximation",
                 )
                 axs[2,1].legend(loc="lower left")
+
+                for ax in axs.flat:
+                    ax.grid()
+                    if ax.get_yscale() == "log":
+                        ax.set_ylim(
+                            10 ** (np.log10(ax.get_ylim())[0] - 0.05 * np.diff(np.log10(ax.get_ylim()))[0]),
+                            10 ** (np.log10(ax.get_ylim())[1] + 0.05 * np.diff(np.log10(ax.get_ylim()))[0]),
+                        )
+                    elif ax.get_yscale() == "linear":
+                        ax.set_ylim(
+                            ax.get_ylim()[0] - 0.05 * np.diff(ax.get_ylim())[0],
+                            ax.get_ylim()[1] + 0.05 * np.diff(ax.get_ylim())[0],
+                        )
 
                 fig.suptitle(f"${general.MASS['phiBare']} = $")
                 fig.tight_layout()

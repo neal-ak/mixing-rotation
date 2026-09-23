@@ -28,12 +28,13 @@ def small_gamma(m_phi, m_etaP_phi):
 
 def scan_quarks(coupling_strength: list[float], tolerance: float, quarks: tuple[float,float,float], m_phi_bare: float, old_results: dict[str|sym.Symbol, np.NDArray] = None) -> dict[str|sym.Symbol, np.NDArray]:
     new_results = {"coupling": np.array(coupling_strength)}
-    new_results["coupling"].sort()
-    proximity_thresh = 1e-1
+    proximity_thresh = 1/3
 
     if old_results is not None: # We're gonna remove duplicates
         matches = np.abs(old_results["coupling"][np.newaxis,...]/new_results["coupling"][...,np.newaxis]-1)
-        new_results["coupling"] = new_results["coupling"][~(np.any(matches<1e-16, axis=1))]
+        new_results["coupling"] = new_results["coupling"][~(np.any(matches==0, axis=1))]
+        if len(new_results["coupling"]) == 0:
+            return old_results
         sort_args = np.argsort(matches, axis=-1)
         sort_args = np.ma.array(sort_args, mask=np.take_along_axis(matches, sort_args, axis=-1) >= proximity_thresh)
     equation = create_mix_equation(general.create_4d_rotation()[0])[0]
@@ -52,18 +53,7 @@ def scan_quarks(coupling_strength: list[float], tolerance: float, quarks: tuple[
             general.MASS["eta-phi"]: diagonals[general.MASS["eta-phi"]][0],
             general.MASS["etaP-phi"]: diagonals[general.MASS["etaP-phi"]][0],
     }
-
-    warnings.filterwarnings("error", category=RuntimeWarning)
-    num_fails = None
-    for index, x in enumerate(new_results["coupling"]):
-        if num_fails is not None and num_fails > len(new_results["coupling"])/10:
-            break
-        known |= {
-            general.MASS["pi0-phi"]: diagonals[general.MASS["pi0-phi"]][index],
-            general.MASS["eta-phi"]: diagonals[general.MASS["eta-phi"]][index],
-            general.MASS["etaP-phi"]: diagonals[general.MASS["etaP-phi"]][index],
-        }
-        unknown = {
+    unknown = {
             general.MASS["phi"]: m_phi_bare,
             general.MASS["pi0Bare"]: solver.MASS_NEUTRAL_PION,
             general.MASS["etaBare"]: solver.MASS_ETA,
@@ -74,12 +64,27 @@ def scan_quarks(coupling_strength: list[float], tolerance: float, quarks: tuple[
             general.ANGLE["delta"]: 0.0,
             general.ANGLE["zeta"]: 0.0,
             general.ANGLE["kappa"]: 0.0,
+    }
+
+    num_fails, previous, successes = None, None, []
+    for index, x in enumerate(new_results["coupling"]):
+        if num_fails is not None and num_fails > 3:
+            break
+        known |= {
+            general.MASS["pi0-phi"]: diagonals[general.MASS["pi0-phi"]][index],
+            general.MASS["eta-phi"]: diagonals[general.MASS["eta-phi"]][index],
+            general.MASS["etaP-phi"]: diagonals[general.MASS["etaP-phi"]][index],
+        }
+        unknown_update = {
+            general.ANGLE["alpha"]: 0.0 if not np.isfinite(small_alpha(m_phi_bare, known[general.MASS["pi0-phi"]])) else small_alpha(m_phi_bare, known[general.MASS["pi0-phi"]]),
+            general.ANGLE["beta"]: 0.0 if not np.isfinite(small_beta(m_phi_bare, known[general.MASS["eta-phi"]])) else small_beta(m_phi_bare, known[general.MASS["eta-phi"]]),
+            general.ANGLE["gamma"]: 0.0 if not np.isfinite(small_gamma(m_phi_bare, known[general.MASS["etaP-phi"]])) else small_gamma(m_phi_bare, known[general.MASS["etaP-phi"]]),
         }
         if previous is not None and np.abs(new_results["coupling"][previous]/x-1)<proximity_thresh:
-            unknown |= {k: new_results[k][previous] for k in unknown}
+            unknown_update = {k: new_results[k][previous] for k in unknown}
         elif old_results is not None:
             try:
-                unknown |= {k: old_results[k][sort_args[index,0]] for k in unknown}
+                unknown_update = {k: old_results[k][sort_args[index,0]] for k in unknown}
             except IndexError:
                 pass
 
@@ -88,24 +93,29 @@ def scan_quarks(coupling_strength: list[float], tolerance: float, quarks: tuple[
             argument_order,
             known,
         )
+        warnings.filterwarnings("error", category=RuntimeWarning)
         try:
             for k,v in solver.solve_mixing(
                 func,
                 argument_order,
-                unknown,
+                unknown | unknown_update,
                 abs_tolerance=tolerance,
             ).items():
                 new_results[k][index] = v
-            for k,v in known.items():
-                new_results[k][index] = v
             previous = index
             num_fails = 0
+            successes.append(index)
         except (ValueError, RuntimeWarning):
             if num_fails is not None:
                 num_fails += 1
-    warnings.resetwarnings()
-    for k,v in old_results.items():
-        new_results[k] = np.concatenate((v, new_results[k]))
+        warnings.resetwarnings()
+    for k in known:
+        del new_results[k]
+    for k, v in new_results.items():
+        new_results[k] = v[successes]
+    if old_results is not None:
+        for k,v in old_results.items():
+            new_results[k] = np.concatenate((v, new_results[k]))
     sort_results = np.argsort(new_results["coupling"], axis=-1)
     for k,v in new_results.items():
         new_results[k] = np.take_along_axis(v, sort_results, axis=-1)
