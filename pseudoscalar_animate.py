@@ -50,22 +50,30 @@ if __name__ == "__main__":
 
 # %%
     tab20 = np.array(plt.get_cmap("tab20").colors).reshape(10,2,3)
-    angle_style = dict(zip([general.ANGLE[k] for k in ["alpha", "beta", "gamma", "delta", "zeta", "kappa"]], tab20))
+    angle_style = dict(zip([general.ANGLE[k] for k in [
+        "alpha",
+        "beta",
+        "gamma",
+        "delta",
+        "zeta",
+        "kappa",
+    ]], tab20))
     mass_style = dict(zip([general.MASS[k] for k in ["phi", "pi0Bare", "etaBare", "etaPBare"]], tab20[[7,0,1,2]]))
     meson_style = dict(zip([general.COUPLING[k] for k in ["phi-chi", "pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]], tab20[[7,0,1,2,6]]))
     g_chi = 1
     fractional = np.array((True, False, True), dtype=bool)
-    height, width, figsize = 3, 2, 5
+    height, width, figsize = 3, 2, 4
     for tolerance in [1e-8]:
         for quarks, scan in stored[tolerance].items():
             phB, xs = scan[general.MASS["phiBare"]], scan["coupling"]
             masks = {
+                "other": (np.log10(phB)-np.log10(phB).min()) % np.diff(np.log10(phB))[0] < 1e-6,
                 "pi": np.abs(phB/solver.MASS_NEUTRAL_PION - 1) < 2e-1,
                 "eta": np.abs(phB/solver.MASS_ETA - 1) < 2e-1,
                 "etaP": np.abs(phB/solver.MASS_ETA_PRIME - 1) < 2e-1,
             }
-            masks["other"] = (np.log10(phB)-np.log10(phB).min()) % np.diff(np.log10(phB))[0] < 1e-3
-            erratic = (np.abs(phB/solver.MASS_NEUTRAL_PION-1)<=1e-3) | (np.abs(phB/solver.MASS_ETA-1)<=1e-3) | (np.abs(phB/solver.MASS_ETA_PRIME-1)<=1e-3)
+            erratic_thresh = 1e-4
+            erratic = (np.abs(phB/solver.MASS_NEUTRAL_PION-1)<=erratic_thresh) | (np.abs(phB/solver.MASS_ETA-1)<=erratic_thresh) | (np.abs(phB/solver.MASS_ETA_PRIME-1)<=erratic_thresh)
 
             scan |= pseudo.pseudo_calculate_meson_couplings(4, g_chi, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]])
             scan[general.COUPLING["phi-gamma"]] = pseudo.pseudo_calculate_photon_coupling(4, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]], scan[general.ANGLE["delta"]], scan[general.ANGLE["zeta"]], scan[general.ANGLE["kappa"]])
@@ -100,7 +108,6 @@ if __name__ == "__main__":
                 for k in [_x for _x in general.COUPLING.values() if _x in ratio]:
                     ratio[k] = np.abs(ratio[k]-1)
 
-            mask, mask_name = np.ones_like(next(iter(masks.values())), dtype=bool), "all"
             for mask_name, mask in masks.items():
                 fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
                 limits = np.empty((*axs.shape, 2))
@@ -118,7 +125,18 @@ if __name__ == "__main__":
                     limits[index,0,:] = axs[index,0].get_ylim()
                     limits[index,1,:] = axs[index,1].get_ylim()
                 plt.close()
-                limits[1,0][0] = max(limits[1,0][0], 1e-6)
+                limits[0,0] = (
+                    max(limits[0,0][0], -2*np.pi),
+                    min(limits[0,0][1], 2*np.pi),
+                )
+                limits[1,0] = (
+                    max(limits[1,0][0], 1e-3),
+                    limits[1,0][1],
+                )
+                limits[2,0] = (
+                    max(limits[2,0][0], -10*g_chi),
+                    min(limits[2,0][1], 10*g_chi),
+                )
                 for index,l in enumerate(limits[:,1]):
                     limits[index,1] = (
                         max(l[0], -(1 if fractional[index] else 10)),
@@ -237,7 +255,6 @@ if __name__ == "__main__":
                     fig.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
                     return angle_lines+small_lines+mass_lines+[phi_hline]+meson_lines+approx_lines
 
-                ani = animation.FuncAnimation(fig, update, frames=len(xs[mask]), interval=3000/len(xs[mask&~erratic]))
                 match quarks:
                     case (1,1,1):
                         quark_name = "equal"
@@ -245,5 +262,10 @@ if __name__ == "__main__":
                         quark_name = "charge"
                     case _:
                         quark_name = str(quarks)
-                ani.save(filename=f"animate_{tolerance:.1e}_{quark_name}_{mask_name}.gif", writer="pillow")
+                filename = f"{tolerance:.1e}_{quark_name}_{mask_name}"
+
+                ani = animation.FuncAnimation(fig, update, frames=len(xs[mask]), interval=5000/len(xs[mask&~erratic]))
+                ani.save(filename=f"animate_{filename}.gif", writer="pillow")
+                ani.save(filename=f"animate_{filename}.mp4", writer="ffmpeg")
+
                 plt.close()
