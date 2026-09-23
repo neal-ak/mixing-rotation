@@ -206,7 +206,7 @@ if __name__ == "__main__":
                             ax.get_ylim()[1] + 0.05 * np.diff(ax.get_ylim())[0],
                         )
 
-                fig.suptitle(f"${general.MASS['phiBare']} = $")
+                fig.suptitle(f"${general.MASS['phiBare']} = (10^{{00}})$")
                 fig.tight_layout()
 
                 def update(frame):
@@ -223,15 +223,18 @@ if __name__ == "__main__":
                         app.set_data(xs[mask][frame], approx[label][mask][frame])
                         rat.set_data(xs[mask][frame], ratio[label][mask][frame])
 
-                    mass_name = f"{phB[mask][frame]:.3e}"
+                    power = f" = {phB[mask][frame]:.3e}".split("e")
+                    mass_name = f"{power[0]} \\times 10^{{{power[1]}}}"
                     for s,m in zip([general.MASS[k] for k in ("pi0", "eta", "etaP")], [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]):
                         if phB[mask][frame] == m:
-                            mass_name = f"{1.0:.5f} {s}"
+                            power = f"{0:+.3e}".split("e")
+                            mass_name = f"/{s} = (1{power[0]} \\times 10^{{{power[1]}}}) = {1:.5f}"
                             break
                         if 0.8 <= phB[mask][frame]/m <= 1.2:
-                            mass_name = f"{phB[mask][frame]/m:.5f} {s}"
+                            power = f"{phB[mask][frame]/m-1:+.3e}".split("e")
+                            mass_name = f"/{s} = (1{power[0]} \\times 10^{{{power[1]}}}) = {phB[mask][frame]/m:.5f}"
                             break
-                    fig.suptitle(f"${general.MASS['phiBare']} = {mass_name}$")
+                    fig.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
                     return angle_lines+small_lines+mass_lines+[phi_hline]+meson_lines+approx_lines
 
                 ani = animation.FuncAnimation(fig, update, frames=len(xs[mask]), interval=3000/len(xs[mask&~erratic]))
