@@ -60,9 +60,9 @@ def calculate_uvw(
     ):
         if np.any(m**2 > m_axial**2):
             bad = np.array(m**2 > m_axial**2)
-            for a,b in zip(m[bad], m_axial[bad]):
+            for a in m[bad]:
                 warnings.warn(
-                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({b**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
                     PhysicsWarning,
                 )
     parameter = {
@@ -129,9 +129,9 @@ def axial_calculate_meson_couplings(
     ):
         if np.any(m**2 > m_axial**2):
             bad = np.array(m**2 > m_axial**2)
-            for a,b in zip(m[bad], m_axial[bad]):
+            for a in m[bad]:
                 warnings.warn(
-                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({b**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
                     PhysicsWarning,
                 )
     parameter = {
@@ -274,9 +274,9 @@ def axial_calculate_bare_kaon(
     ):
         if np.any(m**2 > m_axial**2):
             bad = np.array(m**2 > m_axial**2)
-            for a,b in zip(m[bad], m_axial[bad]):
+            for a in m[bad]:
                 warnings.warn(
-                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({b**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
                     PhysicsWarning,
                 )
     parameter = {

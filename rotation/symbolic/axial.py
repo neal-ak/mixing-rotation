@@ -161,11 +161,11 @@ def rotated_axial_meson_couplings() -> dict[sym.Symbol, sym.core.mul.Mul]:
 
 
 # %%
-def bare_axial_masses() -> tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]:
+def bare_axial_masses() -> dict[sym.Symbol, sym.core.mul.Mul]:
     """The bare axial mediator off-diagonal terms.
 
     :return: bare particle masses
-    :rtype: tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
+    :rtype: tuple[sympy.Symbol, sympy.core.mul.Mul]
     """
     terms = {
         MASS["pi0-AP"]: (
