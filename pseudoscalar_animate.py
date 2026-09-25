@@ -29,17 +29,17 @@ if __name__ == "__main__":
 
 # %%
     for tolerance in stored:
-        for quarks, scan in stored[tolerance].items():
-            phis = sorted(scan)
-            stored[tolerance][quarks] = {k: v[np.newaxis, ...] for k,v in scan[phis[0]].items()}
+        for quarks, stored[tolerance][quarks] in stored[tolerance].items():
+            phis = sorted(stored[tolerance][quarks])
+            stored[tolerance][quarks] = {k: v[np.newaxis, ...] for k,v in stored[tolerance][quarks][phis[0]].items()}
             for p in phis[1:]:
                 syn_shape = next(iter(stored[tolerance][quarks].values())).shape
-                curr_shape = next(iter(scan[p].values())).shape
+                curr_shape = next(iter(stored[tolerance][quarks][p].values())).shape
                 if curr_shape[-1] > syn_shape[-1]:
                     for k,v in stored[tolerance][quarks].items():
                         stored[tolerance][quarks][k] = np.pad(v, ((0,0),(0,curr_shape[-1]-syn_shape[-1])), mode="constant", constant_values=np.nan)
                     syn_shape = *syn_shape[:-1], curr_shape[-1]
-                for k,v in scan[p].items():
+                for k,v in stored[tolerance][quarks][p].items():
                     if k in stored[tolerance][quarks]:
                         if syn_shape[-1] > curr_shape[-1]:
                             v = np.pad(v, (0,syn_shape[-1]-curr_shape[-1]), mode="constant", constant_values=np.nan)
@@ -47,6 +47,44 @@ if __name__ == "__main__":
                     else:
                         raise ValueError("Had an extra key not in others, they should all be the same.")
             stored[tolerance][quarks][general.MASS["phiBare"]] = np.array(phis)
+
+    g_chi = 1
+    approx, ratio, fraction = {}, {}, {}
+    for tolerance in stored:
+        approx[tolerance], ratio[tolerance], fraction[tolerance] = {}, {}, {}
+        for quarks in stored[tolerance]:
+            stored[tolerance][quarks] |= pseudo.pseudo_calculate_meson_couplings(
+                n_dim = 4,
+                bare_mediator_dm_coupling = g_chi,
+                alpha = stored[tolerance][quarks][general.ANGLE["alpha"]],
+                beta = stored[tolerance][quarks][general.ANGLE["beta"]],
+                gamma = stored[tolerance][quarks][general.ANGLE["gamma"]],
+            )
+            stored[tolerance][quarks][general.COUPLING["phi-gamma"]] = pseudo.pseudo_calculate_photon_coupling(
+                n_dim = 4,
+                alpha = stored[tolerance][quarks][general.ANGLE["alpha"]],
+                beta = stored[tolerance][quarks][general.ANGLE["beta"]],
+                gamma = stored[tolerance][quarks][general.ANGLE["gamma"]],
+                delta = stored[tolerance][quarks][general.ANGLE["delta"]],
+                zeta = stored[tolerance][quarks][general.ANGLE["zeta"]],
+                kappa = stored[tolerance][quarks][general.ANGLE["kappa"]],
+            )
+            m_diag = pseudo.pseudo_calculate_bare_masses(*(stored[tolerance][quarks]["coupling"]*np.array(quarks)[:,np.newaxis,np.newaxis]))
+            approx[tolerance][quarks] = {general.ANGLE[a]: f(stored[tolerance][quarks][general.MASS["phi"]], m_diag[general.MASS[m+"-phi"]]) for a, f, m in zip(("alpha", "beta", "gamma"), (small_alpha, small_beta, small_gamma), ("pi0", "eta", "etaP"))}
+            approx[tolerance][quarks] |= {
+                general.COUPLING["pi0-chi"]: approx[tolerance][quarks][general.ANGLE["alpha"]] * g_chi,
+                general.COUPLING["eta-chi"]: approx[tolerance][quarks][general.ANGLE["beta"]] * g_chi,
+                general.COUPLING["etaP-chi"]: approx[tolerance][quarks][general.ANGLE["gamma"]] * g_chi,
+                general.COUPLING["phi-gamma"]: -solver.G_PI_GAMMA*approx[tolerance][quarks][general.ANGLE["alpha"]] - solver.G_ETA_GAMMA*approx[tolerance][quarks][general.ANGLE["beta"]] - solver.G_ETA_PRIME_GAMMA*approx[tolerance][quarks][general.ANGLE["gamma"]],
+            }
+            ratio[tolerance][quarks] = {k: v/stored[tolerance][quarks][k] for k,v in approx[tolerance][quarks].items()}
+            ratio[tolerance][quarks] |= {
+                general.MASS["phi"]: stored[tolerance][quarks][general.MASS["phi"]] / stored[tolerance][quarks][general.MASS["phiBare"]][...,np.newaxis],
+                general.MASS["pi0Bare"]: solver.MASS_NEUTRAL_PION / stored[tolerance][quarks][general.MASS["pi0Bare"]],
+                general.MASS["etaBare"]: solver.MASS_ETA / stored[tolerance][quarks][general.MASS["etaBare"]],
+                general.MASS["etaPBare"]: solver.MASS_ETA_PRIME / stored[tolerance][quarks][general.MASS["etaPBare"]],
+            }
+            fraction[tolerance][quarks] = {k: np.abs(v-1) for k,v in ratio[tolerance][quarks].items()}
 
 # %%
     tab20 = np.array(plt.get_cmap("tab20").colors).reshape(10,2,3)
@@ -62,10 +100,10 @@ if __name__ == "__main__":
     meson_style = dict(zip([general.COUPLING[k] for k in ["phi-chi", "pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]], tab20[[7,0,1,2,6]]))
     g_chi = 1
     fractional = np.array((True, False, True), dtype=bool)
-    height, width, figsize = 3, 2, 4
+    height, width, figsize = 2, 2, 4
     for tolerance in [1e-8]:
-        for quarks, scan in stored[tolerance].items():
-            phB, xs = scan[general.MASS["phiBare"]], scan["coupling"]
+        for quarks in [(2,-1,-1)]:
+            phB, xs = stored[tolerance][quarks][general.MASS["phiBare"]], stored[tolerance][quarks]["coupling"]
             masks = {
                 "other": (np.log10(phB)-np.log10(phB).min()) % np.diff(np.log10(phB))[0] < 1e-6,
                 "pi": np.abs(phB/solver.MASS_NEUTRAL_PION - 1) < 2e-1,
@@ -75,73 +113,65 @@ if __name__ == "__main__":
             erratic_thresh = 1e-4
             erratic = (np.abs(phB/solver.MASS_NEUTRAL_PION-1)<=erratic_thresh) | (np.abs(phB/solver.MASS_ETA-1)<=erratic_thresh) | (np.abs(phB/solver.MASS_ETA_PRIME-1)<=erratic_thresh)
 
-            scan |= pseudo.pseudo_calculate_meson_couplings(4, g_chi, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]])
-            scan[general.COUPLING["phi-gamma"]] = pseudo.pseudo_calculate_photon_coupling(4, scan[general.ANGLE["alpha"]], scan[general.ANGLE["beta"]], scan[general.ANGLE["gamma"]], scan[general.ANGLE["delta"]], scan[general.ANGLE["zeta"]], scan[general.ANGLE["kappa"]])
-            m_diag = pseudo.pseudo_calculate_bare_masses(*(xs*np.array(quarks)[:,np.newaxis,np.newaxis]))
-            approx = {general.ANGLE[a]: f(scan[general.MASS["phi"]], m_diag[general.MASS[m+"-phi"]]) for a, f, m in zip(("alpha", "beta", "gamma"), (small_alpha, small_beta, small_gamma), ("pi0", "eta", "etaP"))}
-            approx |= {
-                general.ANGLE["delta"]: np.nan * xs,
-                general.ANGLE["zeta"]: np.nan * xs,
-                general.ANGLE["kappa"]: np.nan * xs,
-            }
-            approx |= {
-                general.COUPLING["phi-chi"]: np.nan * xs,
-                general.COUPLING["pi0-chi"]: approx[general.ANGLE["alpha"]] * g_chi,
-                general.COUPLING["eta-chi"]: approx[general.ANGLE["beta"]] * g_chi,
-                general.COUPLING["etaP-chi"]: approx[general.ANGLE["gamma"]] * g_chi,
-                general.COUPLING["phi-gamma"]: -solver.G_PI_GAMMA*approx[general.ANGLE["alpha"]] - solver.G_ETA_GAMMA*approx[general.ANGLE["beta"]] - solver.G_ETA_PRIME_GAMMA*approx[general.ANGLE["gamma"]],
-            }
-            ratio = {k: scan[k]/v for k,v in approx.items()}
-            ratio |= {
-                general.MASS["phi"]: scan[general.MASS["phi"]] / phB[...,np.newaxis],
-                general.MASS["pi0Bare"]: solver.MASS_NEUTRAL_PION / scan[general.MASS["pi0Bare"]],
-                general.MASS["etaBare"]: solver.MASS_ETA / scan[general.MASS["etaBare"]],
-                general.MASS["etaPBare"]: solver.MASS_ETA_PRIME / scan[general.MASS["etaPBare"]],
-            }
-            if fractional[0]:
-                for k in [_x for _x in general.ANGLE.values() if _x in ratio]:
-                    ratio[k] = np.abs(ratio[k]-1)
-            if fractional[1]:
-                for k in [_x for _x in general.MASS.values() if _x in ratio]:
-                    ratio[k] = np.abs(ratio[k]-1)
-            if fractional[2]:
-                for k in [_x for _x in general.COUPLING.values() if _x in ratio]:
-                    ratio[k] = np.abs(ratio[k]-1)
-
             for mask_name, mask in masks.items():
                 fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
                 limits = np.empty((*axs.shape, 2))
-                axs[0,0].set_xscale("log")
-                axs[1,0].set_yscale("log")
-                for index, style in enumerate((angle_style, mass_style, meson_style)):
-                    for label in style:
-                        axs[index,0].plot(xs[mask&~erratic].T, scan[label][mask&~erratic].T, marker="")
-                        if label in approx:
-                            axs[index,0].plot(xs[mask&~erratic].T, approx[label][mask&~erratic].T, marker="")
-                        if label in ratio:
-                            axs[index,1].plot(xs[mask&~erratic].T, ratio[label][mask&~erratic].T, marker="")
-                    axs[index,0].margins(0)
-                    axs[index,1].margins(0)
-                    limits[index,0,:] = axs[index,0].get_ylim()
-                    limits[index,1,:] = axs[index,1].get_ylim()
+
+                # Prep limits
+                # Angles
+                ax = axs[0,0]
+                ax.set_xscale("log")
+                for label in angle_style:
+                    ax.plot(xs[mask&~erratic].T, stored[tolerance][quarks][label][mask&~erratic].T)
+                    if label in approx:
+                        ax.plot(xs[mask&~erratic].T, approx[tolerance][quarks][label][mask&~erratic].T)
+                angle_limits = (
+                    max(ax.get_ylim()[0], -1/2*np.pi),
+                    min(ax.get_ylim()[1], 1/2*np.pi),
+                )
+                # Masses
+                ax = axs[0,1]
+                ax.set_xscale("log")
+                for label in mass_style:
+                    ax.plot(xs[mask&~erratic].T, stored[tolerance][quarks][label][mask&~erratic].T)
+                    if label in approx:
+                        ax.plot(xs[mask&~erratic].T, approx[tolerance][quarks][label][mask&~erratic].T)
+                mass_limits = (
+                    max(ax.get_ylim()[0], 1e-3),
+                    ax.get_ylim()[1],
+                )
+                # Meson couplings
+                ax = axs[1,0]
+                ax.set_xscale("log")
+                for label in meson_style:
+                    ax.plot(xs[mask&~erratic].T, stored[tolerance][quarks][label][mask&~erratic].T)
+                    if label in approx:
+                        ax.plot(xs[mask&~erratic].T, approx[tolerance][quarks][label][mask&~erratic].T)
+                meson_limits = (
+                    max(ax.get_ylim()[0], -10*g_chi),
+                    min(ax.get_ylim()[1], 10*g_chi),
+                )
+                # # Ratio
+                # ax = axs[1,1]
+                # ax.set_xscale("log")
+                # for label in angle_style|mass_style|meson_style:
+                #     if label in ratio[tolerance][quarks]:
+                #         ax.plot(xs[mask&~erratic].T, ratio[tolerance][quarks][label][mask&~erratic].T)
+                # ratio_limits = (
+                #     max(ax.get_ylim()[0], -10),
+                #     min(ax.get_ylim()[1], 10),
+                # )
+                # Fractional error
+                ax = axs[1,1]
+                ax.set_xscale("log")
+                for label in angle_style|mass_style|meson_style:
+                    if label in fraction[tolerance][quarks]:
+                        ax.plot(xs[mask&~erratic].T, fraction[tolerance][quarks][label][mask&~erratic].T)
+                fraction_limits = (
+                    max(ax.get_ylim()[0], -1),
+                    min(ax.get_ylim()[1], 1),
+                )
                 plt.close()
-                limits[0,0] = (
-                    max(limits[0,0][0], -2*np.pi),
-                    min(limits[0,0][1], 2*np.pi),
-                )
-                limits[1,0] = (
-                    max(limits[1,0][0], 1e-3),
-                    limits[1,0][1],
-                )
-                limits[2,0] = (
-                    max(limits[2,0][0], -10*g_chi),
-                    min(limits[2,0][1], 10*g_chi),
-                )
-                for index,l in enumerate(limits[:,1]):
-                    limits[index,1] = (
-                        max(l[0], -(1 if fractional[index] else 10)),
-                        min(l[1], 1 if fractional[index] else 10),
-                    )
 
                 fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
                 for ax in axs[-1,:]:
@@ -149,67 +179,94 @@ if __name__ == "__main__":
                     ax.set_xlim(1e-7, 1e1)
                     ax.set_xscale("log")
 
+                plot_elements = []
+
                 # Angles
-                angle_lines, small_lines, angle_ratio = [], [], []
+                ax = axs[0,0]
                 for label, colours in angle_style.items():
-                    angle_lines.append(axs[0,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")[0])
-                    l = f"${label}_{{\\text{{approx}}}}$" if not np.all(np.isnan(approx[label][mask][0])) else ""
-                    small_lines.append(axs[0,0].plot(xs[mask][0], approx[label][mask][0], label=l, color=colours[1], linewidth=1, marker="")[0])
-                    l = f"${label}$" if not np.all(np.isnan(ratio[label][mask][0])) else ""
-                    angle_ratio.append(axs[0,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0], marker="")[0])
-                axs[0,0].set(
-                    ylim=limits[0,0],
+                    line = ax.plot(xs[mask][0], stored[tolerance][quarks][label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")
+                    plot_elements.append((line[0], xs[mask], stored[tolerance][quarks][label][mask]))
+                    if label in approx[tolerance][quarks]:
+                        line = ax.plot(xs[mask][0], approx[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(approx[tolerance][quarks][label][mask])) else ""+f"${label}_{{\\text{{approx}}}}$", color=colours[1], linewidth=1, marker="")
+                        plot_elements.append((line[0], xs[mask], approx[tolerance][quarks][label][mask]))
+                ax.set(
+                    ylim=angle_limits,
                     ylabel="Angle [Rad]",
                 )
-                axs[0,0].legend(loc="lower left")
-                sec_y = axs[0,0].secondary_yaxis("right", functions=(lambda x: x*180/np.pi, lambda x: x*np.pi/180))
+                ax.legend(loc="lower left")
+                sec_y = ax.secondary_yaxis("right", functions=(lambda x: x*180/np.pi, lambda x: x*np.pi/180))
                 sec_y.set_ylabel("Angle [Deg]")
-                axs[0,1].set(
-                    ylim=limits[0,1],
-                    ylabel=("|" if fractional[0] else "")+"Angle / Small Angle Approximation"+(" - 1|" if fractional[0] else ""),
-                )
-                axs[0,1].legend(loc="lower left")
 
                 # Masses
-                mass_lines, mass_ratio = [], []
-                phi_hline = axs[1,0].axhline(phB[0], color="black", linewidth=1)
+                ax = axs[0,1]
+                phi_hline = ax.axhline(phB[0], color="black", linewidth=1)
+                plot_elements.append((phi_hline, None, phB[...,np.newaxis]))
                 for label, colours in mass_style.items():
-                    mass_lines.append(axs[1,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")[0])
-                    l = f"${label}$" if not np.all(np.isnan(ratio[label][mask][0])) else ""
-                    mass_ratio.append(axs[1,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0], marker="")[0])
+                    line = ax.plot(xs[mask][0], stored[tolerance][quarks][label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")
+                    plot_elements.append((line[0], xs[mask], stored[tolerance][quarks][label][mask]))
                 for m, colours in zip((solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME), tab20):
-                    axs[1,0].axhline(m, color=colours[1], linewidth=1)
-                axs[1,0].set(
-                    ylim=(max(limits[1,0][0], 1e-6), limits[1,0][1]),
+                    ax.axhline(m, color=colours[1], linewidth=1)
+                ax.set(
+                    ylim=mass_limits,
                     ylabel="Mass [GeV]",
                     yscale="log",
                 )
-                axs[1,0].legend(loc="lower left")
-                axs[1,1].set(
-                    ylim=limits[1,1],
-                    ylabel=("|" if fractional[1] else "")+"Mass / Bare Mass"+(" - 1|" if fractional[1] else ""),
-                )
-                axs[1,1].legend(loc="lower left")
+                ax.legend(loc="lower left")
 
                 # Couplings
-                meson_lines, approx_lines, meson_ratio = [], [], []
-                axs[2,0].axhline(g_chi, color=tab20[7,1], linewidth=1, label=f"${general.COUPLING['chi']} = {g_chi}$")
+                ax = axs[1,0]
+                ax.axhline(g_chi, color=tab20[7,1], linewidth=1, label=f"${general.COUPLING['chi']} = {g_chi}$")
                 for label, colours in meson_style.items():
-                    meson_lines.append(axs[2,0].plot(xs[mask][0], scan[label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")[0])
-                    l = f"${str(label)[:-1]},\\text{{approx}}}}$" if not np.all(np.isnan(approx[label][mask][0])) else ""
-                    approx_lines.append(axs[2,0].plot(xs[mask][0], approx[label][mask][0], label=l, color=colours[1], linewidth=1, marker="")[0])
-                    l = f"${label}$" if not np.all(np.isnan(ratio[label][mask][0])) else ""
-                    meson_ratio.append(axs[2,1].plot(xs[mask][0], ratio[label][mask][0], label=l, color=colours[0], marker="")[0])
-                axs[2,0].set(
-                    ylim=limits[2,0],
+                    line = ax.plot(xs[mask][0], stored[tolerance][quarks][label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")
+                    plot_elements.append((line[0], xs[mask], stored[tolerance][quarks][label][mask]))
+                    if label in approx[tolerance][quarks]:
+                        line = ax.plot(xs[mask][0], approx[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(approx[tolerance][quarks][label][mask])) else ""+f"${str(label)[:-1]},\\text{{approx}}}}$", color=colours[1], linewidth=1, marker="")
+                        plot_elements.append((line[0], xs[mask], approx[tolerance][quarks][label][mask]))
+                ax.set(
+                    ylim=meson_limits,
                     ylabel="Coupling",
                 )
-                axs[2,0].legend(loc="lower left")
-                axs[2,1].set(
-                    ylim=limits[2,1],
-                    ylabel=("|" if fractional[2] else "")+"Coupling / Coupling Approximation"+(" - 1|" if fractional[2] else ""),
+                ax.legend(loc="lower left")
+
+                # # Ratio
+                # ax = axs[1,1]
+                # for label, colours in angle_style.items():
+                #     if label in ratio[tolerance][quarks]:
+                #         line = ax.plot(xs[mask][0], ratio[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(ratio[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="--", linewidth=1, marker="")
+                #         plot_elements.append((line[0], xs[mask], ratio[tolerance][quarks][label][mask]))
+                # for label, colours in mass_style.items():
+                #     if label in ratio[tolerance][quarks]:
+                #         line = ax.plot(xs[mask][0], ratio[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(ratio[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-.", linewidth=1, marker="")
+                #         plot_elements.append((line[0], xs[mask], ratio[tolerance][quarks][label][mask]))
+                # for label, colours in meson_style.items():
+                #     if label in ratio[tolerance][quarks]:
+                #         line = ax.plot(xs[mask][0], ratio[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(ratio[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle=":", linewidth=1, marker="")
+                #         plot_elements.append((line[0], xs[mask], ratio[tolerance][quarks][label][mask]))
+                # ax.set(
+                #     ylim=ratio_limits,
+                #     ylabel="Approx / Reference",
+                # )
+                # ax.legend(loc="lower left")
+
+                # Fractional error
+                ax = axs[1,1]
+                for label, colours in angle_style.items():
+                    if label in fraction[tolerance][quarks]:
+                        line = ax.plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="--", linewidth=1, marker="")
+                        plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
+                for label, colours in mass_style.items():
+                    if label in fraction[tolerance][quarks]:
+                        line = ax.plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-.", linewidth=1, marker="")
+                        plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
+                for label, colours in meson_style.items():
+                    if label in fraction[tolerance][quarks]:
+                        line = ax.plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle=":", linewidth=1, marker="")
+                        plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
+                ax.set(
+                    ylim=fraction_limits,
+                    ylabel="| Approx / Reference - 1 |",
                 )
-                axs[2,1].legend(loc="lower left")
+                ax.legend(loc="lower left")
 
                 for ax in axs.flat:
                     ax.grid()
@@ -228,18 +285,12 @@ if __name__ == "__main__":
                 fig.tight_layout()
 
                 def update(frame):
-                    for line, small, rat, label in zip(angle_lines, small_lines, angle_ratio, angle_style):
-                        line.set_data(xs[mask][frame], scan[label][mask][frame])
-                        small.set_data(xs[mask][frame], approx[label][mask][frame])
-                        rat.set_data(xs[mask][frame], ratio[label][mask][frame])
-                    for line, rat, label in zip(mass_lines, mass_ratio, mass_style):
-                        line.set_data(xs[mask][frame], scan[label][mask][frame])
-                        rat.set_data(xs[mask][frame], ratio[label][mask][frame])
-                    phi_hline.set_ydata([phB[mask][frame]])
-                    for line, app, rat, label in zip(meson_lines, approx_lines, meson_ratio, meson_style):
-                        line.set_data(xs[mask][frame], scan[label][mask][frame])
-                        app.set_data(xs[mask][frame], approx[label][mask][frame])
-                        rat.set_data(xs[mask][frame], ratio[label][mask][frame])
+                    frame = int(2*frame)
+                    for line, x, y in plot_elements:
+                        if x is not None:
+                            line.set_xdata(x[frame])
+                        if y is not None:
+                            line.set_ydata(y[frame])
 
                     power = f" = {phB[mask][frame]:.3e}".split("e")
                     mass_name = f"{power[0]} \\times 10^{{{power[1]}}}"
@@ -253,7 +304,7 @@ if __name__ == "__main__":
                             mass_name = f"/{s} = (1{power[0]} \\times 10^{{{power[1]}}}) = {phB[mask][frame]/m:.5f}"
                             break
                     fig.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
-                    return angle_lines+small_lines+mass_lines+[phi_hline]+meson_lines+approx_lines
+                    return [l for l,_,_ in plot_elements]
 
                 match quarks:
                     case (1,1,1):
