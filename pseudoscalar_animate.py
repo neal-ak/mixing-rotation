@@ -285,7 +285,6 @@ if __name__ == "__main__":
                 fig.tight_layout()
 
                 def update(frame):
-                    frame = int(2*frame)
                     for line, x, y in plot_elements:
                         if x is not None:
                             line.set_xdata(x[frame])
