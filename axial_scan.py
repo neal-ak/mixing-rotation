@@ -127,7 +127,7 @@ def main():
     for tol in [1e-8]:
         for quark in [(2,-1,-1), (1,1,1)]:
             # log spacing from 1e-3 to 1e3
-            maxials = np.linspace(-3,3,num=1+22*6)
+            maxials = np.logspace(-3,3,num=1+22*6)
 
             # fractional offsets from each meson mass
             fracs = np.linspace(-4, -0.75, num=42)
