@@ -148,6 +148,7 @@ if __name__ == "__main__":
 
             for mask_name, mask in masks.items():
                 fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)))
+                fig_frame, ax_frame = plt.subplots(1,1, figsize=figsize*np.array((1,1)))
                 limits = np.empty((*axs.shape, 2))
 
                 angle_ax = 0,0
@@ -215,6 +216,7 @@ if __name__ == "__main__":
                 try:
                     # Fractional error
                     axs[fractional_ax].set_xscale("log")
+                    ax_frame.set_xscale("log")
                     for label in angle_style|mass_style|meson_style:
                         if label in fraction[tolerance][quarks]:
                             axs[fractional_ax].plot(xs[mask&~erratic].T, fraction[tolerance][quarks][label][mask&~erratic].T)
@@ -229,10 +231,10 @@ if __name__ == "__main__":
                 plt.close()
 
                 fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
-                for ax in axs[-1,:]:
-                    ax.set_xlabel(f"$\\text{{Quark coupling strength: (}}{',\\quad'.join([f'{general.COUPLING[s]}={p}' for s,p in zip('uds',quarks)])} \\text{{)}}$")
+                for ax in list(axs[-1,:])+[ax_frame]:
+                    ax.set_xlabel(f"$\\text{{Quark coupling strength: (}}{',\\quad'.join([f'{general.COUPLING[s]}={p/q:n}{sym.symbols(r'Q_{'+s+r'}')}' for s,p,q in zip('uds',quarks,(2/3,-1/3,-1/3))])} \\text{{)}}$")
                 secondary_xaxes = []
-                for index, ax in enumerate(axs.flat):
+                for index, ax in enumerate(list(axs.flat)+[ax_frame]):
                     if mask_name == "other":
                         ax.set_xlim(1e-4, 1e1)
                     elif mask_name == "pi0":
@@ -252,10 +254,8 @@ if __name__ == "__main__":
                                 lambda x: secondary_xs[mask_name][1](x, *quarks, phB[mask][0]),
                             ),
                         ))
-                        if index < width:
+                        if index < width or index > height*width:
                             secondary_xaxes[-1].set_xlabel(f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$")
-                        # else:
-                        #     secondary_xaxes[-1].set_ticks([])
 
                 plot_elements = []
 
@@ -299,6 +299,9 @@ if __name__ == "__main__":
                     # Meson Couplings
                     axs[meson_ax].axhline(g_chi, color=tab20[7,1], linewidth=1, label=f"${general.COUPLING['chi']} = {g_chi}$")
                     for label, colours in meson_style.items():
+                        if label in approx[tolerance][quarks]:
+                            if np.all(np.abs(stored[tolerance][quarks][label][mask][0][~np.isnan(stored[tolerance][quarks][label][mask][0])]) < 1e-15) and np.all(np.abs(approx[tolerance][quarks][label][mask][0][~np.isnan(approx[tolerance][quarks][label][mask][0])]) < 1e-15):
+                                continue # if it's exactly zero, we don't need to show it
                         line = axs[meson_ax].plot(xs[mask][0], stored[tolerance][quarks][label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")
                         plot_elements.append((line[0], xs[mask], stored[tolerance][quarks][label][mask]))
                         if label in approx[tolerance][quarks]:
@@ -340,19 +343,31 @@ if __name__ == "__main__":
                         if label in fraction[tolerance][quarks]:
                             line = axs[fractional_ax].plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-.", linewidth=1, marker="")
                             plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
+                            line = ax_frame.plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-.", linewidth=1, marker="")
+                            plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
                     for label, colours in meson_style.items():
+                        if label in approx[tolerance][quarks]:
+                            if np.all(np.abs(stored[tolerance][quarks][label][mask][0][~np.isnan(stored[tolerance][quarks][label][mask][0])]) < 1e-15) and np.all(np.abs(approx[tolerance][quarks][label][mask][0][~np.isnan(approx[tolerance][quarks][label][mask][0])]) < 1e-15):
+                                continue # if it's exactly zero, we don't need to show it
                         if label in fraction[tolerance][quarks]:
                             line = axs[fractional_ax].plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-", linewidth=1, marker="")
+                            plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
+                            line = ax_frame.plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-", linewidth=1, marker="")
                             plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
                     axs[fractional_ax].set(
                         ylim=fraction_limits,
                         ylabel="| Approx / Reference - 1 |",
                     )
                     axs[fractional_ax].legend(loc="lower left")
+                    ax_frame.set(
+                        ylim=fraction_limits,
+                        ylabel="| Approx / Reference - 1 |",
+                    )
+                    ax_frame.legend(loc="lower left")
                 except NameError:
                     pass
 
-                for ax in axs.flat:
+                for ax in list(axs.flat)+[ax_frame]:
                     ax.grid()
                     if ax.get_yscale() == "log":
                         ax.set_ylim(
@@ -367,6 +382,9 @@ if __name__ == "__main__":
 
                 fig.suptitle(f"${general.MASS['phiBare']} = (10^{{00}})$")
                 fig.tight_layout()
+
+                fig_frame.suptitle(f"${general.MASS['phiBare']} = (10^{{00}})$")
+                fig_frame.tight_layout()
 
                 def update(frame):
                     for line, x, y in plot_elements:
@@ -387,6 +405,7 @@ if __name__ == "__main__":
                             mass_name = f"/{s} = (1{power[0]} \\times 10^{{{power[1]}}}) = {phB[mask][frame]/m:.5f}"
                             break
                     fig.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
+                    fig_frame.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
                     if mask_name in secondary_xs and phB[mask][frame] not in [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]:
                         for index, ax in enumerate(axs.flat):
                             secondary_xaxes[index].remove()
@@ -399,8 +418,6 @@ if __name__ == "__main__":
                             )
                             if index < width:
                                 secondary_xaxes[index].set_xlabel(f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$")
-                            # else:
-                            #     secondary_xaxes[index].set_ticks([])
                     return [l for l,_,_ in plot_elements]
 
                 match quarks:
@@ -420,7 +437,7 @@ if __name__ == "__main__":
                         if nearness[target] > 1e-3:
                             continue
                         update(target)
-                        fig.savefig(f"frame_{filename}_{target:0>4n}_{phB[mask][target]}.pdf")
+                        fig_frame.savefig(f"frame_{filename}_{target:0>4n}_{phB[mask][target]:.3e}.pdf")
 
                 ani = animation.FuncAnimation(fig, update, frames=len(xs[mask]), interval=5000/len(xs[mask&~erratic]))
                 ani.save(filename=f"animate_{filename}.gif", writer="pillow")
