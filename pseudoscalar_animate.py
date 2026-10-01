@@ -50,6 +50,30 @@ def pseudo_mass_ratio():
         )
     return result
 
+def draw_angles(ax, x_strength: np.NDArray, alpha:tuple[np.NDArray, dict]=None, beta:tuple[np.NDArray, dict]=None, gamma:tuple[np.NDArray, dict]=None, delta:tuple[np.NDArray, dict]=None, zeta:tuple[np.NDArray, dict]=None, kappa:tuple[np.NDArray, dict]=None, alpha_approx:tuple[np.NDArray, dict]=None, beta_approx:tuple[np.NDArray, dict]=None, gamma_approx:tuple[np.NDArray, dict]=None):
+    draw_order = tuple(_x for _x in [alpha, alpha_approx, beta, beta_approx, gamma, gamma_approx, delta, zeta, kappa] if _x is not None)
+    maximal_limits = (-1/2*np.pi, 1/2*np.pi)
+    for ys, _ in draw_order:
+        ax.plot(x_strength.T, ys[0].T)
+    limits = (
+        max(ax.get_ylim()[0], maximal_limits[0]),
+        min(ax.get_ylim()[1], maximal_limits[1]),
+    )
+    ax.clear()
+
+    elements = []
+    for ys, style in draw_order:
+        elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
+    ax.set(
+        xscale="log",
+        ylim=limits,
+        ylabel="Angle [Rad]",
+    )
+    ax.legend(loc="lower left")
+    sec_y = ax.secondary_yaxis("right", functions=(lambda x: x*180/np.pi, lambda x: x*np.pi/180))
+    sec_y.set_ylabel("Angle [Deg]")
+    return elements
+
 # %%
 if __name__ == "__main__":
     stored_results = pathlib.Path() / "results_pseudo.pkl"
@@ -159,20 +183,6 @@ if __name__ == "__main__":
 
                 # Prep limits
                 try:
-                # Angles
-                    axs[angle_ax].set_xscale("log")
-                    for label in angle_style:
-                        axs[angle_ax].plot(xs[mask&~erratic].T, stored[tolerance][quarks][label][mask&~erratic].T)
-                        if label in approx:
-                            axs[angle_ax].plot(xs[mask&~erratic].T, approx[tolerance][quarks][label][mask&~erratic].T)
-                    angle_limits = (
-                        max(axs[angle_ax].get_ylim()[0], -1/2*np.pi),
-                        min(axs[angle_ax].get_ylim()[1], 1/2*np.pi),
-                    )
-                except NameError:
-                    pass
-
-                try:
                     # Masses
                     axs[masses_ax].set_xscale("log")
                     for label in mass_style:
@@ -216,7 +226,6 @@ if __name__ == "__main__":
                 try:
                     # Fractional error
                     axs[fractional_ax].set_xscale("log")
-                    ax_frame.set_xscale("log")
                     for label in angle_style|mass_style|meson_style:
                         if label in fraction[tolerance][quarks]:
                             axs[fractional_ax].plot(xs[mask&~erratic].T, fraction[tolerance][quarks][label][mask&~erratic].T)
@@ -228,52 +237,36 @@ if __name__ == "__main__":
                     )
                 except NameError:
                     pass
-                plt.close()
 
-                fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)), sharex=True)
-                for ax in list(axs[-1,:])+[ax_frame]:
-                    ax.set_xlabel(f"$\\text{{Quark coupling strength: (}}{',\\quad'.join([f'{general.COUPLING[s]}={p/q:n}{sym.symbols(r'Q_{'+s+r'}')}' for s,p,q in zip('uds',quarks,(2/3,-1/3,-1/3))])} \\text{{)}}$")
-                secondary_xaxes = []
-                for index, ax in enumerate(list(axs.flat)+[ax_frame]):
-                    if mask_name == "other":
-                        ax.set_xlim(1e-4, 1e1)
-                    elif mask_name == "pi0":
-                        ax.set_xlim(1e-5,1e-1)
-                    elif mask_name == "eta":
-                        ax.set_xlim(2e-5,2e-1)
-                    elif mask_name == "etaP":
-                        ax.set_xlim(3e-5,3e-1)
-                    else:
-                        ax.set_xlim(1e-7, 1e1)
-                    ax.set_xscale("log")
-                    if mask_name in secondary_xs:
-                        secondary_xaxes.append(ax.secondary_xaxis(
-                            "top",
-                            functions=(
-                                lambda x: secondary_xs[mask_name][0](x, *quarks, phB[mask][0]),
-                                lambda x: secondary_xs[mask_name][1](x, *quarks, phB[mask][0]),
-                            ),
-                        ))
-                        if index < width or index > height*width:
-                            secondary_xaxes[-1].set_xlabel(f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$")
+                for ax in axs.flat:
+                    ax.clear()
 
                 plot_elements = []
 
                 try:
-                    # Angles
-                    for label, colours in angle_style.items():
-                        line = axs[angle_ax].plot(xs[mask][0], stored[tolerance][quarks][label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")
-                        plot_elements.append((line[0], xs[mask], stored[tolerance][quarks][label][mask]))
-                        if label in approx[tolerance][quarks]:
-                            line = axs[angle_ax].plot(xs[mask][0], approx[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(approx[tolerance][quarks][label][mask])) else ""+f"${label}_{{\\text{{approx}}}}$", color=colours[1], linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], approx[tolerance][quarks][label][mask]))
-                    axs[angle_ax].set(
-                        ylim=angle_limits,
-                        ylabel="Angle [Rad]",
+                    plot_elements += draw_angles(
+                        axs[angle_ax],
+                        xs[mask],
+                        **{
+                            k: (
+                                stored[tolerance][quarks][general.ANGLE[k]][mask],
+                                {
+                                    "label": f"${general.ANGLE[k]}$",
+                                    "color": angle_style[general.ANGLE[k]][0],
+                                    "linestyle": "-.",
+                                }
+                            ) for k in general.ANGLE if general.ANGLE[k] in stored[tolerance][quarks]
+                        } | {
+                            k+"_approx": (
+                                approx[tolerance][quarks][general.ANGLE[k]][mask],
+                                {
+                                    "label": f"${general.ANGLE[k]}_\\text{{approx}}$",
+                                    "color": angle_style[general.ANGLE[k]][1],
+                                    "linewidth": 1,
+                                }
+                            ) for k in general.ANGLE if general.ANGLE[k] in approx[tolerance][quarks]
+                        }
                     )
-                    axs[angle_ax].legend(loc="lower left")
-                    sec_y = axs[angle_ax].secondary_yaxis("right", functions=(lambda x: x*180/np.pi, lambda x: x*np.pi/180))
-                    sec_y.set_ylabel("Angle [Deg]")
                 except NameError:
                     pass
 
@@ -367,8 +360,34 @@ if __name__ == "__main__":
                 except NameError:
                     pass
 
-                for ax in list(axs.flat)+[ax_frame]:
+                for ax in list(axs[-1,:])+[ax_frame]:
+                    ax.set_xlabel(f"$\\text{{Quark coupling strength: (}}{',\\quad'.join([f'{general.COUPLING[s]}={p/q:n}{sym.symbols(r'Q_{'+s+r'}')}' for s,p,q in zip('uds',quarks,(2/3,-1/3,-1/3))])} \\text{{)}}$")
+                secondary_xaxes = []
+                match mask_name:
+                    case "other":
+                        xlims = (1e-4, 1e1)
+                    case "pi0":
+                        xlims = (1e-5, 1e-1)
+                    case "eta":
+                        xlims = (2e-5, 2e-1)
+                    case "etaP":
+                        xlims = (3e-5, 3e-1)
+                    case _:
+                        xlims = (1e-7, 1e1)
+                for index, ax in enumerate(list(axs.flat)+[ax_frame]):
+                    ax.set_xlim(*xlims)
                     ax.grid()
+                    ax.set_xscale("log")
+                    if mask_name in secondary_xs:
+                        secondary_xaxes.append(ax.secondary_xaxis(
+                            "top",
+                            functions=(
+                                lambda x: secondary_xs[mask_name][0](x, *quarks, phB[mask][0]),
+                                lambda x: secondary_xs[mask_name][1](x, *quarks, phB[mask][0]),
+                            ),
+                        ))
+                        if index < width or index > height*width:
+                            secondary_xaxes[-1].set_xlabel(f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$")
                     if ax.get_yscale() == "log":
                         ax.set_ylim(
                             10 ** (np.log10(ax.get_ylim())[0] - 0.05 * np.diff(np.log10(ax.get_ylim()))[0]),
