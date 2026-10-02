@@ -74,6 +74,37 @@ def draw_angles(ax, x_strength: np.NDArray, alpha:tuple[np.NDArray, dict]=None, 
     sec_y.set_ylabel("Angle [Deg]")
     return elements
 
+def draw_masses(ax, x_strength:np.NDArray, m_phi:tuple[np.NDArray, dict]=None, m_pi0Bare:tuple[np.NDArray, dict]=None, m_etaBare:tuple[np.NDArray, dict]=None, m_etaPBare:tuple[np.NDArray, dict]=None, m_phiBare:tuple[np.NDArray, dict]=None, m_pi0:tuple[np.NDArray, dict]=None, m_eta:tuple[np.NDArray, dict]=None, m_etaP:tuple[np.NDArray, dict]=None):
+    draw_order = tuple(_x for _x in [m_phi, m_pi0Bare, m_etaBare, m_etaPBare] if _x is not None)
+    for ys, _ in draw_order:
+        axs[masses_ax].plot(x_strength.T, ys.T)
+    limits = (
+        max(axs[masses_ax].get_ylim()[0], 1e-3),
+        axs[masses_ax].get_ylim()[1],
+    )
+    ax.clear()
+
+    elements = []
+    if m_phiBare is not None:
+            elements.append((ax.axhline(m_phiBare[0][0], **m_phiBare[1]), None, m_phiBare[0][...,np.newaxis]))
+    for ys, style in draw_order:
+        elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
+    if m_pi0 is None:
+        m_pi0 = solver.MASS_NEUTRAL_PION, {}
+    if m_eta is None:
+        m_eta = solver.MASS_ETA, {}
+    if m_etaP is None:
+        m_etaP = solver.MASS_ETA_PRIME, {}
+    for ys, style in [m_pi0, m_eta, m_etaP]:
+        ax.axhline(ys, **style)
+    ax.set(
+        yscale="log",
+        ylim=limits,
+        ylabel="Mass [GeV]",
+    )
+    ax.legend(loc="lower left")
+    return elements
+
 # %%
 if __name__ == "__main__":
     stored_results = pathlib.Path() / "results_pseudo.pkl"
@@ -183,20 +214,6 @@ if __name__ == "__main__":
 
                 # Prep limits
                 try:
-                    # Masses
-                    axs[masses_ax].set_xscale("log")
-                    for label in mass_style:
-                        axs[masses_ax].plot(xs[mask&~erratic].T, stored[tolerance][quarks][label][mask&~erratic].T)
-                        if label in approx:
-                            axs[masses_ax].plot(xs[mask&~erratic].T, approx[tolerance][quarks][label][mask&~erratic].T)
-                    mass_limits = (
-                        max(axs[masses_ax].get_ylim()[0], 1e-3),
-                        axs[masses_ax].get_ylim()[1],
-                    )
-                except NameError:
-                    pass
-
-                try:
                     # Meson couplings
                     axs[meson_ax].set_xscale("log")
                     for label in meson_style:
@@ -244,8 +261,12 @@ if __name__ == "__main__":
                 plot_elements = []
 
                 try:
+                    ax = axs[angle_ax]
+                except NameError:
+                    pass
+                else:
                     plot_elements += draw_angles(
-                        axs[angle_ax],
+                        ax,
                         xs[mask],
                         **{
                             k: (
@@ -267,26 +288,22 @@ if __name__ == "__main__":
                             ) for k in general.ANGLE if general.ANGLE[k] in approx[tolerance][quarks]
                         }
                     )
-                except NameError:
-                    pass
 
                 try:
-                    # Masses
-                    phi_hline = axs[masses_ax].axhline(phB[mask][0], color="black", linewidth=1)
-                    plot_elements.append((phi_hline, None, phB[mask][...,np.newaxis]))
-                    for label, colours in mass_style.items():
-                        line = axs[masses_ax].plot(xs[mask][0], stored[tolerance][quarks][label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")
-                        plot_elements.append((line[0], xs[mask], stored[tolerance][quarks][label][mask]))
-                    for m, colours in zip((solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME), tab20):
-                        axs[masses_ax].axhline(m, color=colours[1], linewidth=1)
-                    axs[masses_ax].set(
-                        ylim=mass_limits,
-                        ylabel="Mass [GeV]",
-                        yscale="log",
-                    )
-                    axs[masses_ax].legend(loc="lower left")
+                    ax = axs[masses_ax]
                 except NameError:
                     pass
+                else:
+                    plot_elements += draw_masses(
+                        ax,
+                        xs[mask],
+                        m_phiBare = (phB[mask], {"color": tab20[7,1], "linewidth": 1}),
+                        **{
+                            "m_"+k: (stored[tolerance][quarks][general.MASS[k]][mask], {"label": f"${general.MASS[k]}$", "color": mass_style[general.MASS[k]][0], "linestyle": "-."}) for k in ["phi", "pi0Bare", "etaBare", "etaPBare"]
+                        } | {
+                            "m_"+k: (m, {"label": f"${general.MASS[k]}$", "color": mass_style[general.MASS[k+"Bare"]][1], "linewidth": 1}) for k,m in zip(["pi0", "eta", "etaP"], (solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME))
+                        }
+                    )
 
                 try:
                     # Meson Couplings
