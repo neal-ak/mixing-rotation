@@ -50,16 +50,28 @@ def pseudo_mass_ratio():
         )
     return result
 
-def draw_angles(ax, x_strength: np.NDArray, alpha:tuple[np.NDArray, dict]=None, beta:tuple[np.NDArray, dict]=None, gamma:tuple[np.NDArray, dict]=None, delta:tuple[np.NDArray, dict]=None, zeta:tuple[np.NDArray, dict]=None, kappa:tuple[np.NDArray, dict]=None, alpha_approx:tuple[np.NDArray, dict]=None, beta_approx:tuple[np.NDArray, dict]=None, gamma_approx:tuple[np.NDArray, dict]=None):
+def draw_angles(
+        ax,
+        x_strength: np.NDArray,
+        alpha: tuple[np.NDArray,dict] = None,
+        beta: tuple[np.NDArray,dict] = None,
+        gamma: tuple[np.NDArray,dict] = None,
+        delta: tuple[np.NDArray,dict] = None,
+        zeta: tuple[np.NDArray,dict] = None,
+        kappa: tuple[np.NDArray,dict] = None,
+        alpha_approx: tuple[np.NDArray,dict] = None,
+        beta_approx: tuple[np.NDArray,dict] = None,
+        gamma_approx: tuple[np.NDArray,dict] = None,
+    ):
     draw_order = tuple(_x for _x in [alpha, alpha_approx, beta, beta_approx, gamma, gamma_approx, delta, zeta, kappa] if _x is not None)
-    maximal_limits = (-1/2*np.pi, 1/2*np.pi)
-    for ys, _ in draw_order:
-        ax.plot(x_strength.T, ys[0].T)
+    limits = [np.nanmin(draw_order[0][0]), np.nanmax(draw_order[0][0])]
+    for ys, _ in draw_order[1:]:
+        limits[0] = min(limits[0], np.nanmin(ys))
+        limits[1] = max(limits[1], np.nanmax(ys))
     limits = (
-        max(ax.get_ylim()[0], maximal_limits[0]),
-        min(ax.get_ylim()[1], maximal_limits[1]),
+        max(limits[0], -1/2*np.pi),
+        min(limits[1], 1/2*np.pi),
     )
-    ax.clear()
 
     elements = []
     for ys, style in draw_order:
@@ -74,15 +86,27 @@ def draw_angles(ax, x_strength: np.NDArray, alpha:tuple[np.NDArray, dict]=None, 
     sec_y.set_ylabel("Angle [Deg]")
     return elements
 
-def draw_masses(ax, x_strength:np.NDArray, m_phi:tuple[np.NDArray, dict]=None, m_pi0Bare:tuple[np.NDArray, dict]=None, m_etaBare:tuple[np.NDArray, dict]=None, m_etaPBare:tuple[np.NDArray, dict]=None, m_phiBare:tuple[np.NDArray, dict]=None, m_pi0:tuple[np.NDArray, dict]=None, m_eta:tuple[np.NDArray, dict]=None, m_etaP:tuple[np.NDArray, dict]=None):
+def draw_masses(
+        ax,
+        x_strength: np.NDArray,
+        m_phi: tuple[np.NDArray,dict] = None,
+        m_pi0Bare: tuple[np.NDArray,dict] = None,
+        m_etaBare: tuple[np.NDArray,dict] = None,
+        m_etaPBare: tuple[np.NDArray,dict] = None,
+        m_phiBare: tuple[np.NDArray,dict] = None,
+        m_pi0: tuple[np.NDArray,dict] = None,
+        m_eta: tuple[np.NDArray,dict] = None,
+        m_etaP: tuple[np.NDArray,dict] = None,
+    ):
     draw_order = tuple(_x for _x in [m_phi, m_pi0Bare, m_etaBare, m_etaPBare] if _x is not None)
-    for ys, _ in draw_order:
-        axs[masses_ax].plot(x_strength.T, ys.T)
+    limits = [np.nanmin(draw_order[0][0]), np.nanmax(draw_order[0][0])]
+    for ys, _ in draw_order[1:]:
+        limits[0] = min(limits[0], np.nanmin(ys))
+        limits[1] = max(limits[1], np.nanmax(ys))
     limits = (
-        max(axs[masses_ax].get_ylim()[0], 1e-3),
-        axs[masses_ax].get_ylim()[1],
+        max(limits[0], 1e-3),
+        limits[1],
     )
-    ax.clear()
 
     elements = []
     if m_phiBare is not None:
@@ -101,6 +125,109 @@ def draw_masses(ax, x_strength:np.NDArray, m_phi:tuple[np.NDArray, dict]=None, m
         yscale="log",
         ylim=limits,
         ylabel="Mass [GeV]",
+    )
+    ax.legend(loc="lower left")
+    return elements
+
+def draw_mesons(
+        ax,
+        x_strength:np.NDArray,
+        g_chi:tuple[float, dict],
+        phi_chi:tuple[np.NDArray, dict]=None,
+        pi0_chi:tuple[np.NDArray, dict]=None,
+        eta_chi:tuple[np.NDArray, dict]=None,
+        etaP_chi:tuple[np.NDArray, dict]=None,
+        gamma_chi:tuple[np.NDArray, dict]=None,
+        phi_gamma:tuple[np.NDArray, dict]=None,
+        pi0_chi_approx:tuple[np.NDArray, dict]=None,
+        eta_chi_approx:tuple[np.NDArray, dict]=None,
+        etaP_chi_approx:tuple[np.NDArray, dict]=None,
+        gamma_chi_approx:tuple[np.NDArray, dict]=None,
+        phi_gamma_approx:tuple[np.NDArray, dict]=None,
+    ):
+    draw_order = tuple(_x for _x in [phi_chi, pi0_chi, eta_chi, etaP_chi, phi_gamma, pi0_chi_approx, eta_chi_approx, etaP_chi_approx, phi_gamma_approx] if _x is not None)
+    limits = [np.nanmin(draw_order[0][0]), np.nanmax(draw_order[0][0])]
+    for ys, _ in draw_order[1:]:
+        limits[0] = min(limits[0], np.nanmin(ys))
+        limits[1] = max(limits[1], np.nanmax(ys))
+    limits = (
+        max(limits[0], -g_chi[0]),
+        min(limits[1], g_chi[0]),
+    )
+
+    ax.axhline(g_chi[0], **g_chi[1])
+    elements = []
+    for ys, style in draw_order:
+        if np.all(np.abs(ys[~np.isnan(ys)]) < 1e-13):
+            continue # if it's exactly zero, we don't need to show it
+        elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
+    ax.set(
+        ylim=limits,
+        ylabel="Coupling",
+    )
+    ax.legend(loc="lower left")
+    return elements
+
+def draw_ratios(
+        ax,
+        x_strength:np.NDArray,
+        alpha: tuple[np.NDArray,dict] = None,
+        beta: tuple[np.NDArray,dict] = None,
+        gamma: tuple[np.NDArray,dict] = None,
+        m_pi0Bare: tuple[np.NDArray,dict] = None,
+        m_etaBare: tuple[np.NDArray,dict] = None,
+        m_etaPBare: tuple[np.NDArray,dict] = None,
+    ):
+    draw_order = tuple(_x for _x in [alpha, beta, gamma, m_pi0Bare, m_etaBare, m_etaPBare] if _x is not None)
+    limits = [np.nanmin(draw_order[0][0]), np.nanmax(draw_order[0][0])]
+    for ys, _ in draw_order[1:]:
+        limits[0] = min(limits[0], np.nanmin(ys))
+        limits[1] = max(limits[1], np.nanmax(ys))
+    limits = (
+        max(limits[0], 10),
+        min(limits[1], -10),
+    )
+
+    elements = []
+    for ys, style in draw_order:
+        if np.all(np.abs(ys[~np.isnan(ys)]) < 1e-13):
+            continue # if it's exactly zero, we don't need to show it
+        elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
+    ax.set(
+        ylim=limits,
+        ylabel="Approx / Reference",
+    )
+    ax.legend(loc="lower left")
+    return elements
+
+def draw_fractions(
+    ax,
+    x_strength:np.NDArray,
+    m_phi:tuple[np.NDArray, dict]=None,
+    pi0_chi:tuple[np.NDArray, dict]=None,
+    eta_chi:tuple[np.NDArray, dict]=None,
+    etaP_chi:tuple[np.NDArray, dict]=None,
+    phi_gamma:tuple[np.NDArray, dict]=None,
+):
+    draw_order = tuple(_x for _x in [m_phi, pi0_chi, eta_chi, etaP_chi, phi_gamma] if _x is not None)
+    limits = [np.nanmin(draw_order[0][0]), np.nanmax(draw_order[0][0])]
+    for ys, _ in draw_order[1:]:
+        limits[0] = min(limits[0], np.nanmin(ys))
+        limits[1] = max(limits[1], np.nanmax(ys))
+    limits = (
+        max(limits[0], 0),
+        min(limits[1], 1),
+    )
+
+    elements = []
+    for ys, style in draw_order:
+        if np.all(np.abs(ys[~np.isnan(ys)]-1) < 1e-13):
+            continue # if it's exactly zero, we don't need to show it
+        elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
+    ax.set(
+        yscale="log",
+        ylim=limits,
+        ylabel="| Approx / Reference - 1 |",
     )
     ax.legend(loc="lower left")
     return elements
@@ -202,183 +329,143 @@ if __name__ == "__main__":
             erratic = (np.abs(phB/solver.MASS_NEUTRAL_PION-1)<=erratic_thresh) | (np.abs(phB/solver.MASS_ETA-1)<=erratic_thresh) | (np.abs(phB/solver.MASS_ETA_PRIME-1)<=erratic_thresh)
 
             for mask_name, mask in masks.items():
+                if mask_name not in ["pi0"]:
+                    continue
                 fig, axs = plt.subplots(height,width, squeeze=False, figsize=figsize*np.array((width,height)))
                 fig_frame, ax_frame = plt.subplots(1,1, figsize=figsize*np.array((1,1)))
                 limits = np.empty((*axs.shape, 2))
 
-                angle_ax = 0,0
-                masses_ax = 0,1
-                meson_ax = 1,0
-                fractional_ax = 1,1
-                # ratio_ax = 1,1
-
-                # Prep limits
-                try:
-                    # Meson couplings
-                    axs[meson_ax].set_xscale("log")
-                    for label in meson_style:
-                        axs[meson_ax].plot(xs[mask&~erratic].T, stored[tolerance][quarks][label][mask&~erratic].T)
-                        if label in approx:
-                            axs[meson_ax].plot(xs[mask&~erratic].T, approx[tolerance][quarks][label][mask&~erratic].T)
-                    meson_limits = (
-                        max(axs[meson_ax].get_ylim()[0], -10*g_chi),
-                        min(axs[meson_ax].get_ylim()[1], 10*g_chi),
-                    )
-                except NameError:
-                    pass
-
-                try:
-                    # Ratio
-                    axs[ratio_ax].set_xscale("log")
-                    for label in angle_style|mass_style|meson_style:
-                        if label in ratio[tolerance][quarks]:
-                            axs[ratio_ax].plot(xs[mask&~erratic].T, ratio[tolerance][quarks][label][mask&~erratic].T)
-                    ratio_limits = (
-                        max(axs[ratio_ax].get_ylim()[0], -10),
-                        min(axs[ratio_ax].get_ylim()[1], 10),
-                    )
-                except NameError:
-                    pass
-
-                try:
-                    # Fractional error
-                    axs[fractional_ax].set_xscale("log")
-                    for label in angle_style|mass_style|meson_style:
-                        if label in fraction[tolerance][quarks]:
-                            axs[fractional_ax].plot(xs[mask&~erratic].T, fraction[tolerance][quarks][label][mask&~erratic].T)
-                    _xs = np.logspace(-8,2,num=101)
-                    _xs = np.tile(_xs, mask.shape[0]).reshape(mask.shape[0],-1)
-                    fraction_limits = (
-                        max(axs[fractional_ax].get_ylim()[0], 0),
-                        min(axs[fractional_ax].get_ylim()[1], 1),
-                    )
-                except NameError:
-                    pass
-
-                for ax in axs.flat:
-                    ax.clear()
-
                 plot_elements = []
+                plot_elements += draw_angles(
+                    axs[0,0],
+                    xs[mask],
+                    **{
+                        k: (
+                            stored[tolerance][quarks][general.ANGLE[k]][mask],
+                            {
+                                "label": f"${general.ANGLE[k]}$",
+                                "color": angle_style[general.ANGLE[k]][0],
+                                "linestyle": "-.",
+                            }
+                        ) for k in general.ANGLE if general.ANGLE[k] in stored[tolerance][quarks]
+                    } | {
+                        k+"_approx": (
+                            approx[tolerance][quarks][general.ANGLE[k]][mask],
+                            {
+                                "label": f"${general.ANGLE[k]}_\\text{{approx}}$",
+                                "color": angle_style[general.ANGLE[k]][1],
+                                "linewidth": 1,
+                            }
+                        ) for k in general.ANGLE if general.ANGLE[k] in approx[tolerance][quarks]
+                    }
+                )
 
-                try:
-                    ax = axs[angle_ax]
-                except NameError:
-                    pass
-                else:
-                    plot_elements += draw_angles(
+                plot_elements += draw_masses(
+                    axs[0,1],
+                    xs[mask],
+                    m_phiBare = (phB[mask], {"color": tab20[7,1], "linewidth": 1}),
+                    **{
+                        "m_"+k:
+                            (
+                                stored[tolerance][quarks][general.MASS[k]][mask],
+                                {
+                                    "label": f"${general.MASS[k]}$",
+                                    "color": mass_style[general.MASS[k]][0],
+                                    "linestyle": "-."
+                                }
+                            ) for k in ["phi", "pi0Bare", "etaBare", "etaPBare"]
+                    } | {
+                        "m_"+k:
+                            (
+                                m,
+                                {
+                                    "label": f"${general.MASS[k]}$",
+                                    "color": mass_style[general.MASS[k+"Bare"]][1],
+                                    "linewidth": 1
+                                }
+                            ) for k,m in zip(("pi0", "eta", "etaP"), (solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME))
+                    }
+                )
+
+                plot_elements += draw_mesons(
+                    axs[1,0],
+                    xs[mask],
+                    g_chi = (
+                        g_chi,
+                        {
+                            "label": f"${general.COUPLING['chi']} = {g_chi}$",
+                            "color": tab20[7,1],
+                            "linewidth": 1,
+                        }
+                    ),
+                    **{
+                        k.replace("-", "_"): (
+                            stored[tolerance][quarks][general.COUPLING[k]][mask],
+                            {
+                                "label": f"${general.COUPLING[k]}$",
+                                "color": meson_style[general.COUPLING[k]][0],
+                                "linestyle": "-."
+                            }
+                        ) for k in ["phi-chi", "pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]
+                    } | {
+                        k.replace("-", "_")+"_approx": (
+                            approx[tolerance][quarks][general.COUPLING[k]][mask],
+                            {
+                                "label": f"${str(general.COUPLING[k])[:-1]}, approx}}$",
+                                "color": meson_style[general.COUPLING[k]][1]
+                            }
+                        ) for k in ["pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]
+                    }
+                )
+
+                plot_elements += draw_ratios(
+                    axs[1,1],
+                    xs[mask],
+                    **{
+                        k: (
+                            ratio[tolerance][quarks][general.ANGLE[k]][mask],
+                            {
+                                "label": f"${general.ANGLE[k]}$",
+                                "color": angle_style[general.ANGLE[k]][0],
+                            }
+                        ) for k in ["alpha", "beta", "gamma"]
+                    } | {
+                        "m_"+k: (
+                            ratio[tolerance][quarks][general.MASS[k]][mask],
+                            {
+                                "label": f"${general.MASS[k]}$",
+                                "color": mass_style[general.MASS[k]][0],
+                                "linestyle": "-."
+                            }
+                        ) for k in ["pi0Bare", "etaBare", "etaPBare"]
+                    }
+                )
+
+                for ax in [ax_frame]:
+                    plot_elements += draw_fractions(
                         ax,
                         xs[mask],
+                        m_phi=(
+                            fraction[tolerance][quarks][general.MASS["phi"]][mask],
+                            {
+                                "label": f"${general.MASS['phi']}$",
+                                "color": mass_style[general.MASS["phi"]][0],
+                                "linestyle": "-.",
+                            }
+                        ),
                         **{
-                            k: (
-                                stored[tolerance][quarks][general.ANGLE[k]][mask],
+                            k.replace("-","_"): (
+                                fraction[tolerance][quarks][general.COUPLING[k]][mask],
                                 {
-                                    "label": f"${general.ANGLE[k]}$",
-                                    "color": angle_style[general.ANGLE[k]][0],
-                                    "linestyle": "-.",
+                                    "label": f"${general.COUPLING[k]}$",
+                                    "color": meson_style[general.COUPLING[k]][0],
                                 }
-                            ) for k in general.ANGLE if general.ANGLE[k] in stored[tolerance][quarks]
-                        } | {
-                            k+"_approx": (
-                                approx[tolerance][quarks][general.ANGLE[k]][mask],
-                                {
-                                    "label": f"${general.ANGLE[k]}_\\text{{approx}}$",
-                                    "color": angle_style[general.ANGLE[k]][1],
-                                    "linewidth": 1,
-                                }
-                            ) for k in general.ANGLE if general.ANGLE[k] in approx[tolerance][quarks]
+                            ) for k in ["pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]
                         }
                     )
-
-                try:
-                    ax = axs[masses_ax]
-                except NameError:
-                    pass
-                else:
-                    plot_elements += draw_masses(
-                        ax,
-                        xs[mask],
-                        m_phiBare = (phB[mask], {"color": tab20[7,1], "linewidth": 1}),
-                        **{
-                            "m_"+k: (stored[tolerance][quarks][general.MASS[k]][mask], {"label": f"${general.MASS[k]}$", "color": mass_style[general.MASS[k]][0], "linestyle": "-."}) for k in ["phi", "pi0Bare", "etaBare", "etaPBare"]
-                        } | {
-                            "m_"+k: (m, {"label": f"${general.MASS[k]}$", "color": mass_style[general.MASS[k+"Bare"]][1], "linewidth": 1}) for k,m in zip(["pi0", "eta", "etaP"], (solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME))
-                        }
-                    )
-
-                try:
-                    # Meson Couplings
-                    axs[meson_ax].axhline(g_chi, color=tab20[7,1], linewidth=1, label=f"${general.COUPLING['chi']} = {g_chi}$")
-                    for label, colours in meson_style.items():
-                        if label in approx[tolerance][quarks]:
-                            if np.all(np.abs(stored[tolerance][quarks][label][mask][0][~np.isnan(stored[tolerance][quarks][label][mask][0])]) < 1e-15) and np.all(np.abs(approx[tolerance][quarks][label][mask][0][~np.isnan(approx[tolerance][quarks][label][mask][0])]) < 1e-15):
-                                continue # if it's exactly zero, we don't need to show it
-                        line = axs[meson_ax].plot(xs[mask][0], stored[tolerance][quarks][label][mask][0], label=f"${label}$", color=colours[0], linestyle="-.", marker="")
-                        plot_elements.append((line[0], xs[mask], stored[tolerance][quarks][label][mask]))
-                        if label in approx[tolerance][quarks]:
-                            line = axs[meson_ax].plot(xs[mask][0], approx[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(approx[tolerance][quarks][label][mask])) else ""+f"${str(label)[:-1]},\\text{{approx}}}}$", color=colours[1], linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], approx[tolerance][quarks][label][mask]))
-                    axs[meson_ax].set(
-                        ylim=meson_limits,
-                        ylabel="Coupling",
-                    )
-                    axs[meson_ax].legend(loc="lower left")
-                except NameError:
-                    pass
-
-                try:
-                    # Ratio
-                    for label, colours in angle_style.items():
-                        if label in ratio[tolerance][quarks]:
-                            line = axs[ratio_ax].plot(xs[mask][0], ratio[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(ratio[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-", linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], ratio[tolerance][quarks][label][mask]))
-                    for label, colours in mass_style.items():
-                        if label in [general.MASS["phi"]]:
-                            continue
-                        if label in ratio[tolerance][quarks]:
-                            line = axs[ratio_ax].plot(xs[mask][0], ratio[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(ratio[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-.", linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], ratio[tolerance][quarks][label][mask]))
-                    axs[ratio_ax].set(
-                        ylim=ratio_limits,
-                        ylabel="Approx / Reference",
-                    )
-                    axs[ratio_ax].legend(loc="lower left")
-                except NameError:
-                    pass
-
-                try:
-                    # Fractional error
-                    for label, colours in mass_style.items():
-                        if label not in [general.MASS["phi"]]:
-                            continue
-                        if label in fraction[tolerance][quarks]:
-                            line = axs[fractional_ax].plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-.", linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
-                            line = ax_frame.plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-.", linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
-                    for label, colours in meson_style.items():
-                        if label in approx[tolerance][quarks]:
-                            if np.all(np.abs(stored[tolerance][quarks][label][mask][0][~np.isnan(stored[tolerance][quarks][label][mask][0])]) < 1e-15) and np.all(np.abs(approx[tolerance][quarks][label][mask][0][~np.isnan(approx[tolerance][quarks][label][mask][0])]) < 1e-15):
-                                continue # if it's exactly zero, we don't need to show it
-                        if label in fraction[tolerance][quarks]:
-                            line = axs[fractional_ax].plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-", linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
-                            line = ax_frame.plot(xs[mask][0], fraction[tolerance][quarks][label][mask][0], label="_" if np.all(np.isnan(fraction[tolerance][quarks][label][mask])) else ""+f"${label}$", color=colours[0], linestyle="-", linewidth=1, marker="")
-                            plot_elements.append((line[0], xs[mask], fraction[tolerance][quarks][label][mask]))
-                    axs[fractional_ax].set(
-                        ylim=fraction_limits,
-                        ylabel="| Approx / Reference - 1 |",
-                    )
-                    axs[fractional_ax].legend(loc="lower left")
-                    ax_frame.set(
-                        ylim=fraction_limits,
-                        ylabel="| Approx / Reference - 1 |",
-                    )
-                    ax_frame.legend(loc="lower left")
-                except NameError:
-                    pass
 
                 for ax in list(axs[-1,:])+[ax_frame]:
-                    ax.set_xlabel(f"$\\text{{Quark coupling strength: (}}{',\\quad'.join([f'{general.COUPLING[s]}={p/q:n}{sym.symbols(r'Q_{'+s+r'}')}' for s,p,q in zip('uds',quarks,(2/3,-1/3,-1/3))])} \\text{{)}}$")
+                    ax.set_xlabel(f"$\\text{{Quark Coupling: (}}{',\\quad'.join([f'{general.COUPLING[s]}' for s in 'uds'])} \\text{{)}}$")
                 secondary_xaxes = []
                 match mask_name:
                     case "other":
@@ -403,7 +490,7 @@ if __name__ == "__main__":
                                 lambda x: secondary_xs[mask_name][1](x, *quarks, phB[mask][0]),
                             ),
                         ))
-                        if index < width or index > height*width:
+                        if index < width or index >= height*width:
                             secondary_xaxes[-1].set_xlabel(f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$")
                     if ax.get_yscale() == "log":
                         ax.set_ylim(
@@ -443,7 +530,7 @@ if __name__ == "__main__":
                     fig.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
                     fig_frame.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
                     if mask_name in secondary_xs and phB[mask][frame] not in [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]:
-                        for index, ax in enumerate(axs.flat):
+                        for index, ax in enumerate(list(axs.flat)+[ax_frame]):
                             secondary_xaxes[index].remove()
                             secondary_xaxes[index] = ax.secondary_xaxis(
                                 "top",
@@ -452,7 +539,7 @@ if __name__ == "__main__":
                                     lambda x: secondary_xs[mask_name][1](x, *quarks, phB[mask][frame]),
                                 ),
                             )
-                            if index < width:
+                            if index < width or index >= height*width:
                                 secondary_xaxes[index].set_xlabel(f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$")
                     return [l for l,_,_ in plot_elements]
 
