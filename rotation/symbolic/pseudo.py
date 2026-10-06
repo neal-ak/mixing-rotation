@@ -59,7 +59,12 @@ def rotated_pseudo_meson_couplings(n_dim) -> dict[sym.Symbol, sym.core.mul.Mul]:
     bare_couplings = sym.Matrix.zeros(1, n_dim)
     bare_couplings[0] = COUPLING["chi"]
     rotated_couplings = bare_couplings * _create_nd_rotation(n_dim)[0].transpose()
-    return dict(zip([COUPLING[f"{k}-chi"] for k in ["phi"]+list(PARTICLE_ORDER)], rotated_couplings))
+    return dict(
+        zip(
+            [COUPLING[f"{k}-chi"] for k in ["phi"] + list(PARTICLE_ORDER)],
+            rotated_couplings,
+        )
+    )
 
 
 # %%

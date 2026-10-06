@@ -206,7 +206,7 @@ def axial_calculate_bare_masses(
         MASS["s"]: mass_strange,
     }
     masses = {}
-    for s,m in bare_axial_masses().items():
+    for s, m in bare_axial_masses().items():
         call = list(m.free_symbols)
         masses[s] = sym.lambdify(call, m)(*[parameter[k] for k in call])
     return masses
