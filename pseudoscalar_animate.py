@@ -467,7 +467,7 @@ if __name__ == "__main__":
                 "eta": np.abs(phB / solver.MASS_ETA - 1) < 2e-1,
                 "etaP": np.abs(phB / solver.MASS_ETA_PRIME - 1) < 2e-1,
             }
-            erratic_thresh = 1e-4
+            erratic_thresh = 1e-6
             erratic = (
                 (np.abs(phB / solver.MASS_NEUTRAL_PION - 1) <= erratic_thresh)
                 | (np.abs(phB / solver.MASS_ETA - 1) <= erratic_thresh)
@@ -475,8 +475,6 @@ if __name__ == "__main__":
             )
 
             for mask_name, mask in masks.items():
-                if mask_name not in ["pi0"]:
-                    continue
                 fig, axs = plt.subplots(
                     height,
                     width,
@@ -649,9 +647,7 @@ if __name__ == "__main__":
                     )
 
                 for ax in list(axs[-1, :]) + [ax_frame]:
-                    ax.set_xlabel(
-                        f"$\\text{{Quark Coupling: (}}{',\\quad'.join([f'{general.COUPLING[s]}' for s in 'uds'])} \\text{{)}}$"
-                    )
+                    ax.set_xlabel("Q")
                 secondary_xaxes = []
                 match mask_name:
                     case "other":
@@ -777,8 +773,7 @@ if __name__ == "__main__":
                         solver.MASS_ETA,
                         solver.MASS_ETA_PRIME,
                     ]:
-                        m = d * m
-                        nearness = np.abs(phB[mask] / m - 1)
+                        nearness = np.abs(phB[mask] / (d * m) - 1)
                         target = np.argmin(nearness)
                         if nearness[target] > 1e-3:
                             continue
@@ -791,9 +786,10 @@ if __name__ == "__main__":
                     fig,
                     update,
                     frames=len(xs[mask]),
-                    interval=5000 / len(xs[mask & ~erratic]),
+                    interval=5000 / len(xs[mask]),
                 )
                 ani.save(filename=f"animate_{filename}.gif", writer="pillow")
-                ani.save(filename=f"animate_{filename}.mp4", writer="ffmpeg")
+                # ani.save(filename=f"animate_{filename}.mp4", writer="ffmpeg")
 
-                plt.close()
+                fig.clear()
+                fig_frame.clear()
