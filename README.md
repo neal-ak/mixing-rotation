@@ -140,6 +140,16 @@ solved = rotation.numerical.solver.solve_mixing(
 The result is a dictionary of the unknowns you gave it mapped to the solutions the solver found.
 The `example.ipynb` shows how to iterate this process multiple times and plot the result.
 
+## Examples
+
+![](animate_1.0e-08_charge_other.gif)
+![](animate_1.0e-08_charge_pi0.gif)
+![](animate_1.0e-08_charge_eta.gif)
+![](animate_1.0e-08_charge_etaP.gif)
+
 ## Citation
 
-This was used in [arxiv:2603.xxxxx](https://arxiv.org/abs/2602.xxxxx).
+[![DOI](https://zenodo.org/badge/.svg)](https://zenodo.org/badge/latestdoi/)
+This was used in [arxiv:2610.xxxxx](https://arxiv.org/abs/2610.xxxxx).
+The equations within ...
+The scanned points can be found in the Zenodo entry: [![DOI](https://zenodo.org/badge/23220809.svg)](https://zenodo.org/badge/latestdoi/23220809)

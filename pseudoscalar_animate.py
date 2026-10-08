@@ -101,6 +101,8 @@ def draw_angles(
 
     elements = []
     for ys, style in draw_order:
+        if np.all(np.abs(ys[~np.isnan(ys)]) < 1e-14):
+            continue  # if it's exactly zero, we don't need to show it
         elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
     ax.set(
         xscale="log",
@@ -210,7 +212,7 @@ def draw_mesons(
     ax.axhline(g_chi[0], **g_chi[1])
     elements = []
     for ys, style in draw_order:
-        if np.all(np.abs(ys[~np.isnan(ys)]) < 1e-13):
+        if np.all(np.abs(ys[~np.isnan(ys)]) < 1e-14):
             continue  # if it's exactly zero, we don't need to show it
         elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
     ax.set(
@@ -247,11 +249,11 @@ def draw_ratios(
 
     elements = []
     for ys, style in draw_order:
-        if np.all(np.abs(ys[~np.isnan(ys)]) < 1e-13):
+        if np.all(np.abs(ys[~np.isnan(ys)]) < 1e-14):
             continue  # if it's exactly zero, we don't need to show it
         elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
     ax.set(
-        ylim=limits,
+        ylim=limits[::-1],
         ylabel="Approx / Reference",
     )
     ax.legend(loc="lower left")
@@ -281,7 +283,7 @@ def draw_fractions(
 
     elements = []
     for ys, style in draw_order:
-        if np.all(np.abs(ys[~np.isnan(ys)] - 1) < 1e-13):
+        if np.all(np.abs(ys[~np.isnan(ys)] - 1) < 1e-14):
             continue  # if it's exactly zero, we don't need to show it
         elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
     ax.set(
