@@ -2,7 +2,7 @@
 import pathlib
 import pickle
 
-from matplotlib import animation
+from matplotlib import animation, rcParams
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sym
@@ -10,6 +10,25 @@ import sympy as sym
 from rotation.numerical import solver, pseudo
 from rotation.symbolic import general
 from rotation.symbolic.pseudo import bare_pseudo_masses
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+FONT_SCALE = 1.0
+rcParams.update({
+    "mathtext.fontset": "cm",
+    "font.family": "serif",
+    "font.serif": ["cmr10", "DejaVu Serif"],
+    "axes.formatter.use_mathtext": True,
+    "axes.unicode_minus": False, # cmr10 has no Unicode minus
+    "font.size": 17 * FONT_SCALE,
+    "axes.labelsize": 24 * FONT_SCALE,
+    "axes.titlesize": 24 * FONT_SCALE,
+    "xtick.labelsize": 19 * FONT_SCALE,
+    "ytick.labelsize": 19 * FONT_SCALE,
+    "legend.fontsize": 19 * FONT_SCALE,
+})
 
 
 def small_alpha(m_phi, m_pi0_phi):
@@ -289,7 +308,7 @@ def draw_fractions(
     ax.set(
         yscale="log",
         ylim=limits,
-        ylabel="| Approx / Reference - 1 |",
+        ylabel="Abs(Approx / Reference - 1)",
     )
     ax.legend(loc="lower left")
     return elements
@@ -453,7 +472,7 @@ if __name__ == "__main__":
     )
     g_chi = 1
     fractional = np.array((True, False, True), dtype=bool)
-    height, width, figsize = 2, 2, 5
+    height, width, figsize = 2, 2, np.array((7.8, 5.8))
     secondary_xs = pseudo_mass_ratio()
     for tolerance in [1e-8]:
         for quarks in [(2, -1, -1)]:
@@ -469,12 +488,6 @@ if __name__ == "__main__":
                 "eta": np.abs(phB / solver.MASS_ETA - 1) < 2e-1,
                 "etaP": np.abs(phB / solver.MASS_ETA_PRIME - 1) < 2e-1,
             }
-            erratic_thresh = 1e-6
-            erratic = (
-                (np.abs(phB / solver.MASS_NEUTRAL_PION - 1) <= erratic_thresh)
-                | (np.abs(phB / solver.MASS_ETA - 1) <= erratic_thresh)
-                | (np.abs(phB / solver.MASS_ETA_PRIME - 1) <= erratic_thresh)
-            )
 
             for mask_name, mask in masks.items():
                 fig, axs = plt.subplots(
@@ -484,7 +497,7 @@ if __name__ == "__main__":
                     figsize=figsize * np.array((width, height)),
                 )
                 fig_frame, ax_frame = plt.subplots(
-                    1, 1, figsize=figsize * np.array((1, 1))
+                    1, 1, figsize=figsize
                 )
                 limits = np.empty((*axs.shape, 2))
 
@@ -680,6 +693,7 @@ if __name__ == "__main__":
                                 ),
                             )
                         )
+                        secondary_xaxes[-1].set_xticks(np.logspace(-20,20,num=41))
                         if index < width or index >= height * width:
                             secondary_xaxes[-1].set_xlabel(
                                 f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$"
@@ -754,6 +768,7 @@ if __name__ == "__main__":
                                     ),
                                 ),
                             )
+                            secondary_xaxes[index].set_xticks(np.logspace(-20,20,num=41))
                             if index < width or index >= height * width:
                                 secondary_xaxes[index].set_xlabel(
                                     f"${general.MASS[mask_name+'-phi']/sym.Abs(general.MASS[mask_name]-general.MASS['phiBare'])}$"
