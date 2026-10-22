@@ -99,7 +99,7 @@ def scan_quarks(
 
     num_fails, previous, successes = None, None, []
     for index, x in enumerate(new_results["coupling"]):
-        if num_fails is not None and num_fails > 3:
+        if num_fails is not None and num_fails > 1:
             break
         known |= {
             general.MASS["pi0-phi"]: diagonals[general.MASS["pi0-phi"]][index],
@@ -186,21 +186,13 @@ def main():
 
     for tol in [1e-8]:
         for quark in [(2, -1, -1), (1, 1, 1)]:
-            # log spacing from 1e-3 to 1e3
-            mphis = np.logspace(-3, 3, num=1 + 22 * 6)
+            # log spacing from 1e-6 to 1e6
+            a,b = -6,6
+            mphis = np.logspace(a, b, num=1 + int(10 * (b-a)))
 
             # fractional offsets from each meson mass
-            fracs = np.linspace(-4, -0.75, num=42)
-            fracs = np.sort(
-                np.concatenate(
-                    (
-                        fracs,
-                        np.linspace(-4 - 13 * np.diff(fracs).mean(), -4, num=1 + 13)[
-                            :-1
-                        ],
-                    )
-                )
-            )
+            a,b = -6,-0.5
+            fracs = np.linspace(a, b, num=1 + int(10 * (b-a)))
             fracs = 1 + np.concatenate((-(10 ** fracs[::-1]), [0], 10**fracs))
             for m in [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]:
                 mphis = np.concatenate((mphis, m * fracs))
@@ -216,8 +208,9 @@ def main():
                     <= 1e-13
                 ):
                     print(tol, quark, mphi, "Initial")
+                    a,b = -12,9
                     old_results[tol][quark][mphi] = scan_quarks(
-                        np.logspace(-7, 1, num=401), tol, quark, mphi
+                        np.logspace(a, b, num=1 + int(20 * (b-a))), tol, quark, mphi
                     )
 
                 # Iteratively approach the numerical instability at high coupling strengths
