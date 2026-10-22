@@ -12,23 +12,26 @@ from rotation.symbolic import general
 from rotation.symbolic.pseudo import bare_pseudo_masses
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 FONT_SCALE = 1.0
-rcParams.update({
-    "mathtext.fontset": "cm",
-    "font.family": "serif",
-    "font.serif": ["cmr10", "DejaVu Serif"],
-    "axes.formatter.use_mathtext": True,
-    "axes.unicode_minus": False, # cmr10 has no Unicode minus
-    "font.size": 17 * FONT_SCALE,
-    "axes.labelsize": 24 * FONT_SCALE,
-    "axes.titlesize": 24 * FONT_SCALE,
-    "xtick.labelsize": 19 * FONT_SCALE,
-    "ytick.labelsize": 19 * FONT_SCALE,
-    "legend.fontsize": 19 * FONT_SCALE,
-})
+rcParams.update(
+    {
+        "mathtext.fontset": "cm",
+        "font.family": "serif",
+        "font.serif": ["cmr10", "DejaVu Serif"],
+        "axes.formatter.use_mathtext": True,
+        "axes.unicode_minus": False,  # cmr10 has no Unicode minus
+        "font.size": 17 * FONT_SCALE,
+        "axes.labelsize": 24 * FONT_SCALE,
+        "axes.titlesize": 24 * FONT_SCALE,
+        "xtick.labelsize": 19 * FONT_SCALE,
+        "ytick.labelsize": 19 * FONT_SCALE,
+        "legend.fontsize": 19 * FONT_SCALE,
+    }
+)
 
 
 def small_alpha(m_phi, m_pi0_phi):
@@ -76,12 +79,18 @@ def pseudo_mass_ratio():
         strengths = [_x[sx] for _x in sym.solve(sr - ratio, [sx], dict=True)]
         result[label] = (
             sym.lambdify([sx] + call, ratio),
-            [([sr] + call, st) for st in strengths]
+            [([sr] + call, st) for st in strengths],
         )
     return result
 
 
-def _generic_plot(ax, x_strength:np.NDArray, draw_order:list[tuple[np.NDArray,dict]], y_min_limit:float=None, y_max_limit:float=None):
+def _generic_plot(
+    ax,
+    x_strength: np.NDArray,
+    draw_order: list[tuple[np.NDArray, dict]],
+    y_min_limit: float = None,
+    y_max_limit: float = None,
+):
     limits = [np.nanmin(draw_order[0][0]), np.nanmax(draw_order[0][0])]
     for ys, _ in draw_order[1:]:
         limits[0] = min(limits[0], np.nanmin(ys))
@@ -99,12 +108,19 @@ def _generic_plot(ax, x_strength:np.NDArray, draw_order:list[tuple[np.NDArray,di
         elements.append((ax.plot(x_strength[0], ys[0], **style)[0], x_strength, ys))
     return elements
 
+
 def draw_angles(
     ax,
     x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray,dict]],
+    draw_order: list[tuple[np.NDArray, dict]],
 ):
-    elements = _generic_plot(ax, x_strength, draw_order, y_min_limit=-1/2*np.pi, y_max_limit=1/2*np.pi)
+    elements = _generic_plot(
+        ax,
+        x_strength,
+        draw_order,
+        y_min_limit=-1 / 2 * np.pi,
+        y_max_limit=1 / 2 * np.pi,
+    )
     ax.set_ylabel(ylabel="Angle [Rad]")
     sec_y = ax.secondary_yaxis(
         "right", functions=(lambda x: x * 180 / np.pi, lambda x: x * np.pi / 180)
@@ -117,7 +133,7 @@ def draw_angles(
 def draw_masses(
     ax,
     x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray,dict]],
+    draw_order: list[tuple[np.NDArray, dict]],
     m_mediator: tuple[np.NDArray, dict] = None,
     m_pi0: tuple[np.NDArray, dict] = None,
     m_eta: tuple[np.NDArray, dict] = None,
@@ -132,7 +148,9 @@ def draw_masses(
                 m_mediator[0][..., np.newaxis],
             )
         )
-    elements += _generic_plot(ax, x_strength, draw_order, y_min_limit=1e-3, y_max_limit=1e2)
+    elements += _generic_plot(
+        ax, x_strength, draw_order, y_min_limit=1e-3, y_max_limit=1e2
+    )
     if m_pi0 is None:
         m_pi0 = solver.MASS_NEUTRAL_PION, {}
     if m_eta is None:
@@ -152,12 +170,18 @@ def draw_masses(
 def draw_mesons(
     ax,
     x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray,dict]],
+    draw_order: list[tuple[np.NDArray, dict]],
     bare_coupling: tuple[float, dict],
 ):
     if bare_coupling is not None:
         ax.axhline(bare_coupling[0], **bare_coupling[1])
-    elements = _generic_plot(ax, x_strength, draw_order, y_min_limit=-bare_coupling[0], y_max_limit=bare_coupling[0])
+    elements = _generic_plot(
+        ax,
+        x_strength,
+        draw_order,
+        y_min_limit=-bare_coupling[0],
+        y_max_limit=bare_coupling[0],
+    )
     ax.set_ylabel("Coupling")
     ax.legend(loc="lower left")
     return elements
@@ -166,9 +190,11 @@ def draw_mesons(
 def draw_ratios(
     ax,
     x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray,dict]],
+    draw_order: list[tuple[np.NDArray, dict]],
 ):
-    elements = _generic_plot(ax, x_strength, draw_order, y_min_limit=-10, y_max_limit=10)
+    elements = _generic_plot(
+        ax, x_strength, draw_order, y_min_limit=-10, y_max_limit=10
+    )
     ax.set_ylabel("Rotated / Bare")
     ax.legend(loc="lower left")
     return elements
@@ -177,9 +203,11 @@ def draw_ratios(
 def draw_fractions(
     ax,
     x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray,dict]],
+    draw_order: list[tuple[np.NDArray, dict]],
 ):
-    elements = _generic_plot(ax, x_strength, draw_order, y_min_limit=1e-16, y_max_limit=1)
+    elements = _generic_plot(
+        ax, x_strength, draw_order, y_min_limit=1e-16, y_max_limit=1
+    )
     ax.set(
         yscale="log",
         ylabel="Abs(Rotated / Bare - 1)",
@@ -198,7 +226,7 @@ if __name__ == "__main__":
         stored = {}
 
     # %%
-    for tolerance,_ in stored.items():
+    for tolerance, _ in stored.items():
         for quarks, scan in stored[tolerance].items():
             phis = sorted(scan)
             stored[tolerance][quarks] = {
@@ -236,7 +264,7 @@ if __name__ == "__main__":
 
     g_chi = 1
     approx, ratio, fraction = {}, {}, {}
-    for tolerance,_ in stored.items():
+    for tolerance, _ in stored.items():
         approx[tolerance], ratio[tolerance], fraction[tolerance] = {}, {}, {}
         for quarks in stored[tolerance]:
             stored[tolerance][quarks] |= pseudo.pseudo_calculate_meson_couplings(
@@ -347,7 +375,7 @@ if __name__ == "__main__":
     g_chi = 1
     height, width, figsize = 2, 2, np.array((7.8, 5.8))
     secondaries = pseudo_mass_ratio()
-    for tolerance,_ in stored.items():
+    for tolerance, _ in stored.items():
         for quarks in stored[tolerance]:
             phB, xs = (
                 stored[tolerance][quarks][general.MASS["phiBare"]],
@@ -367,15 +395,12 @@ if __name__ == "__main__":
                     height,
                     width,
                     squeeze=False,
-                    figsize=figsize * 1.1*np.array((width, height)),
+                    figsize=figsize * 1.1 * np.array((width, height)),
                 )
-                fig_frame, ax_frame = plt.subplots(
-                    1, 1, figsize=figsize
-                )
+                fig_frame, ax_frame = plt.subplots(1, 1, figsize=figsize)
                 limits = np.empty((*axs.shape, 2))
 
-
-                if quarks == (2,-1,-1) and mask_name == "pi0":
+                if quarks == (2, -1, -1) and mask_name == "pi0":
                     meson_couplings = ("pi0-chi", "etaP-chi")
                 else:
                     meson_couplings = ("pi0-chi", "eta-chi", "etaP-chi")
@@ -393,8 +418,10 @@ if __name__ == "__main__":
                                 "linestyle": "-.",
                             },
                         )
-                        for k in general.ANGLE.values() if k in stored[tolerance][quarks]
-                    ] + [
+                        for k in general.ANGLE.values()
+                        if k in stored[tolerance][quarks]
+                    ]
+                    + [
                         (
                             approx[tolerance][quarks][k][mask],
                             {
@@ -403,7 +430,8 @@ if __name__ == "__main__":
                                 "linewidth": 1,
                             },
                         )
-                        for k in general.ANGLE.values() if k in approx[tolerance][quarks]
+                        for k in general.ANGLE.values()
+                        if k in approx[tolerance][quarks]
                     ],
                 )
 
@@ -460,11 +488,14 @@ if __name__ == "__main__":
                             *meson_couplings,
                             "phi-gamma",
                         ]
-                    ] + [
+                    ]
+                    + [
                         (
                             approx[tolerance][quarks][general.COUPLING[k]][mask],
                             {
-                                "label": "$"+ str(general.COUPLING[k])[:-1] + r", approx}$",
+                                "label": "$"
+                                + str(general.COUPLING[k])[:-1]
+                                + r", approx}$",
                                 "color": meson_style[general.COUPLING[k]][1],
                             },
                         )
@@ -492,7 +523,8 @@ if __name__ == "__main__":
                             },
                         )
                         for k in ["alpha", "beta", "gamma"]
-                    ] + [
+                    ]
+                    + [
                         (
                             ratio[tolerance][quarks][general.MASS[k]][mask],
                             {
@@ -502,7 +534,7 @@ if __name__ == "__main__":
                             },
                         )
                         for k in ["pi0Bare", "etaBare", "etaPBare"]
-                    ]
+                    ],
                 )
 
                 for ax in [ax_frame]:
@@ -518,7 +550,8 @@ if __name__ == "__main__":
                                 },
                             )
                             for k in meson_couplings
-                        ] + [
+                        ]
+                        + [
                             (
                                 fraction[tolerance][quarks][general.MASS["phi"]][mask],
                                 {
@@ -546,10 +579,12 @@ if __name__ == "__main__":
                 if mask_name in secondaries:
                     to_secondary = secondaries[mask_name][0]
                     from_secondary = None
-                    for call,sol in secondaries[mask_name][1]:
-                        sol = sol.subs({general.COUPLING[k]: q for k,q in zip("uds",quarks)})
+                    for call, sol in secondaries[mask_name][1]:
+                        sol = sol.subs(
+                            {general.COUPLING[k]: q for k, q in zip("uds", quarks)}
+                        )
                         if sol.is_nonnegative:
-                            from_secondary = sym.lambdify(call,sol)
+                            from_secondary = sym.lambdify(call, sol)
                             break
                 for index, ax in enumerate(list(axs.flat) + [ax_frame]):
                     ax.set_xlim(*xlims)
@@ -560,16 +595,12 @@ if __name__ == "__main__":
                             ax.secondary_xaxis(
                                 "top",
                                 functions=(
-                                    lambda x: to_secondary(
-                                        x, *quarks, phB[mask][0]
-                                    ),
-                                    lambda x: from_secondary(
-                                        x, *quarks, phB[mask][0]
-                                    ),
+                                    lambda x: to_secondary(x, *quarks, phB[mask][0]),
+                                    lambda x: from_secondary(x, *quarks, phB[mask][0]),
                                 ),
                             )
                         )
-                        secondary_xaxes[-1].set_xticks(np.logspace(-20,20,num=41))
+                        secondary_xaxes[-1].set_xticks(np.logspace(-20, 20, num=41))
                         if index < width or index >= height * width:
                             secondary_xaxes[-1].set_xlabel(
                                 f"${general.MASS[mask_name+'-phi']}^{{2}} / Abs({general.MASS[mask_name]}^{{2}} - {general.MASS['phiBare']}^{{2}})$",
@@ -594,7 +625,14 @@ if __name__ == "__main__":
                             ax.get_ylim()[1] + 0.05 * np.diff(ax.get_ylim())[0],
                         )
                     # Place vertical line where the first angle crosses 0.3
-                    all_angles = np.concatenate([stored[tolerance][quarks][k][mask][...,np.newaxis] for k in general.ANGLE.values() if k in stored[tolerance][quarks]], axis=-1)
+                    all_angles = np.concatenate(
+                        [
+                            stored[tolerance][quarks][k][mask][..., np.newaxis]
+                            for k in general.ANGLE.values()
+                            if k in stored[tolerance][quarks]
+                        ],
+                        axis=-1,
+                    )
                     greater = np.abs(all_angles) > 0.3
                     lesser = np.abs(all_angles) < 0.3
                     rising = greater[..., :-1, :] & lesser[..., 1:, :]
@@ -602,36 +640,45 @@ if __name__ == "__main__":
                     is_thresh = np.abs(all_angles) == 0.3
                     is_thresh[..., :-1, :] = is_thresh[..., :-1, :] | rising | falling
                     edges = np.argwhere(is_thresh)
-                    args = -np.ones((xs[mask].shape[0],1), dtype=int)
+                    args = -np.ones((xs[mask].shape[0], 1), dtype=int)
                     for index, arg, _ in edges:
-                        if args[index,0] == -1:
-                            args[index,0] = arg
+                        if args[index, 0] == -1:
+                            args[index, 0] = arg
                         else:
-                            args[index,0] = min(args[index,0], arg)
+                            args[index, 0] = min(args[index, 0], arg)
                     vert_x = np.take_along_axis(xs[mask], args, axis=1)[..., 0]
-                    vert_x[args[...,0]==-1] = ax.get_xlim()[1]+1 # move it off the plot to hide it
-                    plot_elements.append((
-                        ax.axvline(vert_x[0], color="black", linestyle=":"),
-                        vert_x[..., np.newaxis],
-                        None,
-                    ))
+                    vert_x[args[..., 0] == -1] = (
+                        ax.get_xlim()[1] + 1
+                    )  # move it off the plot to hide it
+                    plot_elements.append(
+                        (
+                            ax.axvline(vert_x[0], color="black", linestyle=":"),
+                            vert_x[..., np.newaxis],
+                            None,
+                        )
+                    )
                     # Hatch out the region where solver fails
                     maxes = np.nanmax(xs[mask], axis=1)
                     lims = ax.get_xlim()[1] * np.ones_like(maxes)
-                    bad_xs = np.concatenate((maxes[:,np.newaxis],lims[:,np.newaxis]),axis=1)
+                    bad_xs = np.concatenate(
+                        (maxes[:, np.newaxis], lims[:, np.newaxis]), axis=1
+                    )
                     bad_ys = ax.get_ylim()
-                    plot_elements.append((
-                        ax.fill_between(bad_xs[0], *bad_ys, facecolor="red", alpha=1/3),
-                        bad_xs,
-                        bad_ys,
-                    ))
+                    plot_elements.append(
+                        (
+                            ax.fill_between(
+                                bad_xs[0], *bad_ys, facecolor="red", alpha=1 / 3
+                            ),
+                            bad_xs,
+                            bad_ys,
+                        )
+                    )
 
                 fig.suptitle(f"${general.MASS['phiBare']} = (10^{{00}})$")
                 fig.tight_layout()
 
                 fig_frame.suptitle(f"${general.MASS['phiBare']} = (10^{{00}})$")
                 fig_frame.tight_layout()
-
 
                 def update(frame):
                     for line, x, y in plot_elements:
@@ -663,11 +710,16 @@ if __name__ == "__main__":
                             break
                     fig.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
                     fig_frame.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
-                    if mask_name in secondaries and from_secondary is not None and phB[mask][frame] not in [
-                        solver.MASS_NEUTRAL_PION,
-                        solver.MASS_ETA,
-                        solver.MASS_ETA_PRIME,
-                    ]:
+                    if (
+                        mask_name in secondaries
+                        and from_secondary is not None
+                        and phB[mask][frame]
+                        not in [
+                            solver.MASS_NEUTRAL_PION,
+                            solver.MASS_ETA,
+                            solver.MASS_ETA_PRIME,
+                        ]
+                    ):
                         for index, ax in enumerate(list(axs.flat) + [ax_frame]):
                             secondary_xaxes[index].remove()
                             secondary_xaxes[index] = ax.secondary_xaxis(
@@ -681,7 +733,9 @@ if __name__ == "__main__":
                                     ),
                                 ),
                             )
-                            secondary_xaxes[index].set_xticks(np.logspace(-20,20,num=41))
+                            secondary_xaxes[index].set_xticks(
+                                np.logspace(-20, 20, num=41)
+                            )
                             if index < width or index >= height * width:
                                 secondary_xaxes[index].set_xlabel(
                                     f"${general.MASS[mask_name+'-phi']}^{{2}} / Abs({general.MASS[mask_name]}^{{2}} - {general.MASS['phiBare']}^{{2}})$",
