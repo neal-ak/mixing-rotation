@@ -595,19 +595,30 @@ if __name__ == "__main__":
                     lesser = np.abs(all_angles) < 0.3
                     rising = greater[..., :-1, :] & lesser[..., 1:, :]
                     falling = lesser[..., :-1, :] & greater[..., 1:, :]
+                    before, after = np.zeros_like(
+                        all_angles, dtype=bool
+                    ), np.zeros_like(all_angles, dtype=bool)
+                    before[..., :-1, :] = rising | falling
+                    after[..., 1:, :] = rising | falling
+                    dx, dy, x_lerp = (
+                        np.nan * np.empty_like(all_angles, dtype=float),
+                        np.nan * np.empty_like(all_angles, dtype=float),
+                        np.nan * np.empty_like(all_angles, dtype=float),
+                    )
+                    all_xs = np.repeat(
+                        xs[mask][:, :, np.newaxis], all_angles.shape[2], axis=2
+                    )
+                    dx[before] = all_xs[after] - all_xs[before]
+                    dy[before] = np.abs(all_angles[after]) - np.abs(all_angles[before])
+                    x_lerp[before] = (
+                        dx[before] / dy[before] * (0.3 - np.abs(all_angles[before]))
+                        + all_xs[before]
+                    )
                     is_thresh = np.abs(all_angles) == 0.3
-                    is_thresh[..., :-1, :] = is_thresh[..., :-1, :] | rising | falling
-                    edges = np.argwhere(is_thresh)
-                    args = -np.ones((xs[mask].shape[0], 1), dtype=int)
-                    for index, arg, _ in edges:
-                        if args[index, 0] == -1:
-                            args[index, 0] = arg
-                        else:
-                            args[index, 0] = min(args[index, 0], arg)
-                    vert_x = np.take_along_axis(xs[mask], args, axis=1)[..., 0]
-                    vert_x[args[..., 0] == -1] = (
-                        ax.get_xlim()[1] + 1
-                    )  # move it off the plot to hide it
+                    x_lerp[is_thresh] = all_xs[is_thresh]
+                    vert_x = np.nanmin(
+                        x_lerp, axis=(1, 2)
+                    )  # We're saving the 0.3 of the minimum x value between all 0.3 crossings and all angles
                     plot_elements.append(
                         (
                             ax.axvline(vert_x[0], color="black", linestyle=":"),
