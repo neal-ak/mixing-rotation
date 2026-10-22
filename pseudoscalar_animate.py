@@ -169,7 +169,7 @@ def draw_ratios(
     draw_order: list[tuple[np.NDArray,dict]],
 ):
     elements = _generic_plot(ax, x_strength, draw_order, y_min_limit=-10, y_max_limit=10)
-    ax.set_ylabel("Approx / Reference")
+    ax.set_ylabel("Rotated / Bare")
     ax.legend(loc="lower left")
     return elements
 
@@ -182,7 +182,7 @@ def draw_fractions(
     elements = _generic_plot(ax, x_strength, draw_order, y_min_limit=1e-16, y_max_limit=1)
     ax.set(
         yscale="log",
-        ylabel="Abs(Approx / Reference - 1)",
+        ylabel="Abs(Rotated / Bare - 1)",
     )
     ax.legend(loc="lower left")
     return elements
@@ -374,6 +374,12 @@ if __name__ == "__main__":
                 )
                 limits = np.empty((*axs.shape, 2))
 
+
+                if quarks == (2,-1,-1) and mask_name == "pi0":
+                    meson_couplings = ("pi0-chi", "etaP-chi")
+                else:
+                    meson_couplings = ("pi0-chi", "eta-chi", "etaP-chi")
+
                 plot_elements = []
                 plot_elements += draw_angles(
                     axs[0, 0],
@@ -451,9 +457,7 @@ if __name__ == "__main__":
                         )
                         for k in [
                             "phi-chi",
-                            "pi0-chi",
-                            "eta-chi",
-                            "etaP-chi",
+                            *meson_couplings,
                             "phi-gamma",
                         ]
                     ] + [
@@ -464,7 +468,7 @@ if __name__ == "__main__":
                                 "color": meson_style[general.COUPLING[k]][1],
                             },
                         )
-                        for k in ["pi0-chi", "eta-chi", "etaP-chi", "phi-gamma"]
+                        for k in [*meson_couplings, "phi-gamma"]
                     ],
                     bare_coupling=(
                         g_chi,
@@ -513,7 +517,15 @@ if __name__ == "__main__":
                                     "color": meson_style[general.COUPLING[k]][0],
                                 },
                             )
-                            for k in ["pi0-chi", "eta-chi", "etaP-chi"]
+                            for k in meson_couplings
+                        ] + [
+                            (
+                                fraction[tolerance][quarks][general.MASS["phi"]][mask],
+                                {
+                                    "label": f"${general.MASS['phi']}$",
+                                    "color": mass_style[general.MASS["phi"]][0],
+                                },
+                            )
                         ],
                     )
 
@@ -599,7 +611,7 @@ if __name__ == "__main__":
                     vert_x = np.take_along_axis(xs[mask], args, axis=1)[..., 0]
                     vert_x[args[...,0]==-1] = ax.get_xlim()[1]+1 # move it off the plot to hide it
                     plot_elements.append((
-                        ax.axvline(vert_x[0], color="black", linestyle="--"),
+                        ax.axvline(vert_x[0], color="black", linestyle=":"),
                         vert_x[..., np.newaxis],
                         None,
                     ))
