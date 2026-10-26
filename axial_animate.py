@@ -600,11 +600,9 @@ if __name__ == "__main__":
                     ), np.zeros_like(all_angles, dtype=bool)
                     before[..., :-1, :] = rising | falling
                     after[..., 1:, :] = rising | falling
-                    dx, dy, x_lerp = (
-                        np.nan * np.empty_like(all_angles, dtype=float),
-                        np.nan * np.empty_like(all_angles, dtype=float),
-                        np.nan * np.empty_like(all_angles, dtype=float),
-                    )
+                    dx = np.nan * np.empty_like(all_angles, dtype=float)
+                    dy = np.nan * np.empty_like(all_angles, dtype=float)
+                    x_lerp = np.nan * np.empty_like(all_angles, dtype=float)
                     all_xs = np.repeat(
                         xs[mask][:, :, np.newaxis], all_angles.shape[2], axis=2
                     )
