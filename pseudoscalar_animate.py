@@ -195,7 +195,7 @@ def draw_ratios(
     elements = _generic_plot(
         ax, x_strength, draw_order, y_min_limit=-10, y_max_limit=10
     )
-    ax.set_ylabel("Rotated / Bare")
+    ax.set_ylabel("Approx / Exact")
     ax.legend(loc="lower left")
     return elements
 
@@ -210,7 +210,7 @@ def draw_fractions(
     )
     ax.set(
         yscale="log",
-        ylabel="Abs(Rotated / Bare - 1)",
+        ylabel="Abs(Approx / Exact - 1)",
     )
     ax.legend(loc="lower left")
     return elements
@@ -401,9 +401,9 @@ if __name__ == "__main__":
                 limits = np.empty((*axs.shape, 2))
 
                 if quarks == (2, -1, -1) and mask_name == "pi0":
-                    meson_couplings = ("pi0-chi", "etaP-chi")
+                    meson_couplings = ("pi0-chi", "eta-chi", "phi-gamma")
                 else:
-                    meson_couplings = ("pi0-chi", "eta-chi", "etaP-chi")
+                    meson_couplings = ("pi0-chi", "eta-chi", "etaP-chi", "phi-gamma")
 
                 plot_elements = []
                 plot_elements += draw_angles(

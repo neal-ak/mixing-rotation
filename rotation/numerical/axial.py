@@ -150,7 +150,7 @@ def axial_calculate_meson_couplings(
     coupling = {}
     for s, l in rotated_axial_meson_couplings().items():
         call = list(l.free_symbols)
-        coupling[s] = sym.lambdify(call, sym.asin(l))(*[parameter[k] for k in call])
+        coupling[s] = sym.lambdify(call, l)(*[parameter[k] for k in call])
     return coupling
 
 

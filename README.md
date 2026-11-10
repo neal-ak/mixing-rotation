@@ -58,21 +58,21 @@ You then need to prepare two dictionaries, one representing fixed known quantiti
 # Pseudo scalar mediator case
 import rotation.numerical.pseudo
 bare_masses = rotation.numerical.pseudo.pseudo_calculate_bare_masses(
-    coupling_up=0.7,
-    coupling_down=0.1,
-    coupling_strange=-0.2,
+    coupling_up=2e-2,
+    coupling_down=-1e-2,
+    coupling_strange=-1e-2,
 )
 known = {
     rotation.symbolic.general.MASS["pi0"]: 0.1349768,
     rotation.symbolic.general.MASS["eta"]: 0.547862,
-    rotation.symbolic.general.MASS["phiBare"]: 5,
-    rotation.symbolic.general.MASS["pi0-phi"]: bare_masses[MASS["pi0-phi"]],
-    rotation.symbolic.general.MASS["eta-phi"]: bare_masses[MASS["eta-phi"]],
+    rotation.symbolic.general.MASS["phiBare"]: 0.1,
+    rotation.symbolic.general.MASS["pi0-phi"]: bare_masses[rotation.symbolic.general.MASS["pi0-phi"]],
+    rotation.symbolic.general.MASS["eta-phi"]: bare_masses[rotation.symbolic.general.MASS["eta-phi"]],
     rotation.symbolic.general.MASS["etaP"]: 0.95778,
-    rotation.symbolic.general.MASS["etaP-phi"]: bare_masses[MASS["etaP-phi"]],
+    rotation.symbolic.general.MASS["etaP-phi"]: bare_masses[rotation.symbolic.general.MASS["etaP-phi"]],
 }
 unknown = {
-    rotation.symbolic.general.MASS["phi"]: 5,
+    rotation.symbolic.general.MASS["phi"]: 0.1,
     rotation.symbolic.general.MASS["pi0Bare"]: 0.1349768,
     rotation.symbolic.general.MASS["etaBare"]: 0.547862,
     rotation.symbolic.general.ANGLE["alpha"]: 0.0,
@@ -90,16 +90,16 @@ Extra note: for the axial vector mediator, the kinetic mixing angles can ether b
 ```python
 # Axial vector mediator case
 import rotation.numerical.axial
-piA, etaA, etaPA = rotation.numerical.axial.axial_calculate_bare_masses(
-    coupling_up=0.7,
-    coupling_down=0.1,
-    coupling_strange=-0.2,
+bare_masses = rotation.numerical.axial.axial_calculate_bare_masses(
+    coupling_up=2e-1,
+    coupling_down=-1e-1,
+    coupling_strange=-1e-1,
 )
 kin_u, kin_v, kin_w = rotation.numerical.axial.calculate_uvw(
-    m_axial=1.0,
-    m_pi0_axial=piA,
-    m_eta_axial=etaA,
-    m_etap_axial=etaPA,
+    m_axial=0.1,
+    m_pi0_axial=bare_masses[rotation.symbolic.general.MASS["pi0-AP"]],
+    m_eta_axial=bare_masses[rotation.symbolic.general.MASS["eta-AP"]],
+    m_etap_axial=bare_masses[rotation.symbolic.general.MASS["etaP-AP"]],
 )
 known = {
     rotation.symbolic.general.MASS["pi0"]: 0.1349768,

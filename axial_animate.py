@@ -69,7 +69,7 @@ def axial_mass_ratio():
     ]
     bares = bare_axial_masses()
     for label in ("pi0", "eta", "etaP"):
-        ratio = bares[general.MASS[f"{label}-AP"]] ** 2 / general.MASS["AP"] ** 2
+        ratio = bares[general.MASS[f"{label}-AP"]] / general.MASS["AP"]
         ratio = ratio.subs(parameter)
         strengths = [_x[sx] for _x in sym.solve(sr - ratio, [sx], dict=True)]
         result[label] = (
@@ -190,7 +190,7 @@ def draw_ratios(
     elements = _generic_plot(
         ax, x_strength, draw_order, y_min_limit=-10, y_max_limit=10
     )
-    ax.set_ylabel("Rotated / Bare")
+    ax.set_ylabel("Approx / Exact")
     ax.legend(loc="lower left")
     return elements
 
@@ -205,7 +205,7 @@ def draw_fractions(
     )
     ax.set(
         yscale="log",
-        ylabel="Abs(Rotated / Bare - 1)",
+        ylabel="Abs(Approx / Exact - 1)",
     )
     ax.legend(loc="lower left")
     return elements
@@ -561,7 +561,7 @@ if __name__ == "__main__":
                         secondary_xaxes[-1].set_xticks(np.logspace(-20, 20, num=41))
                         if index < width or index >= height * width:
                             secondary_xaxes[-1].set_xlabel(
-                                f"{general.MASS[mask_name+'-AP']}^{{2}} / {general.MASS['AP']}",
+                                f"${general.MASS[mask_name+'-AP']} / {general.MASS['AP']}$",
                                 labelpad=16,
                             )
                     if ax.get_yscale() == "log":
@@ -703,7 +703,7 @@ if __name__ == "__main__":
                             )
                             if index < width or index >= height * width:
                                 secondary_xaxes[index].set_xlabel(
-                                    f"${general.MASS[mask_name+'-AP']}^{{2}} / {general.MASS['AP']}^{{2}}$",
+                                    f"${general.MASS[mask_name+'-AP']} / {general.MASS['AP']}$",
                                     labelpad=16,
                                 )
                     return [l for l, _, _ in plot_elements]
