@@ -188,7 +188,7 @@ def scan_quarks(
 
 
 def main():
-    storage = pathlib.Path() / "results_axial.pkl"
+    storage = pathlib.Path("results_axial.pkl").resolve()
     if storage.is_file():
         with open(storage, "rb") as f:
             old_results = pickle.load(f)
@@ -198,12 +198,12 @@ def main():
     for tol in [1e-8]:
         for quark in [(2, -1, -1), (1, 1, 1)]:
             # log spacing from 1e-6 to 1e6
-            a,b = -6,6
-            maxials = np.logspace(a, b, num=1 + int(10 * (b-a)))
+            a, b = -6, 6
+            maxials = np.logspace(a, b, num=1 + int(10 * (b - a)))
 
             # fractional offsets from each meson mass
-            a,b = -6,-0.5
-            fracs = np.linspace(a, b, num=1 + int(10 * (b-a)))
+            a, b = -6, -0.5
+            fracs = np.linspace(a, b, num=1 + int(10 * (b - a)))
             fracs = 1 + np.concatenate((-(10 ** fracs[::-1]), [0], 10**fracs))
             for m in [solver.MASS_NEUTRAL_PION, solver.MASS_ETA, solver.MASS_ETA_PRIME]:
                 maxials = np.concatenate((maxials, m * fracs))
@@ -219,9 +219,9 @@ def main():
                     <= 1e-13
                 ):
                     print(tol, quark, maxial, "Initial")
-                    a,b = -12,9
+                    a, b = -12, 9
                     old_results[tol][quark][maxial] = scan_quarks(
-                        np.logspace(a, b, num=1 + int(20 * (b-a))), tol, quark, maxial
+                        np.logspace(a, b, num=1 + int(20 * (b - a))), tol, quark, maxial
                     )
 
                 # Iteratively approach the numerical instability at high coupling strengths

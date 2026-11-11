@@ -213,7 +213,7 @@ def draw_fractions(
 
 # %%
 if __name__ == "__main__":
-    stored_results = pathlib.Path() / "results_axial.pkl"
+    stored_results = pathlib.Path("results_axial.pkl").resolve()
     if stored_results.is_file():
         with open(stored_results, "rb") as f:
             stored = pickle.load(f)
@@ -729,7 +729,9 @@ if __name__ == "__main__":
                             continue
                         update(target)
                         fig_frame.savefig(
-                            f"frame_{filename}_{target:0>4n}_{AP[mask][target]:.3e}.pdf"
+                            pathlib.Path(
+                                f"figures/frame_{filename}_{target:0>4n}_{AP[mask][target]:.3e}.pdf"
+                            )
                         )
 
                 ani = animation.FuncAnimation(
@@ -738,8 +740,10 @@ if __name__ == "__main__":
                     frames=len(xs[mask]),
                     interval=5000 / len(xs[mask]),
                 )
-                ani.save(filename=f"animate_{filename}.gif", writer="pillow")
-                # ani.save(filename=f"animate_{filename}.mp4", writer="ffmpeg")
+                ani.save(
+                    filename=pathlib.Path(f"figures/animate_{filename}.gif"),
+                    writer="pillow",
+                )
 
                 fig.clear()
                 fig_frame.clear()

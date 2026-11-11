@@ -140,12 +140,25 @@ solved = rotation.numerical.solver.solve_mixing(
 The result is a dictionary of the unknowns you gave it mapped to the solutions the solver found.
 The `example.ipynb` shows how to iterate this process multiple times and plot the result.
 
-## Examples
+## Scanning Examples
 
-![](animate_1.0e-08_charge_other.gif)
-![](animate_1.0e-08_charge_pi0.gif)
-![](animate_1.0e-08_charge_eta.gif)
-![](animate_1.0e-08_charge_etaP.gif)
+The following show animated examples after sweeping the mediator mass in a scan, performed by the `*_scan.py` scripts.
+The plotting is then performed by the `*_animate.py` scripts.
+The data from `*_scan.py` was used in [arxiv:2610.xxxxx](https://arxiv.org/abs/2610.xxxxx), and is available at [![DOI](https://zenodo.org/badge/23220809.svg)](https://zenodo.org/badge/latestdoi/23220809).
+
+### Charge proportional quark couplings:
+
+![](figures/animate_pseudo_1.0e-08_charge_other.gif)
+![](figures/animate_pseudo_1.0e-08_charge_pi0.gif)
+![](figures/animate_axial_1.0e-08_charge_other.gif)
+![](figures/animate_axial_1.0e-08_charge_pi0.gif)
+
+### Equal proportional quark couplings:
+
+![](figures/animate_pseudo_1.0e-08_equal_other.gif)
+![](figures/animate_pseudo_1.0e-08_equal_eta.gif)
+![](figures/animate_axial_1.0e-08_equal_other.gif)
+![](figures/animate_axial_1.0e-08_equal_eta.gif)
 
 ## Citation
 
