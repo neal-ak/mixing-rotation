@@ -40,7 +40,7 @@ def pseudo_calculate_meson_couplings(
     alpha: float,
     beta: float,
     gamma: float,
-) -> dict[sympy.Symbol, float]:
+) -> dict[sym.Symbol, float]:
     """Numerical calculation of the rotated meson to dark matter couplings.
 
     Specific to the pseudo scalar mediator phi case.

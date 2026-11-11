@@ -81,8 +81,8 @@ def axial_mass_ratio():
 
 def _generic_plot(
     ax,
-    x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray, dict]],
+    x_strength: np.ndarray,
+    draw_order: list[tuple[np.ndarray, dict]],
     y_min_limit: float = None,
     y_max_limit: float = None,
 ):
@@ -106,8 +106,8 @@ def _generic_plot(
 
 def draw_angles(
     ax,
-    x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray, dict]],
+    x_strength: np.ndarray,
+    draw_order: list[tuple[np.ndarray, dict]],
 ):
     elements = _generic_plot(
         ax,
@@ -127,12 +127,12 @@ def draw_angles(
 
 def draw_masses(
     ax,
-    x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray, dict]],
-    m_mediator: tuple[np.NDArray, dict] = None,
-    m_pi0: tuple[np.NDArray, dict] = None,
-    m_eta: tuple[np.NDArray, dict] = None,
-    m_etaP: tuple[np.NDArray, dict] = None,
+    x_strength: np.ndarray,
+    draw_order: list[tuple[np.ndarray, dict]],
+    m_mediator: tuple[np.ndarray, dict] = None,
+    m_pi0: tuple[np.ndarray, dict] = None,
+    m_eta: tuple[np.ndarray, dict] = None,
+    m_etaP: tuple[np.ndarray, dict] = None,
 ):
     elements = []
     if m_mediator is not None:
@@ -164,8 +164,8 @@ def draw_masses(
 
 def draw_mesons(
     ax,
-    x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray, dict]],
+    x_strength: np.ndarray,
+    draw_order: list[tuple[np.ndarray, dict]],
     bare_coupling: tuple[float, dict],
 ):
     if bare_coupling is not None:
@@ -184,8 +184,8 @@ def draw_mesons(
 
 def draw_ratios(
     ax,
-    x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray, dict]],
+    x_strength: np.ndarray,
+    draw_order: list[tuple[np.ndarray, dict]],
 ):
     elements = _generic_plot(
         ax, x_strength, draw_order, y_min_limit=-10, y_max_limit=10
@@ -197,8 +197,8 @@ def draw_ratios(
 
 def draw_fractions(
     ax,
-    x_strength: np.NDArray,
-    draw_order: list[tuple[np.NDArray, dict]],
+    x_strength: np.ndarray,
+    draw_order: list[tuple[np.ndarray, dict]],
 ):
     elements = _generic_plot(
         ax, x_strength, draw_order, y_min_limit=1e-16, y_max_limit=1

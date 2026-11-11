@@ -58,9 +58,9 @@ def calculate_uvw(
     for m, meson in zip(
         [m_pi0_axial, m_eta_axial, m_etap_axial], ["pi0", "eta", "etaP"]
     ):
-        if np.any(m**2 > m_axial**2):
-            bad = np.array(m**2 > m_axial**2)
-            for a in m[bad]:
+        if np.any(np.asarray(m) ** 2 > m_axial**2):
+            bad = np.array(np.asarray(m) ** 2 > m_axial**2)
+            for a in np.asarray(m)[bad]:
                 warnings.warn(
                     f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
                     PhysicsWarning,
@@ -227,7 +227,7 @@ def axial_calculate_bare_kaon(
     g_8s: float = G_8S,
     m_pion: float = MASS_CHARGED_PION,
     m_kaon: float = MASS_CHARGED_KAON,
-) -> dict[sympy.Symbol, float]:
+) -> dict[sym.Symbol, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
     Specific to the axial vector mediator case. Defaults are from the PDG

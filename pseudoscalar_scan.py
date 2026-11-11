@@ -29,8 +29,8 @@ def scan_quarks(
     tolerance: float,
     quarks: tuple[float, float, float],
     m_phi_bare: float,
-    old_results: dict[str | sym.Symbol, np.NDArray] = None,
-) -> dict[str | sym.Symbol, np.NDArray]:
+    old_results: dict[str | sym.Symbol, np.ndarray] = None,
+) -> dict[str | sym.Symbol, np.ndarray]:
     new_results = {"coupling": np.array(coupling_strength)}
     proximity_thresh = 1 / 3
 
