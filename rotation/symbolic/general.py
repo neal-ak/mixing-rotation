@@ -1,14 +1,20 @@
 """General use for symbolic calculations."""
 
 # %%
-import sympy as sym
+import sympy
 
 PARTICLE_ORDER = "pi0", "eta", "etaP"
 
 
 # %%
-def _preprocess_symbol(s):
-    """Helper to automate assigning dict key strings from symbols."""
+def _preprocess_symbol(s: sympy.Symbol) -> str:
+    """Helper to automate assigning dict key strings from symbols.
+
+    :param s: A sympy symbol.
+    :type s: sympy.Symbol
+    :return: Key string to represent the symbol.
+    :rtype: str
+    """
     s = str(s).replace("\\", "")
     s = s.replace(r"_{b}", "Bare")
     s = s.replace("{", "")
@@ -22,7 +28,7 @@ def _preprocess_symbol(s):
 
 # %%
 ANGLE = {
-    _preprocess_symbol(k): sym.Symbol(k, real=True)
+    _preprocess_symbol(k): sympy.Symbol(k, real=True)
     for k in [
         r"\alpha",
         r"\beta",
@@ -38,7 +44,7 @@ ANGLE = {
 
 # %%
 MASS = {
-    _preprocess_symbol(k): sym.Symbol(f"m_{{{k}}}", nonnegative=True)
+    _preprocess_symbol(k): sympy.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [
         "u",
         "d",
@@ -65,7 +71,7 @@ MASS = {
 
 # %%
 COUPLING = {
-    _preprocess_symbol(k): sym.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
+    _preprocess_symbol(k): sympy.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
     for k in [
         "u",
         "d",
@@ -98,7 +104,7 @@ COUPLING = {
 
 # %%
 AXIAL_COUPLING = {
-    _preprocess_symbol(k): sym.Symbol(f"\\lambda_{{{k}}}", real=True)
+    _preprocess_symbol(k): sympy.Symbol(f"\\lambda_{{{k}}}", real=True)
     for k in [
         "a",
         r"\pi^{0}_{b} \chi",
@@ -118,7 +124,7 @@ AXIAL_COUPLING = {
 
 # %%
 PARAMETERS = {
-    _preprocess_symbol(k): sym.Symbol(k, real=True)
+    _preprocess_symbol(k): sympy.Symbol(k, real=True)
     for k in [
         r"E_{\pi^\pm}",
         r"E_{K^\pm}",
@@ -139,17 +145,21 @@ PARAMETERS = {
 
 
 # %%
-def _create_nd_rotation(n_dim) -> tuple[sym.Matrix, list[sym.Matrix], sym.Matrix]:
+def _create_nd_rotation(
+    n_dim: int,
+) -> tuple[sympy.Matrix, list[sympy.Matrix], sympy.Matrix]:
     """Creates the n-D rotation matrix from 2D rotation matrices.
 
-    :return: Rotation matrix, list of 2D rotations, generic 2D rotation
-    :rtype: tuple[sym.Matrix, list[sym.Matrix], sym.Matrix]
+    :param n_dim: Number of dimensions for the rotation.
+    :type n_dim: int
+    :return: Full rotation matrix, list of 2D rotation matrices, the generic 2D rotation matrix.
+    :rtype: tuple[sympy.Matrix, list[sympy.Matrix], sympy.Matrix]
     """
-    theta = sym.Symbol(r"\theta", real=True)
-    basic_2d = sym.Matrix(
+    theta = sympy.Symbol(r"\theta", real=True)
+    basic_2d = sympy.Matrix(
         [
-            [sym.cos(theta), -sym.sin(theta)],
-            [sym.sin(theta), sym.cos(theta)],
+            [sympy.cos(theta), -sympy.sin(theta)],
+            [sympy.sin(theta), sympy.cos(theta)],
         ]
     )
     index_pairs = []
@@ -158,7 +168,7 @@ def _create_nd_rotation(n_dim) -> tuple[sym.Matrix, list[sym.Matrix], sym.Matrix
             index_pairs.append(tuple([i, j]))
     rotate = []
     for indices in index_pairs:
-        matrix_2d = sym.Matrix.eye(n_dim)
+        matrix_2d = sympy.Matrix.eye(n_dim)
         for i, a in enumerate(indices):
             for j, b in enumerate(indices):
                 matrix_2d[a, b] = basic_2d[i, j]
@@ -178,12 +188,13 @@ def _create_nd_rotation(n_dim) -> tuple[sym.Matrix, list[sym.Matrix], sym.Matrix
 
 # %%
 def create_3d_rotation() -> (
-    tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+    tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix]
 ):
     """Creates the 3D rotation matrix from three 2D rotation matrices.
 
-    :return: Rotation matrix, (alpha, beta, gamma) rotations, 2D matrix
-    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+    :return: Full 3D rotation matrix, list of three 2D rotation matrices, the generic 2D rotation
+    matrix.
+    :rtype: (tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix])
     """
     rotation, matrices, basic_2d = _create_nd_rotation(3)
     return rotation, tuple(matrices), basic_2d
@@ -191,14 +202,22 @@ def create_3d_rotation() -> (
 
 # %%
 def create_4d_rotation() -> tuple[
-    sym.Matrix,
-    tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix],
-    sym.Matrix,
+    sympy.Matrix,
+    tuple[
+        sympy.Matrix,
+        sympy.Matrix,
+        sympy.Matrix,
+        sympy.Matrix,
+        sympy.Matrix,
+        sympy.Matrix,
+    ],
+    sympy.Matrix,
 ]:
     """Creates the 4D rotation matrix from six 2D rotation matrices.
 
-    :return: Rotation matrix, (alpha, beta, gamma, delta, zeta, kappa) rotations, 2D matrix
-    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix], sym.Matrix]
+    :return: Full 4D rotation matrix, list of six 2D rotation matrices, the generic 2D rotation
+    matrix.
+    :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix]
     """
     rotation, matrices, basic_2d = _create_nd_rotation(4)
     return rotation, tuple(matrices), basic_2d
