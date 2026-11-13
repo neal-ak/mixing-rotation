@@ -563,7 +563,7 @@ if __name__ == "__main__":
                     )
 
                 for ax in list(axs[-1, :]) + [ax_frame]:
-                    ax.set_xlabel("Q")
+                    ax.set_xlabel("$Q$")
                 match mask_name:
                     case "other":
                         xlims = (3e-5, 3e2)
@@ -603,7 +603,7 @@ if __name__ == "__main__":
                         secondary_xaxes[-1].set_xticks(np.logspace(-20, 20, num=41))
                         if index < width or index >= height * width:
                             secondary_xaxes[-1].set_xlabel(
-                                f"${general.MASS[mask_name+'-phi']}^{{2}} / Abs({general.MASS[mask_name]}^{{2}} - {general.MASS['phiBare']}^{{2}})$",
+                                f"${general.MASS[mask_name+'-phi']}^{{2}} / \\text{{Abs}}({general.MASS[mask_name]}^{{2}} - {general.MASS['phiBare']}^{{2}})$",
                                 labelpad=16,
                             )
                     if ax.get_yscale() == "log":
@@ -661,7 +661,7 @@ if __name__ == "__main__":
                     )  # We're saving the 0.3 of the minimum x value between all 0.3 crossings and all angles
                     plot_elements.append(
                         (
-                            ax.axvline(vert_x[0], color="black", linestyle=":"),
+                            ax.axvline(vert_x[0], color="black", linestyle=":", label="Angle$ = 0.3$"),
                             vert_x[..., np.newaxis],
                             None,
                         )
@@ -676,12 +676,13 @@ if __name__ == "__main__":
                     plot_elements.append(
                         (
                             ax.fill_between(
-                                bad_xs[0], *bad_ys, facecolor="red", alpha=1 / 3
+                                bad_xs[0], *bad_ys, facecolor="red", alpha=1 / 3, label="Theory bad"
                             ),
                             bad_xs,
                             bad_ys,
                         )
                     )
+                    ax.legend()
 
                 fig.suptitle(f"${general.MASS['phiBare']} = (10^{{00}})$")
                 fig.tight_layout()
@@ -699,8 +700,8 @@ if __name__ == "__main__":
                         except AttributeError:
                             line.set_data(x[frame], *y)
 
-                    power = f" = {phB[mask][frame]:.3e}".split("e")
-                    mass_name = f"{power[0]} \\times 10^{{{power[1]}}}"
+                    power = f" = {phB[mask][frame]:+.3e}".split("e")
+                    mass_name = f"{power[0].rstrip('0.')} \\times 10^{{{power[1]}}}"
                     for s, m in zip(
                         [general.MASS[k] for k in ("pi0", "eta", "etaP")],
                         [
@@ -711,11 +712,11 @@ if __name__ == "__main__":
                     ):
                         if phB[mask][frame] == m:
                             power = f"{0:+.3e}".split("e")
-                            mass_name = f"/{s} = (1{power[0]} \\times 10^{{{power[1]}}}) = {1:.5f}"
+                            mass_name = f"/{s} = (1{power[0].rstrip('0.')} \\times 10^{{{power[1]}}}) = {1:.5f}"
                             break
                         if 0.8 <= phB[mask][frame] / m <= 1.2:
                             power = f"{phB[mask][frame]/m-1:+.3e}".split("e")
-                            mass_name = f"/{s} = (1{power[0]} \\times 10^{{{power[1]}}}) = {phB[mask][frame]/m:.5f}"
+                            mass_name = f"/{s} = (1{power[0].rstrip('0.')} \\times 10^{{{power[1]}}}) = {phB[mask][frame]/m:.5f}"
                             break
                     fig.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
                     fig_frame.suptitle(f"${general.MASS['phiBare']} {mass_name}$")
@@ -747,7 +748,7 @@ if __name__ == "__main__":
                             )
                             if index < width or index >= height * width:
                                 secondary_xaxes[index].set_xlabel(
-                                    f"${general.MASS[mask_name+'-phi']}^{{2}} / Abs({general.MASS[mask_name]}^{{2}} - {general.MASS['phiBare']}^{{2}})$",
+                                    f"${general.MASS[mask_name+'-phi']}^{{2}} / \\text{{Abs}}({general.MASS[mask_name]}^{{2}} - {general.MASS['phiBare']}^{{2}})$",
                                     labelpad=16,
                                 )
                     return [l for l, _, _ in plot_elements]
