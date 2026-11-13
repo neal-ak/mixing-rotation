@@ -14,7 +14,6 @@ from rotation.symbolic.axial import bare_axial_masses
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
 FONT_SCALE = 1.0
 rcParams.update(
@@ -121,7 +120,7 @@ def draw_angles(
         "right", functions=(lambda x: x * 180 / np.pi, lambda x: x * np.pi / 180)
     )
     sec_y.set_ylabel("Angle [Deg]")
-    ax.legend(loc="lower left")
+    ax.legend()
     return elements
 
 
@@ -158,7 +157,7 @@ def draw_masses(
         yscale="log",
         ylabel="Mass [GeV]",
     )
-    ax.legend(loc="lower left")
+    ax.legend()
     return elements
 
 
@@ -178,7 +177,7 @@ def draw_mesons(
         y_max_limit=bare_coupling[0],
     )
     ax.set_ylabel("Coupling")
-    ax.legend(loc="lower left")
+    ax.legend()
     return elements
 
 
@@ -191,7 +190,7 @@ def draw_ratios(
         ax, x_strength, draw_order, y_min_limit=-10, y_max_limit=10
     )
     ax.set_ylabel("Approx / Exact")
-    ax.legend(loc="lower left")
+    ax.legend()
     return elements
 
 
@@ -207,7 +206,7 @@ def draw_fractions(
         yscale="log",
         ylabel="Abs(Approx / Exact - 1)",
     )
-    ax.legend(loc="lower left")
+    ax.legend()
     return elements
 
 
@@ -545,9 +544,9 @@ if __name__ == "__main__":
                             from_secondary = sym.lambdify(call, sol)
                             break
                 for index, ax in enumerate(list(axs.flat) + [ax_frame]):
-                    ax.set_xlim(*xlims)
                     ax.grid()
                     ax.set_xscale("log")
+                    ax.set_xlim(*xlims)
                     if mask_name in secondaries and from_secondary is not None:
                         secondary_xaxes.append(
                             ax.secondary_xaxis(
