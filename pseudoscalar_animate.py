@@ -220,7 +220,8 @@ if __name__ == "__main__":
     stored_results = pathlib.Path("results_pseudo.pkl").resolve()
     if stored_results.is_file():
         with open(stored_results, "rb") as f:
-            stored = pickle.load(f)
+            stored = {1e-8: {(2, -1, -1): pickle.load(f)[1e-8][(2, -1, -1)]}}
+            # stored = pickle.load(f)
     else:
         stored = {}
 
@@ -390,6 +391,8 @@ if __name__ == "__main__":
             }
 
             for mask_name, mask in masks.items():
+                if mask_name not in ["pi0"]:
+                    continue
                 fig, axs = plt.subplots(
                     height,
                     width,
@@ -566,7 +569,7 @@ if __name__ == "__main__":
                     case "other":
                         xlims = (3e-5, 3e2)
                     case "pi0":
-                        xlims = (2e-6, 2e-1)
+                        xlims = (2.7e-5, 1.3e0)
                     case "eta":
                         xlims = (3e-6, 3e-1)
                     case "etaP":
@@ -604,6 +607,8 @@ if __name__ == "__main__":
                                 f"${general.MASS[mask_name+'-phi']}^{{2}} / \\text{{Abs}}({general.MASS[mask_name]}^{{2}} - {general.MASS['phiBare']}^{{2}})$",
                                 labelpad=16,
                             )
+                    ax.set_yticks(np.logspace(-18, 6, num=13))
+                    ax.set_ylim(1e-12, 1e0)
                     if ax.get_yscale() == "log":
                         ax.set_ylim(
                             10
@@ -786,17 +791,17 @@ if __name__ == "__main__":
                             )
                         )
 
-                ani = animation.FuncAnimation(
-                    fig,
-                    update,
-                    frames=len(xs[mask]),
-                    interval=5000 / len(xs[mask]),
-                )
-                ani.save(
-                    filename=pathlib.Path(f"figures/animate_{filename}.avif"),
-                    writer="pillow",
-                    dpi=48,
-                )
+                # ani = animation.FuncAnimation(
+                #     fig,
+                #     update,
+                #     frames=len(xs[mask]),
+                #     interval=5000 / len(xs[mask]),
+                # )
+                # ani.save(
+                #     filename=pathlib.Path(f"figures/animate_{filename}.avif"),
+                #     writer="pillow",
+                #     dpi=48,
+                # )
 
                 fig.clear()
                 fig_frame.clear()
