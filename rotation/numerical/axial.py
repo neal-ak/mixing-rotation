@@ -39,20 +39,22 @@ from .solver import (
 def calculate_uvw(
     m_axial: float, m_pi0_axial: float, m_eta_axial: float, m_etap_axial: float
 ) -> tuple[float, float, float]:
-    """Numerically calculates the kinetic mixing angles u, v, and w.
+    """Numerically calculates the kinetic mixing angles $u$, $v$, and $w$.
 
     For the axial vector mediator case.
 
-    :param m_axial: Mass of axial vector mediator
+    This makes use of :py:func:`rotation.symbolic.axial.kinetic_sines`.
+
+    :param m_axial: Mass of axial vector mediator.
     :type m_axial: float
-    :param m_pi0_axial: Neutral pion - mediator mass
+    :param m_pi0_axial: Neutral pion - mediator mass.
     :type m_pi0_axial: float
-    :param m_eta_axial: Eta - mediator mass
+    :param m_eta_axial: Eta - mediator mass.
     :type m_eta_axial: float
-    :param m_etap_axial: Eta prime - mediator mass
+    :param m_etap_axial: Eta prime - mediator mass.
     :type m_etap_axial: float
-    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
-    :return: u, v, w
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges.
+    :return: $u$, $v$, $w$
     :rtype: tuple[float, float, float]
     """
     for m, meson in zip(
@@ -62,7 +64,10 @@ def calculate_uvw(
             bad = np.array(np.asarray(m) ** 2 > m_axial**2)
             for a in np.asarray(m)[bad]:
                 warnings.warn(
-                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    "The kinetic mixing cannot be removed for this combination of model"
+                    + f" parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2"
+                    + f" ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted"
+                    + " couplings will be unphysical!",
                     PhysicsWarning,
                 )
     parameter = {
@@ -95,32 +100,35 @@ def axial_calculate_meson_couplings(
 
     Specific to the axial vector mediator case.
 
-    :param l_axial: Axial vector mediator coupling
+    This provides numerical evaluation of
+    :py:func:`rotation.symbolic.axial.rotated_axial_meson_couplings`.
+
+    :param l_axial: Axial vector mediator coupling.
     :type l_axial: float
-    :param m_axial: Axial vector mediator mass
+    :param m_axial: Axial vector mediator mass.
     :type m_axial: float
-    :param m_pi0_axial: Neutral pion - mediator mass
+    :param m_pi0_axial: Neutral pion - mediator mass.
     :type m_pi0_axial: float
-    :param m_eta_axial: Eta - mediator mass
+    :param m_eta_axial: Eta - mediator mass.
     :type m_eta_axial: float
-    :param m_etap_axial: Eta prime - mediator mass
+    :param m_etap_axial: Eta prime - mediator mass.
     :type m_etap_axial: float
-    :param u: 1st kinetic rotation angle
+    :param u: 1st kinetic rotation angle.
     :type u: float
-    :param v: 2nd kinetic rotation angle
+    :param v: 2nd kinetic rotation angle.
     :type v: float
-    :param w: 3rd kinetic rotation angle
+    :param w: 3rd kinetic rotation angle.
     :type w: float
-    :param alpha: 1st rotation angle
+    :param alpha: 1st rotation angle.
     :type alpha: float
-    :param beta: 2nd rotation angle
+    :param beta: 2nd rotation angle.
     :type beta: float
-    :param gamma: 3rd rotation angle
+    :param gamma: 3rd rotation angle.
     :type gamma: float
-    :raises ValueError: Raised if the input axial vector mass is not strictly positive
-    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
-    :return: pion-chi, eta-chi, eta^prime-chi
-    :rtype: dict[sympy.Symbol, float]
+    :raises ValueError: Raised if the input axial vector mass is not strictly positive.
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges.
+    :return: pion-chi, eta-chi, eta^prime-chi, keys are the coupling symbols.
+    :rtype: dict[sym.Symbol, float]
     """
     if np.any(m_axial <= 0):
         raise ValueError("Axial vector mediator mass should be strictly positive")
@@ -131,7 +139,10 @@ def axial_calculate_meson_couplings(
             bad = np.array(m**2 > m_axial**2)
             for a in m[bad]:
                 warnings.warn(
-                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    "The kinetic mixing cannot be removed for this combination of model"
+                    + f" parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2"
+                    + f" ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted"
+                    + " couplings will be unphysical!",
                     PhysicsWarning,
                 )
     parameter = {
@@ -170,28 +181,34 @@ def axial_calculate_bare_masses(
 
     Specific to the axial vector mediator case.
 
-    :param coupling_up: Up coupling
+    This provides numerical evaluation of
+    :py:func:`rotation.symbolic.axial.bare_axial_masses`.
+
+    :param coupling_up: Up coupling.
     :type coupling_up: float
-    :param coupling_down: Down coupling
+    :param coupling_down: Down coupling.
     :type coupling_down: float
-    :param coupling_strange: Strange coupling
+    :param coupling_strange: Strange coupling.
     :type coupling_strange: float
-    :param b_0: B_{0}, defaults to B_0
-    :type b_0: float
-    :param pion_decay: The pion decay constant, defaults to PION_DECAY
-    :type pion_decay: float
-    :param l_4: L_{4}, defaults to L_4
-    :type l_4: float
-    :param l_5: L_{5}, defaults to L_5
-    :type l_5: float
-    :param mass_up: Up mass, defaults to MASS_QUARK["up"]
+    :param b_0: B_{0}, defaults to :py:const:`rotation.numerical.solver.B_0`.
+    :type b_0: float, optional
+    :param pion_decay: The pion decay constant, defaults to
+    :py:const:`rotation.numerical.solver.PION_DECAY`.
+    :type pion_decay: float, optional
+    :param l_4: L_{4}, defaults to :py:const:`rotation.numerical.solver.L_4`.
+    :type l_4: float, optional
+    :param l_5: L_{5}, defaults to :py:const:`rotation.numerical.solver.L_5`.
+    :type l_5: float, optional
+    :param mass_up: Up mass, defaults to :py:const:`rotation.numerical.solver.MASS_QUARK["up"]`.
     :type mass_up: float, optional
-    :param mass_down: Down mass, defaults to MASS_QUARK["down"]
+    :param mass_down: Down mass, defaults to
+    :py:const:`rotation.numerical.solver.MASS_QUARK["down"]`.
     :type mass_down: float, optional
-    :param mass_strange: Strange mass, defaults to MASS_QUARK["strange"]
+    :param mass_strange: Strange mass, defaults to
+    :py:const:`rotation.numerical.solver.MASS_QUARK["strange"]`.
     :type mass_strange: float, optional
-    :return: pion-mediator, eta-mediator, eta^prime-mediator
-    :rtype: dict[sympy.Symbol, float]
+    :return: pion-mediator, eta-mediator, eta^prime-mediator, keys are the mass symbols.
+    :rtype: dict[sym.Symbol, float]
     """
     parameter = {
         PARAMETERS["au"]: coupling_up,
@@ -230,42 +247,50 @@ def axial_calculate_bare_kaon(
 ) -> dict[sym.Symbol, float]:
     """Numerical calculation of the un-rotated kaon couplings.
 
-    Specific to the axial vector mediator case. Defaults are from the PDG
-    [charged pion](https://pdglive.lbl.gov/Particle.action?node=S008) and
-    [charged kaon](https://pdglive.lbl.gov/Particle.action?node=S010).
+    Specific to the axial vector mediator case.
 
-    :param energy_pion: Pion energy
+    This provides numerical evaluation of
+    :py:func:`rotation.symbolic.axial.bare_axial_kaon_couplings`.
+
+    :param energy_pion: Pion energy.
     :type energy_pion: float
-    :param energy_dm: Dark matter energy
+    :param energy_dm: Dark matter energy.
     :type energy_dm: float
-    :param m_axial: Axial vector mediator mass
+    :param m_axial: Axial vector mediator mass.
     :type m_axial: float
-    :param coupling_up: Up coupling
+    :param coupling_up: Up coupling.
     :type coupling_up: float
-    :param coupling_down: Down coupling
+    :param coupling_down: Down coupling.
     :type coupling_down: float
-    :param coupling_strange: Strange coupling
+    :param coupling_strange: Strange coupling.
     :type coupling_strange: float
-    :param m_pi0_axial: Pion - mediator mass
+    :param m_pi0_axial: Pion - mediator mass.
     :type m_pi0_axial: float
-    :param m_eta_axial: Eta - mediator mass
+    :param m_eta_axial: Eta - mediator mass.
     :type m_eta_axial: float
-    :param m_etap_axial: Eta prime - mediator mass
+    :param m_etap_axial: Eta prime - mediator mass.
     :type m_etap_axial: float
-    :param pion_decay: The pion decay constant, defaults to PION_DECAY
-    :type pion_decay: float
-    :param g_8: g_{8}, defaults to G_8
-    :type g_8: float
-    :param g_8s: g_{8s}, defaults to G_8S
-    :type g_8s: float
-    :param m_pion: Chared pion mass, defaults to MASS_CHARGED_PION
+    :param pion_decay: The pion decay constant, defaults to
+    :py:const:`rotation.numerical.solver.PION_DECAY`.
+    :type pion_decay: float, optional
+    :param g_8: g_{8}, defaults to :py:const:`rotation.numerical.solver.G_8`.
+    :type g_8: float, optional
+    :param g_8s: g_{8s}, defaults to
+    :py:const:`rotation.numerical.solver.G_8S`.
+    :type g_8s: float, optional
+    :param m_pion: Chared pion mass, defaults to
+    :py:const:`rotation.numerical.solver.MASS_CHARGED_PION`.
     :type m_pion: float, optional
-    :param m_kaon: Charged kaon mass, defaults to MASS_CHARGED_KAON
+    :param m_kaon: Charged kaon mass, defaults to
+    :py:const:`rotation.numerical.solver.MASS_CHARGED_KAON`.
     :type m_kaon: float, optional
-    :raises ValueError: Raised if the input axial vector mass is not strictly positive
-    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
-    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
-    :rtype: dict[sympy.Symbol, float]
+    :raises ValueError: Raised if the input axial vector mass is not strictly
+    positive.
+    :raises PhysicsWarning: Raised if solution values outside physically
+    permitted ranges.
+    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon, keys are the
+    coupling symbols.
+    :rtype: dict[sym.Symbol, float]
     """
     if np.any(m_axial <= 0):
         raise ValueError("Axial vector mediator mass should be strictly positive")
@@ -276,7 +301,10 @@ def axial_calculate_bare_kaon(
             bad = np.array(m**2 > m_axial**2)
             for a in m[bad]:
                 warnings.warn(
-                    f"The kinetic mixing cannot be removed for this combination of model parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2 ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted couplings will be unphysical!",
+                    "The kinetic mixing cannot be removed for this combination of model"
+                    + f" parameters. m_{{{meson} AP}} ({a:.4e} GeV^2) is larger than m_AP^2"
+                    + f" ({m_axial**2:.4e} GeV^2). The model is likely unstable. The predicted"
+                    + " couplings will be unphysical!",
                     PhysicsWarning,
                 )
     parameter = {
@@ -317,26 +345,29 @@ def axial_calculate_kaon_couplings(
 
     Specific to the axial vector mediator case.
 
-    :param bare_pi0_pion_kaon: Un-rotated pion-pion-kaon coupling
+    This provides numerical evaluation of
+    :py:func:`rotation.symbolic.axial.rotated_axial_kaon_couplings`.
+
+    :param bare_pi0_pion_kaon: Un-rotated pion-pion-kaon coupling.
     :type bare_pi0_pion_kaon: float
-    :param bare_eta_pion_kaon: Un-rotated eta-pion-kaon coupling
+    :param bare_eta_pion_kaon: Un-rotated eta-pion-kaon coupling.
     :type bare_eta_pion_kaon: float
-    :param bare_etap_pion_kaon: Un-rotated eta^prime-pion-kaon coupling
+    :param bare_etap_pion_kaon: Un-rotated eta^prime-pion-kaon coupling.
     :type bare_etap_pion_kaon: float
-    :param u: 1st kinetic rotation angle
+    :param u: 1st kinetic rotation angle.
     :type u: float
-    :param v: 2nd kinetic rotation angle
+    :param v: 2nd kinetic rotation angle.
     :type v: float
-    :param w: 3rd kinetic rotation angle
+    :param w: 3rd kinetic rotation angle.
     :type w: float
-    :param alpha: 1st rotation angle
+    :param alpha: 1st rotation angle.
     :type alpha: float
-    :param beta: 2nd rotation angle
+    :param beta: 2nd rotation angle.
     :type beta: float
-    :param gamma: 3rd rotation angle
+    :param gamma: 3rd rotation angle.
     :type gamma: float
-    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon
-    :rtype: dict[sympy.Symbol, float]
+    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon, keys are the symbol couplings.
+    :rtype: dict[sym.Symbol, float]
     """
     parameter = {
         AXIAL_COUPLING["pi0Bare-pi-K"]: bare_pi0_pion_kaon,

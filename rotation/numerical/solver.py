@@ -29,30 +29,29 @@ MASS_ETA = 0.547862
 MASS_ETA_PRIME = 0.95778
 # https://pdglive.lbl.gov/BranchingRatio.action?desig=6&parCode=M002
 DECAY_ETA_PRIME_2GAMMA = 4.34e-06
-# equation 28 in tex
+# Equation 26 in https://arxiv.org/abs/2611.xxxxx.
 ETA_PRIME_DECAY = (
     7.2973525693e-3 * MASS_ETA_PRIME / 8 / np.sqrt(np.pi) ** 3 / DECAY_ETA_PRIME_2GAMMA
 )
-# below eqn 3 in tex
+G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
+G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
+G_ETA_PRIME_GAMMA = G_PI_GAMMA * PION_DECAY / ETA_PRIME_DECAY
+# Below equation 3 in https://arxiv.org/abs/2611.xxxxx.
 B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
 # https://arxiv.org/abs/1405.6488
 L_4 = 1.87e-3
 L_5 = 1.22e-3
 L_6 = 1.46e-3
 L_7 = -0.39e-3
-# below eqn 7 in tex
+# Below equation 7 in https://arxiv.org/abs/2611.xxxxx.
 G_8 = 3.62
 # https://arxiv.org/abs/hep-ph/0508189
 G_8S = -0.38 * G_8
-# eqn 28 in tex, use natural units for elementary charge
-G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
-G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
-G_ETA_PRIME_GAMMA = G_PI_GAMMA * PION_DECAY / ETA_PRIME_DECAY
 
 
 # %%
 class PhysicsWarning(Warning):
-    pass
+    """Warning that the physical veracity is in doubt."""
 
 
 # %%
@@ -63,13 +62,13 @@ def _build_call(
 ) -> list[float]:
     """Create call signature for lambdified Sympy functions.
 
-    :param arg_ordering: Call order defined by the Sympy lambdification
-    :type arg_ordering: list[sympy.Symbol]
-    :param x0: Values for unknown parameters
+    :param arg_ordering: Call order defined by the Sympy lambdification.
+    :type arg_ordering: list[sym.Symbol]
+    :param x0: Values for unknown parameters.
     :type x0: list[float]
-    :param knowns: Known arguments and their fixed values
-    :type knowns: dict[sympy.Symbol, float]
-    :return: Call signature
+    :param knowns: Known arguments and their fixed values.
+    :type knowns: dict[sym.Symbol, float]
+    :return: Call signature.
     :rtype: list[float]
     """
     x0 = iter(x0)
@@ -91,23 +90,25 @@ def _least_sqr_tolerance(
     arg_ordering: list[sym.Symbol],
     init_unknowns: dict[sym.Symbol, float],
     abs_tolerance: float | None,
-    **kwargs,
+    **kwargs: dict,
 ) -> tuple[dict[sym.Symbol, float], optimize.OptimizeResult]:
     """Runs least squares optimization and checks solution for validity.
 
     The tolerance check can be disabled by setting the tolerance to None.
 
-    :param function: Function that least squares will optimize
+    :param function: Function that least squares will optimize.
     :type function: Callable
-    :param arg_ordering: Call order defined by the Sympy lambdification
-    :type arg_ordering: list[sympy.Symbol]
-    :param init_unknowns: Unknown arguments and their initial guesses
-    :type init_unknowns: dict[sympy.Symbol, float]
-    :param abs_tolerance: Absolute tolerance for the check, disable with None
+    :param arg_ordering: Call order defined by the Sympy lambdification.
+    :type arg_ordering: list[sym.Symbol]
+    :param init_unknowns: Unknown arguments and their initial guesses.
+    :type init_unknowns: dict[sym.Symbol, float]
+    :param abs_tolerance: Absolute tolerance for the check, disable with None.
     :type abs_tolerance: float | None
-    :raises ValueError: Raised if solution outside tolerance
-    :return: Dictionary of solved values and the raw OptimizeResult output
-    :rtype: tuple[dict[sympy.Symbol, float], scipy.optimize.OptimizeResult]
+    :param kwargs: Keyword arguments passed along to :py:func:`scipy.optimize.least_squares`.
+    :type kwargs: dict
+    :raises ValueError: Raised if solution outside tolerance.
+    :return: Dictionary of solved values and the raw OptimizeResult output.
+    :rtype: tuple[dict[sym.Symbol, float], optimize.OptimizeResult]
     """
     unknown_args = [k for k in arg_ordering if k in init_unknowns]
     solution = optimize.least_squares(
@@ -137,10 +138,11 @@ def initialize_system(equation: sym.Matrix) -> tuple[list[sym.Symbol], list[Call
     system drops the lower diagonal component of the matrix (it is a symmetric
     matrix).
 
-    :param equation: Matrix representing the system of equations
+    :param equation: Matrix representing the system of equations.
     :type equation: sym.Matrix
-    :return: Argument call order, and the system of equations
-    :rtype: tuple[list[sympy.Symbol], list[Callable]]
+    :return: Argument call order, and the system of equations.
+    :rtype: tuple[list[sym.Symbol], list[Callable]]
+    :raises ValueError: Raised when the equation is not symmetric.
     """
     if not equation.is_symmetric():
         raise ValueError("The equation matrix must be symmetric")
@@ -162,21 +164,20 @@ def create_func(
 ) -> Callable:
     """Creates the vector function for the Scipy solver.
 
-    :param system: System of equations lambdified from Sympy
+    :param system: System of equations lambdified from Sympy.
     :type system: list[Callable]
-    :param arg_ordering: Call order defined by the Sympy lambdification
-    :type arg_ordering: list[sympy.Symbol]
-    :param arg_unknown: The unknowns as a subset of the call order
-    :type arg_unknown: list[sympy.Symbol]
-    :param knowns: Known arguments and their values in the system
-    :type knowns: dict[sympy.Symbol, float]
-    :raises ValueError: Raised if bare pseudo scalar mass input less than zero
-    :return: The function Scipy can use to optimize
+    :param arg_ordering: Call order defined by the Sympy lambdification.
+    :type arg_ordering: list[sym.Symbol]
+    :param knowns: Known arguments and their values in the system.
+    :type knowns: dict[sym.Symbol, float]
+    :raises ValueError: Raised if bare pseudo scalar mass input less than zero.
+    :return: The function Scipy can use to optimize.
     :rtype: Callable
     """
     if MASS["phiBare"] in knowns and knowns[MASS["phiBare"]] < 0:
         raise ValueError(
-            f"Pseudo scalar mediator mass should be non-negative ({knowns[MASS['phiBare']]:.4e} GeV)"
+            "Pseudo scalar mediator mass should be non-negative"
+            + f" ({knowns[MASS['phiBare']]:.4e} GeV)"
         )
 
     def function(x):
@@ -193,26 +194,28 @@ def debug_solve_mixing(
     init_unknowns: dict[sym.Symbol, float],
     abs_tolerance: float | None,
     bounds: dict[sym.Symbol, tuple[float, float]] | None,
-    **kwargs,
+    **kwargs: dict,
 ) -> tuple[dict[sym.Symbol, float], optimize.OptimizeResult]:
     """See `solve_mixing`.
 
-    This function also returns the raw scipy.optimize.OptimizeResult for
+    This function also returns the raw :py:func:`scipy.optimize.OptimizeResult` for
     debugging help.
 
-    :param func: The vector function
-    :type func: Callable,
-    :param arg_ordering: Call order defined by the Sympy lambdification
-    :type arg_ordering: list[sympy.Symbol]
-    :param init_unknowns: The unknowns and their initial guesses for the solver
-    :type init_unknowns: dict[sympy.Symbol, float]
-    :param abs_tolerance: Absolute tolerance of the result from zero (disable check with None)
+    :param func: The vector function.
+    :type func: Callable
+    :param arg_ordering: Call order defined by the Sympy lambdification.
+    :type arg_ordering: list[sym.Symbol]
+    :param init_unknowns: The unknowns and their initial guesses for the solver.
+    :type init_unknowns: dict[sym.Symbol, float]
+    :param abs_tolerance: Absolute tolerance of the result from zero (disable check with None).
     :type abs_tolerance: float | None
-    :param bounds: Bounds for each of the unknown arguments
-    :type bounds: dict[sympy.Symbol, tuple[float, float]] | None
-    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges
-    :return: Dictionary of solved values and the raw OptimizeResult output
-    :rtype: tuple[dict[sympy.Symbol, float], scipy.optimize.OptimizeResult]
+    :param bounds: Bounds for each of the unknown arguments.
+    :type bounds: dict[sym.Symbol, tuple[float, float]] | None
+    :param kwargs: Keyword arguments passed to `_least_sqr_tolerance`.
+    :type kwargs: dict
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges.
+    :return: Dictionary of solved values and the raw OptimizeResult output.
+    :rtype: tuple[dict[sym.Symbol, float], optimize.OptimizeResult]
     """
     unknown_args = [k for k in arg_ordering if k in init_unknowns]
 
@@ -241,7 +244,12 @@ def debug_solve_mixing(
     )
     if MASS["phi"] in solve[0] and solve[0][MASS["phi"]] < 0:
         warnings.warn(
-            f"This combination of model parameters produces a negative pseudo scalar observed (propagating) mass ({solve[0][MASS['phi']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!",
+            "This combination of model parameters produces a negative pseudo scalar observed"
+            + f" (propagating) mass ({solve[0][MASS['phi']]:.4e} GeV). The coupling parameters"
+            + " leading to mixing are too large compared to the difference between the mass of"
+            + " the mediator and the mass of the mesons it mixes with. The model is unstable with"
+            + " these parameters and predictions for the effecitve coupling in the rotated basis"
+            + " should not be trusted!",
             PhysicsWarning,
         )
     for meson, mass in {
@@ -252,13 +260,21 @@ def debug_solve_mixing(
         if MASS[meson + "Bare"] in solve[0]:
             if solve[0][MASS[meson + "Bare"]] < 0:
                 warnings.warn(
-                    f"This combination of model parameters produces a negative bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV). The coupling parameters leading to mixing are too large compared to the difference between the mass of the mediator and the mass of the mesons it mixes with. The model is unstable with these parameters and predictions for the effecitve coupling in the rotated basis should not be trusted!",
+                    f"This combination of model parameters produces a negative bare {meson} mass"
+                    + f" ({solve[0][MASS[meson + 'Bare']]:.4e} GeV). The coupling parameters"
+                    + " leading to mixing are too large compared to the difference between the"
+                    + " mass of the mediator and the mass of the mesons it mixes with. The model"
+                    + " is unstable with these parameters and predictions for the effecitve"
+                    + " coupling in the rotated basis should not be trusted!",
                     PhysicsWarning,
                 )
             max_rotation = MASS_CHARGED_PION - MASS_NEUTRAL_PION
             if np.abs(solve[0][MASS[meson + "Bare"]] - mass) > max_rotation:
                 warnings.warn(
-                    f"This combination of model parameters predicts a bare {meson} mass ({solve[0][MASS[meson + 'Bare']]:.4e} GeV) that differs by more than {max_rotation:.4e} GeV from its observed value. This may be in conflict with some predictions from the ChEFT Lagrangian!",
+                    f"This combination of model parameters predicts a bare {meson} mass"
+                    + f" ({solve[0][MASS[meson + 'Bare']]:.4e} GeV) that differs by more than"
+                    + f" {max_rotation:.4e} GeV from its observed value. This may be in conflict"
+                    + " with some predictions from the ChEFT Lagrangian!",
                     PhysicsWarning,
                 )
     return solve
@@ -271,27 +287,30 @@ def solve_mixing(
     init_unknowns: dict[sym.Symbol, float],
     abs_tolerance: float | None = 1e-8,
     bounds: dict[sym.Symbol, tuple[float, float]] | None = None,
-    **kwargs,
+    **kwargs: dict,
 ) -> dict[sym.Symbol, float]:
     """Solves the provided vector function for unknowns in the mixing equation.
 
     The absolute tolerance is used to check the accuracy of the solution, which
     will raise a ValueError if any equation in the system is too far from 0.
-    More options can be passed along to `scipy.optimize.least_squares` using
+    More options can be passed along to :py:func:`scipy.optimize.least_squares` using
     keyword arguments.
 
-    :param func: The vector function
+    :param func: The vector function.
     :type func: Callable
-    :param arg_ordering: Call order defined by the Sympy lambdification
-    :type arg_ordering: list[sympy.Symbol]
-    :param init_unknowns: The unknowns and their initial guesses for the solver
-    :type init_unknowns: dict[sympy.Symbol, float]
-    :param abs_tolerance: Absolute tolerance of the result from zero (disable check with None), defaults to 1e-8
+    :param arg_ordering: Call order defined by the Sympy lambdification.
+    :type arg_ordering: list[sym.Symbol]
+    :param init_unknowns: The unknowns and their initial guesses for the solver.
+    :type init_unknowns: dict[sym.Symbol, float]
+    :param abs_tolerance: Absolute tolerance of the result from zero (disable check with None),
+    defaults to 1e-8.
     :type abs_tolerance: float | None, optional
-    :param bounds: Bounds for each of the unknown arguments, defaults to None
-    :type bounds: dict[sympy.Symbol, tuple[float, float]] | None, optional
-    :return: Dictionary of solved values
-    :rtype: dict[sympy.Symbol, float]
+    :param bounds: Bounds for each of the unknown arguments, defaults to None.
+    :type bounds: dict[sym.Symbol, tuple[float, float]] | None, optional
+    :param kwargs: Keyword arguments passed to "py:func:`_least_sqr_tolerance`.
+    :type kwargs: dict
+    :return: Dictionary of solved values.
+    :rtype: dict[sym.Symbol, float]
     """
     return debug_solve_mixing(
         func, arg_ordering, init_unknowns, abs_tolerance, bounds, **kwargs
