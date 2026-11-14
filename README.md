@@ -4,8 +4,9 @@
 
 This was tested on Python versions 3.10 through 3.14.
 
-To run the rotation solver you'll need
+To run the rotation solver you'll need and make plots
 
+- Matplotlib
 - Numpy
 - Scipy
 - Sympy
@@ -13,7 +14,6 @@ To run the rotation solver you'll need
 Optionally to run the notebook also install
 
 - Jupyter
-- Matplotlib
 
 Both lists with the tested package versions are found in the `requirements.txt` and `requirements-optional.txt` files, which can be used with
 
