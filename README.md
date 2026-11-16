@@ -162,7 +162,7 @@ The data from `*_scan.py` was used in [arxiv:2611.xxxxx](https://arxiv.org/abs/2
 
 ## Citation
 
-[![DOI](https://zenodo.org/badge/.svg)](https://zenodo.org/badge/latestdoi/)
+[![DOI](https://zenodo.org/badge/23220809.svg)](https://zenodo.org/badge/latestdoi/23220809)
 This was used in [arxiv:2611.xxxxx](https://arxiv.org/abs/2611.xxxxx).
-The equations within ...
-The scanned points can be found in the Zenodo entry: [![DOI](https://zenodo.org/badge/23220809.svg)](https://zenodo.org/badge/latestdoi/23220809)
+Each function indicates in its docstring which equation it implements from the paper.
+The scanned points can be found in the Zenodo entry.
