@@ -20,7 +20,7 @@ def create_kinetic() -> sympy.Matrix:
 
     For the axial vector mediator $A^\\prime$.
     Comes from `B8<https://arxiv.org/pdf/2611.xxxxx#equation.B.8>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Kinetic mixing matrix.
     :rtype: sym.Matrix
@@ -66,7 +66,7 @@ def create_axial_mix_equation(
 
     For the axial vector mediator $A^\\prime$.
     Comes from `B11<https://arxiv.org/pdf/2611.xxxxx#equation.B.11>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :param rotation: Rotation matrix.
     :type rotation: sym.Matrix
@@ -134,7 +134,7 @@ def kinetic_sines() -> (
 
     For the axial vector mediator $A^\\prime$.
     Comes from `B9<https://arxiv.org/pdf/2611.xxxxx#equation.B.9>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Tuple of sine(u), sine(v), sine(w)
     :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
@@ -151,7 +151,7 @@ def bare_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 
     For the axial vector mediator $A^\\prime$.
     Implicit in `B13<https://arxiv.org/pdf/2611.xxxxx#equation.B.13>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Bare meson dark matter couplings, keys are the coupling symbols.
     :rtype: dict[sym.Symbol, sym.core.mul.Mul]
@@ -172,7 +172,7 @@ def rotated_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 
     For the axial vector mediator $A^\\prime$.
     Comes from `B13<https://arxiv.org/pdf/2611.xxxxx#equation.B.13>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Rotated meson dark matter couplings, keys are the coupling symbols.
     :rtype: dict[sym.Symbol, sym.core.mul.Mul]
@@ -195,7 +195,7 @@ def bare_axial_masses() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 
     For the axial vector mediator $A^\\prime$.
     Comes from `B5<https://arxiv.org/pdf/2611.xxxxx#equation.B.5>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Bare particle off-diagonal masses, keys are the mass symbols.
     :rtype: dict[sym.Symbol, sym.core.mul.Mul]
@@ -255,7 +255,7 @@ def bare_axial_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 
     For the axial vector mediator $A^\\prime$.
     Implicit in `D24<https://arxiv.org/pdf/2611.xxxxx#equation.D.24>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Bare kaon couplings, keys are the coupling symbols.
     :rtype: dict[sym.Symbol, sym.core.mul.Mul]
@@ -323,7 +323,7 @@ def rotated_axial_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 
     For the axial vector mediator $A^\\prime$.
     Comes from `D24<https://arxiv.org/pdf/2611.xxxxx#equation.D.24>`__ in
-    `arxiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
+    `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Rotated particle couplings, keys are the coupling symbols.
     :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
