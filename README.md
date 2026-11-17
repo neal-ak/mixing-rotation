@@ -144,7 +144,7 @@ The `example.ipynb` shows how to iterate this process multiple times and plot th
 
 The following show animated examples after sweeping the mediator mass in a scan, performed by the `*_scan.py` scripts.
 The plotting is then performed by the `*_animate.py` scripts.
-The data from `*_scan.py` was used in [arxiv:2611.xxxxx](https://arxiv.org/abs/2611.xxxxx), and is available at [![DOI](https://zenodo.org/badge/23220809.svg)](https://zenodo.org/badge/latestdoi/23220809).
+The data from `*_scan.py` was used in [![arXiv](https://img.shields.io/badge/arXiv-2611.xxxxx-b31b1b.svg)](https://arxiv.org/abs/2611.xxxxx), and is available at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23220808.svg)](https://doi.org/10.5281/zenodo.23220808).
 
 ### Charge proportional quark couplings:
 
@@ -162,8 +162,8 @@ The data from `*_scan.py` was used in [arxiv:2611.xxxxx](https://arxiv.org/abs/2
 
 ## Citation
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23220809.svg)](https://doi.org/10.5281/zenodo.23220809)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23220808.svg)](https://doi.org/10.5281/zenodo.23220808)
 
-This was used in [arxiv:2611.xxxxx](https://arxiv.org/abs/2611.xxxxx).
+This was used in [![arXiv](https://img.shields.io/badge/arXiv-2611.xxxxx-b31b1b.svg)](https://arxiv.org/abs/2611.xxxxx).
 Each function indicates in its docstring which equation it implements from the paper.
 The scanned points can be found in the Zenodo entry.
