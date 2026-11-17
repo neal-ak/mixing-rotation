@@ -148,17 +148,17 @@ The data from `*_scan.py` was used in [arxiv:2611.xxxxx](https://arxiv.org/abs/2
 
 ### Charge proportional quark couplings:
 
-![](figures/animate_pseudo_1.0e-08_charge_other.gif)
-![](figures/animate_pseudo_1.0e-08_charge_pi0.gif)
-![](figures/animate_axial_1.0e-08_charge_other.gif)
-![](figures/animate_axial_1.0e-08_charge_pi0.gif)
+![](figures/animate_pseudo_1.0e-08_charge_other.avif)
+![](figures/animate_pseudo_1.0e-08_charge_pi0.avif)
+![](figures/animate_axial_1.0e-08_charge_other.avif)
+![](figures/animate_axial_1.0e-08_charge_pi0.avif)
 
 ### Equal proportional quark couplings:
 
-![](figures/animate_pseudo_1.0e-08_equal_other.gif)
-![](figures/animate_pseudo_1.0e-08_equal_eta.gif)
-![](figures/animate_axial_1.0e-08_equal_other.gif)
-![](figures/animate_axial_1.0e-08_equal_eta.gif)
+![](figures/animate_pseudo_1.0e-08_equal_other.avif)
+![](figures/animate_pseudo_1.0e-08_equal_eta.avif)
+![](figures/animate_axial_1.0e-08_equal_other.avif)
+![](figures/animate_axial_1.0e-08_equal_eta.avif)
 
 ## Citation
 

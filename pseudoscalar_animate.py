@@ -394,7 +394,7 @@ if __name__ == "__main__":
                     height,
                     width,
                     squeeze=False,
-                    figsize=figsize * 1.1 * np.array((width, height)),
+                    figsize=figsize * 4/3 * np.array((width, height)),
                 )
                 fig_frame, ax_frame = plt.subplots(1, 1, figsize=figsize)
                 limits = np.empty((*axs.shape, 2))
@@ -485,7 +485,6 @@ if __name__ == "__main__":
                         for k in [
                             "phi-chi",
                             *meson_couplings,
-                            "phi-gamma",
                         ]
                     ]
                     + [
@@ -498,7 +497,7 @@ if __name__ == "__main__":
                                 "color": meson_style[general.COUPLING[k]][1],
                             },
                         )
-                        for k in [*meson_couplings, "phi-gamma"]
+                        for k in meson_couplings
                     ],
                     bare_coupling=(
                         g_chi,
@@ -785,8 +784,9 @@ if __name__ == "__main__":
                     interval=5000 / len(xs[mask]),
                 )
                 ani.save(
-                    filename=pathlib.Path(f"figures/animate_{filename}.gif"),
+                    filename=pathlib.Path(f"figures/animate_{filename}.avif"),
                     writer="pillow",
+                    dpi=48,
                 )
 
                 fig.clear()

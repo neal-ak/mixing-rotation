@@ -371,7 +371,7 @@ if __name__ == "__main__":
                     height,
                     width,
                     squeeze=False,
-                    figsize=figsize * 1.1 * np.array((width, height)),
+                    figsize=figsize * 4/3 * np.array((width, height)),
                 )
                 fig_frame, ax_frame = plt.subplots(1, 1, figsize=figsize)
                 limits = np.empty((*axs.shape, 2))
@@ -741,8 +741,9 @@ if __name__ == "__main__":
                     interval=5000 / len(xs[mask]),
                 )
                 ani.save(
-                    filename=pathlib.Path(f"figures/animate_{filename}.gif"),
+                    filename=pathlib.Path(f"figures/animate_{filename}.avif"),
                     writer="pillow",
+                    dpi=48,
                 )
 
                 fig.clear()
