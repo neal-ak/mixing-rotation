@@ -371,7 +371,7 @@ if __name__ == "__main__":
                     height,
                     width,
                     squeeze=False,
-                    figsize=figsize * 4/3 * np.array((width, height)),
+                    figsize=figsize * 4 / 3 * np.array((width, height)),
                 )
                 fig_frame, ax_frame = plt.subplots(1, 1, figsize=figsize)
                 limits = np.empty((*axs.shape, 2))
@@ -618,7 +618,12 @@ if __name__ == "__main__":
                     )  # We're saving the 0.3 of the minimum x value between all 0.3 crossings and all angles
                     plot_elements.append(
                         (
-                            ax.axvline(vert_x[0], color="black", linestyle=":", label="Angle$ = 0.3$"),
+                            ax.axvline(
+                                vert_x[0],
+                                color="black",
+                                linestyle=":",
+                                label="Angle$ = 0.3$",
+                            ),
                             vert_x[..., np.newaxis],
                             None,
                         )
@@ -633,7 +638,11 @@ if __name__ == "__main__":
                     plot_elements.append(
                         (
                             ax.fill_between(
-                                bad_xs[0], *bad_ys, facecolor="red", alpha=1 / 3, label="Theory bad"
+                                bad_xs[0],
+                                *bad_ys,
+                                facecolor="red",
+                                alpha=1 / 3,
+                                label="Theory bad",
                             ),
                             bad_xs,
                             bad_ys,
