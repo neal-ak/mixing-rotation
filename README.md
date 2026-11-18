@@ -24,6 +24,16 @@ pip install -r requirements-optional.txt
 
 to install the packages either in your global Python environment or a virtual Python environment.
 
+## Build
+
+To build and install it as a package, run the following in the root directory (you may need to install `build` with `pip`):
+
+```shell
+python3 -m build
+```
+
+and then you can install it locally using the built wheel `dist/mixing_rotation-*.whl` using `pip`.
+
 ## Usage
 
 The notebooks contain examples of how to use the rotation solver.
