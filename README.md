@@ -31,9 +31,9 @@ The basic usage is to first initialize the symbolic equation as a system of equa
 
 ```python
 # Pseudo scalar mediator case
-import rotation.symbolic.general
-import rotation.symbolic.pseudo
-import rotation.numerical.solver
+import mixing_rotation.symbolic.general
+import mixing_rotation.symbolic.pseudo
+import mixing_rotation.numerical.solver
 
 rotation_matrix = rotation.symbolic.general.create_4d_rotation()[0]
 pseudo_mixing_equation = rotation.symbolic.pseudo.create_mix_equation(rotation_matrix)[0]
@@ -42,9 +42,9 @@ argument_order, system_of_equations = rotation.numerical.solver.initialize_syste
 
 ```python
 # Axial vector mediator case
-import rotation.symbolic.general
-import rotation.symbolic.axial
-import rotation.numerical.solver
+import mixing_rotation.symbolic.general
+import mixing_rotation.symbolic.axial
+import mixing_rotation.numerical.solver
 
 rotation_matrix = rotation.symbolic.general.create_3d_rotation()[0]
 kinetic_rotation_matrix = rotation.symbolic.axial.create_kinetic()
@@ -56,7 +56,7 @@ You then need to prepare two dictionaries, one representing fixed known quantiti
 
 ```python
 # Pseudo scalar mediator case
-import rotation.numerical.pseudo
+import mixing_rotation.numerical.pseudo
 bare_masses = rotation.numerical.pseudo.pseudo_calculate_bare_masses(
     coupling_up=2e-2,
     coupling_down=-1e-2,
@@ -89,7 +89,7 @@ Extra note: for the axial vector mediator, the kinetic mixing angles can ether b
 
 ```python
 # Axial vector mediator case
-import rotation.numerical.axial
+import mixing_rotation.numerical.axial
 bare_masses = rotation.numerical.axial.axial_calculate_bare_masses(
     coupling_up=2e-1,
     coupling_down=-1e-1,

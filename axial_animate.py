@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sym
 
-from rotation.numerical import solver, axial
-from rotation.symbolic import general
-from rotation.symbolic.axial import bare_axial_masses
+from mixing_rotation.numerical import solver, axial
+from mixing_rotation.symbolic import general
+from mixing_rotation.symbolic.axial import bare_axial_masses
 
 import matplotlib
 
