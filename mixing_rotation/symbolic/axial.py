@@ -23,7 +23,7 @@ def create_kinetic() -> sympy.Matrix:
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Kinetic mixing matrix.
-    :rtype: sym.Matrix
+    :rtype: sympy.Matrix
     """
     angles = [ANGLE[k] for k in ["u", "v", "w"]]
     d = sympy.sqrt(
@@ -69,12 +69,12 @@ def create_axial_mix_equation(
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :param rotation: Rotation matrix.
-    :type rotation: sym.Matrix
+    :type rotation: sympy.Matrix
     :param kinetic: Kinetic rotation matrix.
-    :type kinetic: sym.Matrix
+    :type kinetic: sympy.Matrix
     :return: Mixing matrix equation, tuple of kinetic transpose, rotation transpose, bare mass \
         matrix, propagation mass matrix.
-    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix]]
+    :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix]]
     """
     rotation_transpose = rotation.transpose()
     kinetic_transpose = kinetic.transpose()
@@ -118,7 +118,7 @@ def _kinetic_sine(m1, m2) -> sympy.core.mul.Mul:
     :param m2: Second off-diagonal mass.
     :type m2: type
     :return: Description of the return value.
-    :rtype: sym.core.mul.Mul
+    :rtype: sympy.core.mul.Mul
     """
     ma = MASS["AP"]
     return (
@@ -137,7 +137,7 @@ def kinetic_sines() -> (
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Tuple of sine(u), sine(v), sine(w)
-    :rtype: tuple[sym.core.mul.Mul, sym.core.mul.Mul, sym.core.mul.Mul]
+    :rtype: (tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul])
     """
     s_u = _kinetic_sine(MASS["pi0-AP"], MASS["eta-AP"])
     s_v = _kinetic_sine(MASS["pi0-AP"], MASS["etaP-AP"])
@@ -154,7 +154,7 @@ def bare_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Bare meson dark matter couplings, keys are the coupling symbols.
-    :rtype: dict[sym.Symbol, sym.core.mul.Mul]
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     couplings = {
         AXIAL_COUPLING[m + "-chi"]: AXIAL_COUPLING["a"]
@@ -175,7 +175,7 @@ def rotated_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Rotated meson dark matter couplings, keys are the coupling symbols.
-    :rtype: dict[sym.Symbol, sym.core.mul.Mul]
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     bares = bare_axial_meson_couplings()
     bare_couplings = sympy.Matrix(
@@ -198,7 +198,7 @@ def bare_axial_masses() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Bare particle off-diagonal masses, keys are the mass symbols.
-    :rtype: dict[sym.Symbol, sym.core.mul.Mul]
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     terms = {
         MASS["pi0-AP"]: (
@@ -258,7 +258,7 @@ def bare_axial_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Bare kaon couplings, keys are the coupling symbols.
-    :rtype: dict[sym.Symbol, sym.core.mul.Mul]
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     # helpers
     lambda_axial_pion_kaon_j_over_m_j = -(

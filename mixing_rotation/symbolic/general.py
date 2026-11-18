@@ -217,7 +217,7 @@ def create_4d_rotation() -> tuple[
 
     :return: Full 4D rotation matrix, list of six 2D rotation matrices, the generic 2D rotation \
         matrix.
-    :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, \
+    :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix]
         sympy.Matrix, sympy.Matrix], sympy.Matrix]
     """
     rotation, matrices, basic_2d = _create_nd_rotation(4)

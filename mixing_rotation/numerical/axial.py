@@ -284,12 +284,9 @@ def axial_calculate_bare_kaon(
     :param m_kaon: Charged kaon mass, defaults to \
         :py:const:`rotation.numerical.solver.MASS_CHARGED_KAON`.
     :type m_kaon: float, optional
-    :raises ValueError: Raised if the input axial vector mass is not strictly
-    positive.
-    :raises PhysicsWarning: Raised if solution values outside physically
-    permitted ranges.
-    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon, keys are the
-    coupling symbols.
+    :raises ValueError: Raised if the input axial vector mass is not strictly positive.
+    :raises PhysicsWarning: Raised if solution values outside physically permitted ranges.
+    :return: pion-pion-kaon, eta-pion-kaon, eta^prime-pion-kaon, keys are the coupling symbols.
     :rtype: dict[sym.Symbol, float]
     """
     if np.any(m_axial <= 0):

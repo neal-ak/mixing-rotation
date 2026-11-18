@@ -24,10 +24,10 @@ def create_mix_equation(
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :param rotation: The full rotation matrix.
-    :type rotation: sym.Matrix
+    :type rotation: sympy.Matrix
     :return: Mixing equation, and tuple of the rotation matrix transpose, the bare mass matrix, \
         and the propagating mass matrix.
-    :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]
+    :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix]]
     :raises ValueError: Raised when the rotation matrix is not square.
     """
     if not rotation.rows == rotation.cols:
@@ -66,7 +66,7 @@ def rotated_pseudo_meson_couplings(
     :param n_dim: Number of dimensions in the rotation.
     :type n_dim: int
     :return: Particle to dark matter rotated couplings, keys are the coupling symbols.
-    :rtype: dict[sym.Symbol, sym.core.mul.Mul]
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     bare_couplings = sympy.Matrix.zeros(1, n_dim)
     bare_couplings[0] = COUPLING["chi"]
@@ -157,7 +157,7 @@ def rotated_pseudo_photon_coupling(n_dim: int) -> sympy.core.mul.Mul:
     :param n_dim: Number of dimensions in the rotation.
     :type n_dim: int
     :return: Mediator to photon coupling.
-    :rtype: sym.core.mul.Mul
+    :rtype: sympy.core.mul.Mul
     """
     gamma_matrix = (
         sympy.Matrix(
@@ -193,7 +193,7 @@ def bare_pseudo_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 
     :return: Particle to pion-kaon bare couplings, keys are the coupling symbols.
-    :rtype: dict[sym.Symbol, sym.core.mul.Mul]
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     particle_pi_kaon = {}
     particle_pi_kaon["phi"] = 0 * sympy.Symbol("")
@@ -221,7 +221,7 @@ def rotated_pseudo_kaon_couplings(n_dim: int) -> dict[sympy.Symbol, sympy.core.m
     :param n_dim: Number of dimensions in the rotation.
     :type n_dim: int
     :return:  Particle to pion-kaon bare couplings, keys are the coupling symbols.
-    :rtype: dict[sym.Symbol, sym.core.mul.Mul]
+    :rtype: dict[sympy.Symbol, sympy.core.mul.Mul]
     """
     particles = ["phi"] + list(PARTICLE_ORDER[: n_dim - 1])
     bare_couplings = sympy.Matrix([[COUPLING[f"{k}Bare-pi-K"] for k in particles]])
