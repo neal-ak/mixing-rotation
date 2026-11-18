@@ -1,0 +1,31 @@
+[build-system]
+requires = [
+    "setuptools ~= 84.2",
+    "setuptools_scm ~= 10.3",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["mixing_rotation", "mixing_rotation.symbolic", "mixing_rotation.numerical"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools_scm]
+
+[project]
+name = "mixing-rotation"
+dynamic = ["dependencies", "version"]
+authors = [
+  { name="Neal P. Avis Kozar" },
+  { name="Christopher Cappiello" },
+  { name="Melissa D. Diamond" },
+  { name="Aaron C. Vincent" },
+]
+description = "Calculates the mixing angles for loop-level dark matter interactions."
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/neal-ak/mixing-rotation"
+Zenodo = "https://zenodo.org/records/23220808"
