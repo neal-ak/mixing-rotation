@@ -302,8 +302,8 @@ def solve_mixing(
     :type arg_ordering: list[sym.Symbol]
     :param init_unknowns: The unknowns and their initial guesses for the solver.
     :type init_unknowns: dict[sym.Symbol, float]
-    :param abs_tolerance: Absolute tolerance of the result from zero (disable check with None),
-    defaults to 1e-8.
+    :param abs_tolerance: Absolute tolerance of the result from zero (disable check with None), \
+        defaults to 1e-8.
     :type abs_tolerance: float | None, optional
     :param bounds: Bounds for each of the unknown arguments, defaults to None.
     :type bounds: dict[sym.Symbol, tuple[float, float]] | None, optional

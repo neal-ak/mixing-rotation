@@ -96,8 +96,8 @@ def pseudo_calculate_bare_masses(
     :type coupling_strange: float
     :param b_0: B_{0}, defaults to B_0.
     :type b_0: float, optional
-    :param pion_decay: The pion decay constant, defaults to
-    :py:const:`rotation.numerical.solver.PION_DECAY`.
+    :param pion_decay: The pion decay constant, defaults to \
+        :py:const:`rotation.numerical.solver.PION_DECAY`.
     :type pion_decay: float, optional
     :return: Bare particle-mediator couplings, keys are the mass symbols.
     :rtype: dict[sym.Symbol, float]
@@ -155,14 +155,14 @@ def pseudo_calculate_photon_coupling(
     :type zeta: float, optional
     :param kappa: kappa mixing angle, defaults to None.
     :type kappa: float, optional
-    :param known_pion_photon_coupling: known pion to photon coupling, defaults
-    to :py:const:`rotation.numerical.solver.G_PI_GAMMA`.
+    :param known_pion_photon_coupling: known pion to photon coupling, defaults \
+        to :py:const:`rotation.numerical.solver.G_PI_GAMMA`.
     :type known_pion_photon_coupling: float, optional
-    :param known_eta_photon_coupling: known eta to photon coupling, defaults to
-    :py:const:`rotation.numerical.solver.G_ETA_GAMMA`.
+    :param known_eta_photon_coupling: known eta to photon coupling, defaults to \
+        :py:const:`rotation.numerical.solver.G_ETA_GAMMA`.
     :type known_eta_photon_coupling: float, optional
-    :param known_etaP_photon_coupling: known eta prime to photon coupling,
-    defaults to :py:const:`rotation.numerical.solver.G_ETA_PRIME_GAMMA`.
+    :param known_etaP_photon_coupling: known eta prime to photon coupling, \
+        defaults to :py:const:`rotation.numerical.solver.G_ETA_PRIME_GAMMA`.
     :type known_etaP_photon_coupling: float, optional
     :return: Rotated mediator to photon coupling.
     :rtype: float
@@ -201,11 +201,11 @@ def pseudo_calculate_bare_kaon(
     :type energy_pion: float
     :param energy_kaon: Kaon energy.
     :type energy_kaon: float
-    :param mass_pion: Charged pion mass, defaults to
-    :py:const:`rotation.numerical.solver.MASS_CHARGED_PION`.
+    :param mass_pion: Charged pion mass, defaults to \
+        :py:const:`rotation.numerical.solver.MASS_CHARGED_PION`.
     :type mass_pion: float, optional
-    :param mass_kaon: Charged kaon mass, defaults to
-    :py:const:`rotation.numerical.solver.MASS_CHARGED_KAON`.
+    :param mass_kaon: Charged kaon mass, defaults to \
+        :py:const:`rotation.numerical.solver.MASS_CHARGED_KAON`.
     :type mass_kaon: float, optional
     :return: Bare particle-pion-kaon couplings, keys are the coupling symbols.
     :rtype: dict[sym.Symbol, float]

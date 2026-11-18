@@ -192,8 +192,8 @@ def create_3d_rotation() -> (
 ):
     """Creates the 3D rotation matrix from three 2D rotation matrices.
 
-    :return: Full 3D rotation matrix, list of three 2D rotation matrices, the generic 2D rotation
-    matrix.
+    :return: Full 3D rotation matrix, list of three 2D rotation matrices, the generic 2D rotation \
+        matrix.
     :rtype: (tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix])
     """
     rotation, matrices, basic_2d = _create_nd_rotation(3)
@@ -215,9 +215,10 @@ def create_4d_rotation() -> tuple[
 ]:
     """Creates the 4D rotation matrix from six 2D rotation matrices.
 
-    :return: Full 4D rotation matrix, list of six 2D rotation matrices, the generic 2D rotation
-    matrix.
-    :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix]
+    :return: Full 4D rotation matrix, list of six 2D rotation matrices, the generic 2D rotation \
+        matrix.
+    :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, \
+        sympy.Matrix, sympy.Matrix], sympy.Matrix]
     """
     rotation, matrices, basic_2d = _create_nd_rotation(4)
     return rotation, tuple(matrices), basic_2d

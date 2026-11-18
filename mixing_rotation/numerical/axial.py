@@ -192,8 +192,8 @@ def axial_calculate_bare_masses(
     :type coupling_strange: float
     :param b_0: B_{0}, defaults to :py:const:`rotation.numerical.solver.B_0`.
     :type b_0: float, optional
-    :param pion_decay: The pion decay constant, defaults to
-    :py:const:`rotation.numerical.solver.PION_DECAY`.
+    :param pion_decay: The pion decay constant, defaults to \
+        :py:const:`rotation.numerical.solver.PION_DECAY`.
     :type pion_decay: float, optional
     :param l_4: L_{4}, defaults to :py:const:`rotation.numerical.solver.L_4`.
     :type l_4: float, optional
@@ -201,11 +201,11 @@ def axial_calculate_bare_masses(
     :type l_5: float, optional
     :param mass_up: Up mass, defaults to :py:const:`rotation.numerical.solver.MASS_QUARK["up"]`.
     :type mass_up: float, optional
-    :param mass_down: Down mass, defaults to
-    :py:const:`rotation.numerical.solver.MASS_QUARK["down"]`.
+    :param mass_down: Down mass, defaults to \
+        :py:const:`rotation.numerical.solver.MASS_QUARK["down"]`.
     :type mass_down: float, optional
-    :param mass_strange: Strange mass, defaults to
-    :py:const:`rotation.numerical.solver.MASS_QUARK["strange"]`.
+    :param mass_strange: Strange mass, defaults to \
+        :py:const:`rotation.numerical.solver.MASS_QUARK["strange"]`.
     :type mass_strange: float, optional
     :return: pion-mediator, eta-mediator, eta^prime-mediator, keys are the mass symbols.
     :rtype: dict[sym.Symbol, float]
@@ -270,19 +270,19 @@ def axial_calculate_bare_kaon(
     :type m_eta_axial: float
     :param m_etap_axial: Eta prime - mediator mass.
     :type m_etap_axial: float
-    :param pion_decay: The pion decay constant, defaults to
-    :py:const:`rotation.numerical.solver.PION_DECAY`.
+    :param pion_decay: The pion decay constant, defaults to \
+        :py:const:`rotation.numerical.solver.PION_DECAY`.
     :type pion_decay: float, optional
     :param g_8: g_{8}, defaults to :py:const:`rotation.numerical.solver.G_8`.
     :type g_8: float, optional
-    :param g_8s: g_{8s}, defaults to
-    :py:const:`rotation.numerical.solver.G_8S`.
+    :param g_8s: g_{8s}, defaults to \
+        :py:const:`rotation.numerical.solver.G_8S`.
     :type g_8s: float, optional
-    :param m_pion: Chared pion mass, defaults to
-    :py:const:`rotation.numerical.solver.MASS_CHARGED_PION`.
+    :param m_pion: Chared pion mass, defaults to \
+        :py:const:`rotation.numerical.solver.MASS_CHARGED_PION`.
     :type m_pion: float, optional
-    :param m_kaon: Charged kaon mass, defaults to
-    :py:const:`rotation.numerical.solver.MASS_CHARGED_KAON`.
+    :param m_kaon: Charged kaon mass, defaults to \
+        :py:const:`rotation.numerical.solver.MASS_CHARGED_KAON`.
     :type m_kaon: float, optional
     :raises ValueError: Raised if the input axial vector mass is not strictly
     positive.

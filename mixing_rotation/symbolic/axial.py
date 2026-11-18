@@ -72,8 +72,8 @@ def create_axial_mix_equation(
     :type rotation: sym.Matrix
     :param kinetic: Kinetic rotation matrix.
     :type kinetic: sym.Matrix
-    :return: Mixing matrix equation, tuple of kinetic transpose, rotation transpose, bare mass
-    matrix, propagation mass matrix.
+    :return: Mixing matrix equation, tuple of kinetic transpose, rotation transpose, bare mass \
+        matrix, propagation mass matrix.
     :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix, sym.Matrix]]
     """
     rotation_transpose = rotation.transpose()
@@ -130,9 +130,9 @@ def _kinetic_sine(m1, m2) -> sympy.core.mul.Mul:
 def kinetic_sines() -> (
     tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul]
 ):
-    """Creates the sines of the three kinetic mixing angles.
+    r"""Creates the sines of the three kinetic mixing angles.
 
-    For the axial vector mediator $A^\\prime$.
+    For the axial vector mediator $A^{\prime}$.
     Comes from `B9<https://arxiv.org/pdf/2611.xxxxx#equation.B.9>`__ in
     `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 

@@ -25,8 +25,8 @@ def create_mix_equation(
 
     :param rotation: The full rotation matrix.
     :type rotation: sym.Matrix
-    :return: Mixing equation, and tuple of the rotation matrix transpose, the bare mass matrix, and
-    the propagating mass matrix.
+    :return: Mixing equation, and tuple of the rotation matrix transpose, the bare mass matrix, \
+        and the propagating mass matrix.
     :rtype: tuple[sym.Matrix, tuple[sym.Matrix, sym.Matrix, sym.Matrix]]
     :raises ValueError: Raised when the rotation matrix is not square.
     """
