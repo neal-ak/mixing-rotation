@@ -10,3 +10,4 @@ dist/
 *.egg-info/
 
 docs/_build/
+docs/source/_autosummary/

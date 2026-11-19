@@ -19,7 +19,10 @@ release = '0.9.3'
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
 ]
+autosummary_generate = True
+autosummary_generate_overwrite = True
 
 templates_path = ['_templates']
 exclude_patterns = ['Thumbs.db', '.DS_Store']
