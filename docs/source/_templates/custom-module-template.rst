@@ -1,6 +1,7 @@
 {{ fullname | escape | underline}}
 
 .. automodule:: {{ fullname }}
+   :members:
 
    {% block attributes %}
    {%- if attributes %}
@@ -29,6 +30,7 @@
    .. rubric:: {{ _('Classes') }}
 
    .. autosummary::
+      :template: custom-class-template.rst
    {% for item in classes %}
       {{ item }}
    {%- endfor %}
@@ -52,6 +54,7 @@
 
 .. autosummary::
    :toctree:
+   :template: custom-module-template.rst
    :recursive:
 {% for item in modules %}
    {{ item }}
