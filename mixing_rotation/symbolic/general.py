@@ -3,6 +3,7 @@
 # %%
 import sympy
 
+#: Defines the order in which the mesons appear in the matrices
 PARTICLE_ORDER = "pi0", "eta", "etaP"
 
 
@@ -27,6 +28,7 @@ def _preprocess_symbol(s: sympy.Symbol) -> str:
 
 
 # %%
+#: Dictionary of all angle symbols
 ANGLE = {
     _preprocess_symbol(k): sympy.Symbol(k, real=True)
     for k in [
@@ -43,6 +45,7 @@ ANGLE = {
 }
 
 # %%
+#: Dictionary of all mass symbols
 MASS = {
     _preprocess_symbol(k): sympy.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [
@@ -70,6 +73,7 @@ MASS = {
 }
 
 # %%
+#: Dictionary of all pseudoscalar coupling symbols
 COUPLING = {
     _preprocess_symbol(k): sympy.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
     for k in [
@@ -103,6 +107,7 @@ COUPLING = {
 }
 
 # %%
+#: Dictionary of all axial vector coupling symbols
 AXIAL_COUPLING = {
     _preprocess_symbol(k): sympy.Symbol(f"\\lambda_{{{k}}}", real=True)
     for k in [
@@ -123,6 +128,7 @@ AXIAL_COUPLING = {
 }
 
 # %%
+#: Dictionary of all other miscellaneous symbols
 PARAMETERS = {
     _preprocess_symbol(k): sympy.Symbol(k, real=True)
     for k in [

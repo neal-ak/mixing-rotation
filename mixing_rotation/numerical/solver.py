@@ -13,39 +13,40 @@ import sympy as sym
 from ..symbolic.general import ANGLE, MASS, COUPLING, PARAMETERS
 
 # %%
-# https://inspirehep.net/literature/303682
+#: The pion decay constant from `<https://inspirehep.net/literature/303682>`__.
 PION_DECAY = 0.0924
-# https://pdglive.lbl.gov/Particle.action?node=Q123
+#: The quark masses from `<https://pdglive.lbl.gov/Particle.action?node=Q123>`__.
 MASS_QUARK = {"up": 2.16e-3, "down": 4.7e-3, "strange": 93.5e-3}
-# https://pdglive.lbl.gov/Particle.action?node=S009
+#: The neutral pion mass from `<https://pdglive.lbl.gov/Particle.action?node=S009>`__.
 MASS_NEUTRAL_PION = 0.1349768
-# https://pdglive.lbl.gov/Particle.action?node=S008
+#: The charged pion mass from `<https://pdglive.lbl.gov/Particle.action?node=S008>`__.
 MASS_CHARGED_PION = 0.13957039
-# https://pdglive.lbl.gov/Particle.action?node=S010
+#: The charged kaon mass from `<https://pdglive.lbl.gov/Particle.action?node=S010>`__.
 MASS_CHARGED_KAON = 0.493677
-# https://pdglive.lbl.gov/Particle.action?node=S014
+#: The eta mass from `<https://pdglive.lbl.gov/Particle.action?node=S014>`__.
 MASS_ETA = 0.547862
-# https://pdglive.lbl.gov/Particle.action?node=M002
+#: The eta prime mass from `<https://pdglive.lbl.gov/Particle.action?node=M002>`__.
 MASS_ETA_PRIME = 0.95778
-# https://pdglive.lbl.gov/BranchingRatio.action?desig=6&parCode=M002
+#: The branching ratio of eta prime decay to two photons from
+#: `<https://pdglive.lbl.gov/BranchingRatio.action?desig=6&parCode=M002>`__.
 DECAY_ETA_PRIME_2GAMMA = 4.34e-06
-# Equation 26 in https://arxiv.org/abs/2611.xxxxx.
+#: Equation 26 in `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 ETA_PRIME_DECAY = (
     7.2973525693e-3 * MASS_ETA_PRIME / 8 / np.sqrt(np.pi) ** 3 / DECAY_ETA_PRIME_2GAMMA
 )
 G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
 G_ETA_PRIME_GAMMA = G_PI_GAMMA * PION_DECAY / ETA_PRIME_DECAY
-# Below equation 3 in https://arxiv.org/abs/2611.xxxxx.
+#: Below equation 3 in `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
-# https://arxiv.org/abs/1405.6488
+#: `arXiv:1405.6488<https://arxiv.org/abs/1405.6488>`__.
 L_4 = 1.87e-3
 L_5 = 1.22e-3
 L_6 = 1.46e-3
 L_7 = -0.39e-3
-# Below equation 7 in https://arxiv.org/abs/2611.xxxxx.
+#: Below equation 7 in `arXiv:2611.xxxxx<https://arxiv.org/abs/2611.xxxxx>`__.
 G_8 = 3.62
-# https://arxiv.org/abs/hep-ph/0508189
+#: `arXiv:hep-ph/0508189<https://arxiv.org/abs/hep-ph/0508189>`__
 G_8S = -0.38 * G_8
 
 
