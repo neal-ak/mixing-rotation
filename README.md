@@ -10,10 +10,11 @@ To run the rotation solver you'll need
 - Scipy
 - Sympy
 
-Optionally to run the notebook and make plots also install
+Optionally to run the notebook, and make plots or documentation also install
 
 - Jupyter
 - Matplotlib
+- Sphinx
 
 Both lists with the tested package versions are found in the `requirements.txt` and `requirements-optional.txt` files, which can be used with
 
@@ -33,6 +34,25 @@ python3 -m build
 ```
 
 and then you can install it locally using the built wheel `dist/mixing_rotation-*.whl` using `pip`.
+
+## Documentation
+
+With `sphinx` installed via `pip`, you can produce local html documenation that can be viewed in a web browser by running `make` in the `docs` directory:
+
+```shell
+cd docs
+make html
+```
+
+This then will procuce documentation in `docs/_build/html`, which can be browsed by opening `docs/_build/html/index.html`.
+Alternatively, the documentation can also be created using a local LaTeX installation using:
+
+```shell
+cd docs
+make latexpdf
+```
+
+which will produce `docs/_build/latex/mixingrotation.pdf`.
 
 ## Usage
 
