@@ -683,7 +683,7 @@ if __name__ == "__main__":
                                 *bad_ys,
                                 facecolor="red",
                                 alpha=1 / 3,
-                                label="Theory bad",
+                                label="Inconsistent",
                             ),
                             bad_xs,
                             bad_ys,
