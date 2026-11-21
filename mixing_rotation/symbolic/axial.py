@@ -18,7 +18,7 @@ from .general import (
 def create_kinetic() -> sympy.Matrix:
     """Creates the kinetic mixing matrix for the axial vector mediator.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Comes from Eqn. (`B.8 <https://arxiv.org/pdf/2611.xxxxx#equation.B.8>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
@@ -64,7 +64,7 @@ def create_axial_mix_equation(
 ) -> tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix]]:
     """Creates the axial vector mixing matrix equation.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Comes from Eqn. (`B.11 <https://arxiv.org/pdf/2611.xxxxx#equation.B.11>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
@@ -134,7 +134,7 @@ def kinetic_sines() -> (
 ):
     """Creates the sines of the three kinetic mixing angles.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Comes from Eqn. (`B.9 <https://arxiv.org/pdf/2611.xxxxx#equation.B.9>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
     See :py:func:`mixing_rotation.symbolic.axial.kinetic_sine` for the calculation of a single
@@ -153,7 +153,7 @@ def kinetic_sines() -> (
 def bare_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     """Symbolic expressions for the un-rotated meson to dark matter couplings.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Implicit in Eqn. (`B.13 <https://arxiv.org/pdf/2611.xxxxx#equation.B.13>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
@@ -174,7 +174,7 @@ def bare_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 def rotated_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     """Symbolic expressions for the rotated meson to dark matter couplings.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Comes from Eqn. (`B.13 <https://arxiv.org/pdf/2611.xxxxx#equation.B.13>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
@@ -197,7 +197,7 @@ def rotated_axial_meson_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 def bare_axial_masses() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     """The bare axial mediator off-diagonal mass terms.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Comes from Eqn. (`B.5 <https://arxiv.org/pdf/2611.xxxxx#equation.B.5>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
@@ -257,7 +257,7 @@ def bare_axial_masses() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 def bare_axial_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     """Symbolic expressions for the un-rotated kaon couplings.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Implicit in Eqn. (`D.24 <https://arxiv.org/pdf/2611.xxxxx#equation.D.24>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
@@ -325,7 +325,7 @@ def bare_axial_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
 def rotated_axial_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     """Symbolic expressions for the rotated kaon couplings.
 
-    For the axial vector mediator :math: `A^{\\prime}`.
+    For the axial vector mediator :math:`A^{\\prime}`.
     Comes from Eqn. (`D.24 <https://arxiv.org/pdf/2611.xxxxx#equation.D.24>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 

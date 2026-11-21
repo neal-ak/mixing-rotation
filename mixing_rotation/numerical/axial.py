@@ -39,7 +39,7 @@ from .solver import (
 def calculate_uvw(
     m_axial: float, m_pi0_axial: float, m_eta_axial: float, m_etap_axial: float
 ) -> tuple[float, float, float]:
-    """Numerically calculates the kinetic mixing angles :math: `u, v, w`.
+    """Numerically calculates the kinetic mixing angles :math:`u`, :math:`v`, and  :math:`w`.
 
     For the axial vector mediator case.
 
@@ -54,7 +54,7 @@ def calculate_uvw(
     :param m_etap_axial: Eta prime - mediator mass.
     :type m_etap_axial: float
     :raises PhysicsWarning: Raised if solution values outside physically permitted ranges.
-    :return: :math: `u, v, w`.
+    :return: :math:`u, v, w`.
     :rtype: tuple[float, float, float]
     """
     for m, meson in zip(
