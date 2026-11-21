@@ -20,9 +20,13 @@ release = '0.9.3'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
 ]
 autosummary_generate = True
 autosummary_generate_overwrite = True
+intersphinx_mapping = {
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+}
 
 templates_path = ['_templates']
 exclude_patterns = ['Thumbs.db', '.DS_Store']
