@@ -255,7 +255,7 @@ def debug_solve_mixing(
             + f" (propagating) mass ({solve[0][MASS['phi']]:.4e} GeV). The coupling parameters"
             + " leading to mixing are too large compared to the difference between the mass of"
             + " the mediator and the mass of the mesons it mixes with. The model is unstable with"
-            + " these parameters and predictions for the effecitve coupling in the rotated basis"
+            + " these parameters and predictions for the effective coupling in the rotated basis"
             + " should not be trusted!",
             PhysicsWarning,
         )
@@ -271,7 +271,7 @@ def debug_solve_mixing(
                     + f" ({solve[0][MASS[meson + 'Bare']]:.4e} GeV). The coupling parameters"
                     + " leading to mixing are too large compared to the difference between the"
                     + " mass of the mediator and the mass of the mesons it mixes with. The model"
-                    + " is unstable with these parameters and predictions for the effecitve"
+                    + " is unstable with these parameters and predictions for the effective"
                     + " coupling in the rotated basis should not be trusted!",
                     PhysicsWarning,
                 )
