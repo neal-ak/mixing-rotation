@@ -108,7 +108,7 @@ def create_axial_mix_equation(
 
 
 # %%
-def _kinetic_sine(m1, m2) -> sympy.core.mul.Mul:
+def kinetic_sine(m1, m2) -> sympy.core.mul.Mul:
     """Helper function in creating the sine of the kinetic mixing angle.
 
     $\frac{-m_1 m_2}{2 m_{A^{\\prime}}^2 \\sqrt{(1 - (m_1 / m_{A^{\\prime}}) ^ 2) (1 - (m_2 / m_{A^{\\prime}}) ^ 2)}}$
@@ -117,7 +117,7 @@ def _kinetic_sine(m1, m2) -> sympy.core.mul.Mul:
     :type m1: type
     :param m2: Second off-diagonal mass.
     :type m2: type
-    :return: Description of the return value.
+    :return: Sine of a kinetic mixing angle.
     :rtype: sympy.core.mul.Mul
     """
     ma = MASS["AP"]
@@ -135,13 +135,15 @@ def kinetic_sines() -> (
     For the axial vector mediator $A^{\prime}$.
     Comes from Eqn. (`B.9 <https://arxiv.org/pdf/2611.xxxxx#equation.B.9>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
+    See :py:func:`mixing_rotation.symbolic.axial.kinetic_sine` for the calculation of a single
+    sine.
 
     :return: Tuple of sine(u), sine(v), sine(w)
     :rtype: (tuple[sympy.core.mul.Mul, sympy.core.mul.Mul, sympy.core.mul.Mul])
     """
-    s_u = _kinetic_sine(MASS["pi0-AP"], MASS["eta-AP"])
-    s_v = _kinetic_sine(MASS["pi0-AP"], MASS["etaP-AP"])
-    s_w = _kinetic_sine(MASS["etaP-AP"], MASS["eta-AP"])
+    s_u = kinetic_sine(MASS["pi0-AP"], MASS["eta-AP"])
+    s_v = kinetic_sine(MASS["pi0-AP"], MASS["etaP-AP"])
+    s_w = kinetic_sine(MASS["etaP-AP"], MASS["eta-AP"])
     return s_u, s_v, s_w
 
 
