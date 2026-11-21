@@ -108,7 +108,7 @@ def create_axial_mix_equation(
 
 
 # %%
-def kinetic_sine(m1, m2) -> sympy.core.mul.Mul:
+def kinetic_sine(m1: sympy.Symbol, m2: sympy.Symbol) -> sympy.core.mul.Mul:
     """Helper function in creating the sine of the kinetic mixing angle.
 
     .. math::
@@ -116,9 +116,9 @@ def kinetic_sine(m1, m2) -> sympy.core.mul.Mul:
         (1 - (m_2 / m_{A^{\\prime}}) ^ 2)}}
 
     :param m1: First off-diagonal mass.
-    :type m1: type
+    :type m1: sympy.Symbol
     :param m2: Second off-diagonal mass.
-    :type m2: type
+    :type m2: sympy.Symbol
     :return: Sine of a kinetic mixing angle.
     :rtype: sympy.core.mul.Mul
     """
