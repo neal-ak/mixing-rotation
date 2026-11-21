@@ -13,36 +13,42 @@ import sympy as sym
 from ..symbolic.general import ANGLE, MASS, COUPLING, PARAMETERS
 
 # %%
-#: The pion decay constant from `<https://inspirehep.net/literature/303682>`_.
+#: The pion decay constant from `Holstein:1990ua <https://inspirehep.net/literature/303682>`_.
 PION_DECAY = 0.0924
-#: The quark masses from `<https://pdglive.lbl.gov/Particle.action?node=Q123>`_.
+#: The quark masses from `PDG <https://pdglive.lbl.gov/Particle.action?node=Q123>`_.
 MASS_QUARK = {"up": 2.16e-3, "down": 4.7e-3, "strange": 93.5e-3}
-#: The neutral pion mass from `<https://pdglive.lbl.gov/Particle.action?node=S009>`_.
+#: The neutral pion mass from `PDG <https://pdglive.lbl.gov/Particle.action?node=S009>`_.
 MASS_NEUTRAL_PION = 0.1349768
-#: The charged pion mass from `<https://pdglive.lbl.gov/Particle.action?node=S008>`_.
+#: The charged pion mass from `PDG <https://pdglive.lbl.gov/Particle.action?node=S008>`_.
 MASS_CHARGED_PION = 0.13957039
-#: The charged kaon mass from `<https://pdglive.lbl.gov/Particle.action?node=S010>`_.
+#: The charged kaon mass from `PDG <https://pdglive.lbl.gov/Particle.action?node=S010>`_.
 MASS_CHARGED_KAON = 0.493677
-#: The eta mass from `<https://pdglive.lbl.gov/Particle.action?node=S014>`_.
+#: The eta mass from `PDG <https://pdglive.lbl.gov/Particle.action?node=S014>`_.
 MASS_ETA = 0.547862
-#: The eta prime mass from `<https://pdglive.lbl.gov/Particle.action?node=M002>`_.
+#: The eta prime mass from `PDG <https://pdglive.lbl.gov/Particle.action?node=M002>`_.
 MASS_ETA_PRIME = 0.95778
 #: The branching ratio of eta prime decay to two photons from
-#: `<https://pdglive.lbl.gov/BranchingRatio.action?desig=6&parCode=M002>`_.
+#: `PDG <https://pdglive.lbl.gov/BranchingRatio.action?desig=6&parCode=M002>`_.
 DECAY_ETA_PRIME_2GAMMA = 4.34e-06
 #: Equation 26 in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 ETA_PRIME_DECAY = (
     7.2973525693e-3 * MASS_ETA_PRIME / 8 / np.sqrt(np.pi) ** 3 / DECAY_ETA_PRIME_2GAMMA
 )
+#: See :py:const:`mixing_rotation.numerical.solver.ETA_PRIME_DECAY`.
 G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
+#: See :py:const:`mixing_rotation.numerical.solver.ETA_PRIME_DECAY`.
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
+#: See :py:const:`mixing_rotation.numerical.solver.ETA_PRIME_DECAY`.
 G_ETA_PRIME_GAMMA = G_PI_GAMMA * PION_DECAY / ETA_PRIME_DECAY
 #: Below equation 3 in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
 #: [`arXiv:1405.6488 <https://arxiv.org/abs/1405.6488>`_].
 L_4 = 1.87e-3
+#: See :py:const:`mixing_rotation.numerical.solver.L_4`.
 L_5 = 1.22e-3
+#: See :py:const:`mixing_rotation.numerical.solver.L_4`.
 L_6 = 1.46e-3
+#: See :py:const:`mixing_rotation.numerical.solver.L_4`.
 L_7 = -0.39e-3
 #: Below equation 7 in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 G_8 = 3.62
@@ -199,7 +205,7 @@ def debug_solve_mixing(
 ) -> tuple[dict[sym.Symbol, float], optimize.OptimizeResult]:
     """See `solve_mixing`.
 
-    This function also returns the raw :py:func:`scipy.optimize.OptimizeResult` for
+    This function also returns the raw :py:class:`scipy.optimize.OptimizeResult` for
     debugging help.
 
     :param func: The vector function.
