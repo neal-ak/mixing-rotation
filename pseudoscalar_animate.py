@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sym
 
-from rotation.numerical import solver, pseudo
-from rotation.symbolic import general
-from rotation.symbolic.pseudo import bare_pseudo_masses
+from mixing_rotation.numerical import solver, pseudo
+from mixing_rotation.symbolic import general
+from mixing_rotation.symbolic.pseudo import bare_pseudo_masses
 
 import matplotlib
 
@@ -688,7 +688,7 @@ if __name__ == "__main__":
                                 *bad_ys,
                                 facecolor="red",
                                 alpha=1 / 3,
-                                label="Theory bad",
+                                label="Inconsistent",
                             ),
                             bad_xs,
                             bad_ys,

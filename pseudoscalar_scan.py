@@ -6,9 +6,9 @@ import warnings
 import numpy as np
 import sympy as sym
 
-from rotation.numerical import solver, pseudo
-from rotation.symbolic import general
-from rotation.symbolic.pseudo import create_mix_equation
+from mixing_rotation.numerical import solver, pseudo
+from mixing_rotation.symbolic import general
+from mixing_rotation.symbolic.pseudo import create_mix_equation
 
 
 # %%
