@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 project = 'Mixing Rotation'
 copyright = '2026, Neal P. Avis Kozar, Christopher Cappiello, Melissa D. Diamond, Aaron C. Vincent'
 author = 'Neal P. Avis Kozar, Christopher Cappiello, Melissa D. Diamond, Aaron C. Vincent'
-release = '0.9.3'
+release = '0.9.4'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
