@@ -3,6 +3,7 @@
 # %%
 import sympy
 
+#: Defines the order in which the mesons appear in the matrices
 PARTICLE_ORDER = "pi0", "eta", "etaP"
 
 
@@ -27,6 +28,7 @@ def _preprocess_symbol(s: sympy.Symbol) -> str:
 
 
 # %%
+#: Dictionary of all angle symbols
 ANGLE = {
     _preprocess_symbol(k): sympy.Symbol(k, real=True)
     for k in [
@@ -43,6 +45,7 @@ ANGLE = {
 }
 
 # %%
+#: Dictionary of all mass symbols
 MASS = {
     _preprocess_symbol(k): sympy.Symbol(f"m_{{{k}}}", nonnegative=True)
     for k in [
@@ -70,6 +73,7 @@ MASS = {
 }
 
 # %%
+#: Dictionary of all pseudoscalar coupling symbols
 COUPLING = {
     _preprocess_symbol(k): sympy.Symbol(f"\\tilde{{g}}_{{{k}}}", real=True)
     for k in [
@@ -103,6 +107,7 @@ COUPLING = {
 }
 
 # %%
+#: Dictionary of all axial vector coupling symbols
 AXIAL_COUPLING = {
     _preprocess_symbol(k): sympy.Symbol(f"\\lambda_{{{k}}}", real=True)
     for k in [
@@ -123,6 +128,7 @@ AXIAL_COUPLING = {
 }
 
 # %%
+#: Dictionary of all other miscellaneous symbols
 PARAMETERS = {
     _preprocess_symbol(k): sympy.Symbol(k, real=True)
     for k in [
@@ -192,8 +198,8 @@ def create_3d_rotation() -> (
 ):
     """Creates the 3D rotation matrix from three 2D rotation matrices.
 
-    :return: Full 3D rotation matrix, list of three 2D rotation matrices, the generic 2D rotation
-    matrix.
+    :return: Full 3D rotation matrix, list of three 2D rotation matrices, the generic 2D rotation \
+        matrix.
     :rtype: (tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix])
     """
     rotation, matrices, basic_2d = _create_nd_rotation(3)
@@ -215,9 +221,10 @@ def create_4d_rotation() -> tuple[
 ]:
     """Creates the 4D rotation matrix from six 2D rotation matrices.
 
-    :return: Full 4D rotation matrix, list of six 2D rotation matrices, the generic 2D rotation
-    matrix.
+    :return: Full 4D rotation matrix, list of six 2D rotation matrices, the generic 2D rotation \
+        matrix.
     :rtype: tuple[sympy.Matrix, tuple[sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix, sympy.Matrix], sympy.Matrix]
+        sympy.Matrix, sympy.Matrix], sympy.Matrix]
     """
     rotation, matrices, basic_2d = _create_nd_rotation(4)
     return rotation, tuple(matrices), basic_2d
