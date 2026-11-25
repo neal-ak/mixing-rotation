@@ -30,7 +30,7 @@ MASS_ETA_PRIME = 0.95778
 #: The branching ratio of eta prime decay to two photons from
 #: `PDG <https://pdglive.lbl.gov/BranchingRatio.action?desig=6&parCode=M002>`_.
 DECAY_ETA_PRIME_2GAMMA = 4.34e-06
-#: Equation 26 in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
+#: Eq. (`27 <https://arxiv.org/pdf/2611.xxxxx#equation.2.27>`_) in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 ETA_PRIME_DECAY = (
     7.2973525693e-3 * MASS_ETA_PRIME / 8 / np.sqrt(np.pi) ** 3 / DECAY_ETA_PRIME_2GAMMA
 )
@@ -40,9 +40,11 @@ G_PI_GAMMA = 7.2973525693e-3 / (np.pi * PION_DECAY)
 G_ETA_GAMMA = G_PI_GAMMA / np.sqrt(3)
 #: See :py:const:`mixing_rotation.numerical.solver.ETA_PRIME_DECAY`.
 G_ETA_PRIME_GAMMA = G_PI_GAMMA * PION_DECAY / ETA_PRIME_DECAY
-#: Below equation 3 in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
+#: Below Eq. (`3 <https://arxiv.org/pdf/2611.xxxxx#equation.2.3>`_) in
+#: [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 B_0 = MASS_CHARGED_PION**2 / (MASS_QUARK["up"] + MASS_QUARK["down"])
-#: [`arXiv:1405.6488 <https://arxiv.org/abs/1405.6488>`_].
+#: Eq. (`5 <https://arxiv.org/pdf/2611.xxxxx#equation.2.5>`_) in
+#: [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 L_4 = 1.87e-3
 #: See :py:const:`mixing_rotation.numerical.solver.L_4`.
 L_5 = 1.22e-3
@@ -50,9 +52,10 @@ L_5 = 1.22e-3
 L_6 = 1.46e-3
 #: See :py:const:`mixing_rotation.numerical.solver.L_4`.
 L_7 = -0.39e-3
-#: Below equation 7 in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
+#: Below Eq. (`8 <https://arxiv.org/pdf/2611.xxxxx#equation.2.8>`_) in
+#: [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 G_8 = 3.62
-#: [`arXiv:hep-ph/0508189 <https://arxiv.org/abs/hep-ph/0508189>`_].
+#: See :py:const:`mixing_rotation.numerical.solver.G_8`.
 G_8S = -0.38 * G_8
 
 

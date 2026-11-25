@@ -20,7 +20,7 @@ def create_mix_equation(
     """Creates the symbolic mixing equation.
 
     For the pseudoscalar mediator :math:`\\tilde{\\phi}`.
-    Comes from Eqn. (`A.9 <https://arxiv.org/pdf/2611.xxxxx#equation.A.9>`_) in
+    Comes from Eq. (`A.9 <https://arxiv.org/pdf/2611.xxxxx#equation.A.9>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
     :param rotation: The full rotation matrix.
@@ -59,8 +59,8 @@ def rotated_pseudo_meson_couplings(
     """Symbolic expressions for the rotated meson to dark matter couplings.
 
     For the pseudoscalar mediator :math:`\\tilde{\\phi}`.
-    Comes from Eqn. (`A.12 <https://arxiv.org/pdf/2611.xxxxx#equation.A.12>`_) and
-    Eqn. (`A.13 <https://arxiv.org/pdf/2611.xxxxx#equation.A.13>`_) in
+    Comes from Eq. (`A.12 <https://arxiv.org/pdf/2611.xxxxx#equation.A.12>`_) and
+    Eq. (`A.13 <https://arxiv.org/pdf/2611.xxxxx#equation.A.13>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
     :param n_dim: Number of dimensions in the rotation.
@@ -84,7 +84,7 @@ def bare_pseudo_masses() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     """The off-diagonal bare mass terms.
 
     For the pseudoscalar mediator :math:`\\tilde{\\phi}`.
-    Comes from Eqn. (`A.5 <https://arxiv.org/pdf/2611.xxxxx#equation.A.5>`_) in
+    Comes from Eq. (`A.5 <https://arxiv.org/pdf/2611.xxxxx#equation.A.5>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
     :return: Particle-mediator bare masses, keys are the mass symbols.
@@ -147,8 +147,8 @@ def rotated_pseudo_photon_coupling(n_dim: int) -> sympy.core.mul.Mul:
     """Symbolic expression for the rotated mediator to photon coupling.
 
     For the pseudoscalar mediator :math:`\\tilde{\\phi}`.
-    Comes from Eqn. (`A.14 <https://arxiv.org/pdf/2611.xxxxx#equation.A.14>`_) and
-    Eqn. (`A.15 <https://arxiv.org/pdf/2611.xxxxx#equation.A.15>`_) in
+    Comes from Eq. (`A.14 <https://arxiv.org/pdf/2611.xxxxx#equation.A.14>`_) and
+    Eq. (`A.15 <https://arxiv.org/pdf/2611.xxxxx#equation.A.15>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
     Note that the bare un-rotated photon couplings have been eliminated from the
@@ -189,7 +189,7 @@ def bare_pseudo_kaon_couplings() -> dict[sympy.Symbol, sympy.core.mul.Mul]:
     """Symbolic expressions for the un-rotated kaon couplings.
 
     For the pseudoscalar mediator :math:`\\tilde{\\phi}`.
-    Implicit in Eqn. (`D.16 <https://arxiv.org/pdf/2611.xxxxx#equation.D.16>`_) in
+    Implicit in Eq. (`C.16 <https://arxiv.org/pdf/2611.xxxxx#equation.C.16>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
     :return: Particle to pion-kaon bare couplings, keys are the coupling symbols.
@@ -215,7 +215,7 @@ def rotated_pseudo_kaon_couplings(n_dim: int) -> dict[sympy.Symbol, sympy.core.m
     """Symbolic expressions for the rotated kaon couplings.
 
     For the pseudoscalar mediator :math:`\\tilde{\\phi}`.
-    Comes from Eqn. (`D.16 <https://arxiv.org/pdf/2611.xxxxx#equation.D.16>`_) in
+    Comes from Eqn. (`C.16 <https://arxiv.org/pdf/2611.xxxxx#equation.C.16>`_) in
     [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
     :param n_dim: Number of dimensions in the rotation.
