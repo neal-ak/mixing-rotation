@@ -6,9 +6,7 @@
 Mixing Rotation documentation
 =============================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+This package provides the numerical calculation of the mixing angles as discussed in [`arXiv:2611.xxxxx <https://arxiv.org/abs/2611.xxxxx>`_].
 
 
 .. autosummary::
